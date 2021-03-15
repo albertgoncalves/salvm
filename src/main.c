@@ -1,87 +1,4 @@
-#include "prelude.h"
-
-#define CAP_INST  64
-#define CAP_STACK 128
-
-typedef enum {
-    INST_HALT = 0,
-
-    INST_PUSH,
-
-    INST_RSRV,
-    INST_DROP,
-
-    INST_COPY,
-    INST_STORE,
-
-    INST_BURY,
-
-    INST_EQ,
-    INST_NOT,
-
-    INST_JPZ,
-    INST_JUMP,
-
-    INST_CALL,
-    INST_RET,
-
-    INST_SAVE,
-    INST_FRAME,
-    INST_RESET,
-
-    INST_ADDI,
-    INST_SUBI,
-    INST_MULI,
-    INST_DIVI,
-
-    INST_ADDF,
-    INST_SUBF,
-    INST_MULF,
-    INST_DIVF,
-
-    INST_LTI,
-    INST_LEI,
-    INST_GTI,
-    INST_GEI,
-
-    INST_LTF,
-    INST_LEF,
-    INST_GTF,
-    INST_GEF,
-
-    COUNT_INST_TAG,
-} InstTag;
-
-typedef union {
-    u32 as_u32;
-    u16 as_u16;
-    i16 as_i16;
-    u8  as_u8;
-    u8  as_pair_u8[2];
-} InstOp;
-
-typedef struct {
-    InstOp  op;
-    InstTag tag;
-} Inst;
-
-typedef struct {
-    u32 magic;
-    u32 count_inst;
-} Header;
-
-typedef struct {
-    u32 inst;
-    u32 stack_top;
-    u32 stack_base;
-} Index;
-
-typedef struct {
-    Inst  insts[CAP_INST];
-    u32   stack[CAP_STACK];
-    Index index;
-    Bool  alive;
-} Vm;
+#include "vm.h"
 
 i32 main(void) {
     printf("sizeof(Inst)   : %zu\n"
@@ -90,5 +7,84 @@ i32 main(void) {
            sizeof(Inst),
            sizeof(Header),
            sizeof(Vm));
+    Vm vm = {0};
+    {
+        vm.alive = TRUE;
+        i32 i = 0;
+
+        vm.insts[i].tag = INST_PUSH;
+        vm.insts[i++].op = 12345;
+
+        vm.insts[i].tag = INST_PUSH;
+        vm.insts[i++].op = 543210;
+
+        vm.insts[i].tag = INST_PUSH;
+        vm.insts[i++].op = -2;
+
+        vm.insts[i++].tag = INST_ADDI;
+
+        vm.insts[i].tag = INST_DROP;
+        vm.insts[i++].op = 2;
+
+        vm.insts[i].tag = INST_RSRV;
+        vm.insts[i++].op = 1;
+
+        vm.insts[i].tag = INST_DROP;
+        vm.insts[i++].op = 2;
+
+        vm.insts[i].tag = INST_COPY;
+        vm.insts[i++].op = 1;
+
+        vm.insts[i].tag = INST_STORE;
+        vm.insts[i++].op = 0;
+
+        vm.insts[i].tag = INST_PUSH;
+        vm.insts[i++].op = 1;
+
+        vm.insts[i].tag = INST_PUSH;
+        vm.insts[i++].op = 2;
+
+        vm.insts[i].tag = INST_PUSH;
+        vm.insts[i++].op = 3;
+
+        vm.insts[i].tag = INST_PUSH;
+        vm.insts[i++].op = 4;
+
+        vm.insts[i].tag = INST_BURY;
+        vm.insts[i++].op = 3;
+
+        vm.insts[i++].tag = INST_EQ;
+
+        vm.insts[i].tag = INST_PUSH;
+        vm.insts[i++].op = 5;
+
+        vm.insts[i].tag = INST_PUSH;
+        vm.insts[i++].op = 5;
+
+        vm.insts[i].tag = INST_JUMP;
+        vm.insts[i++].op = 4;
+
+        vm.insts[i++].tag = INST_SAVE;
+
+        vm.insts[i].tag = INST_FRAME;
+        vm.insts[i++].op = 5;
+
+        vm.insts[i++].tag = INST_HALT;
+
+        vm.insts[i++].tag = INST_EQ;
+
+        vm.insts[i++].tag = INST_NOT;
+
+        vm.insts[i].tag = INST_PUSH;
+        vm.insts[i++].op = 0x7FFFFFFF;
+
+        vm.insts[i++].tag = INST_NOT;
+
+        vm.insts[i].tag = INST_JPZ;
+        vm.insts[i++].op = -7;
+
+        vm.insts[i++].tag = INST_HALT;
+    }
+    run(&vm);
     return EXIT_SUCCESS;
 }

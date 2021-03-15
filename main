@@ -3,6 +3,8 @@
 set -euo pipefail
 
 flags=(
+    "-DDEBUG_BOUNDS_CHECK"
+    "-DDEBUG_PRINT_VM"
     "-fanalyzer"
     "-fshort-enums"
     "-g"
