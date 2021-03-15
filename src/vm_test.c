@@ -6,7 +6,7 @@
         printf(".");       \
     }
 
-TEST(test_inst_push, {
+TEST(test_push, {
     Vm vm = {0};
     vm.insts[0].tag = INST_PUSH;
     vm.insts[0].op = 12345;
@@ -16,7 +16,7 @@ TEST(test_inst_push, {
     EXIT_IF(vm.stack[0].as_i32 != 12345);
 })
 
-TEST(test_inst_rsrv, {
+TEST(test_rsrv, {
     Vm vm = {0};
     vm.insts[0].tag = INST_RSRV;
     vm.insts[0].op = 5;
@@ -25,7 +25,7 @@ TEST(test_inst_rsrv, {
     EXIT_IF(vm.index.stack_top != 5);
 })
 
-TEST(test_inst_drop, {
+TEST(test_drop, {
     Vm vm = {0};
     vm.insts[0].tag = INST_DROP;
     vm.insts[0].op = 3;
@@ -35,7 +35,7 @@ TEST(test_inst_drop, {
     EXIT_IF(vm.index.stack_top != 5);
 })
 
-TEST(test_inst_copy, {
+TEST(test_copy, {
     Vm vm = {0};
     vm.insts[0].tag = INST_COPY;
     vm.insts[0].op = 1;
@@ -48,7 +48,7 @@ TEST(test_inst_copy, {
     EXIT_IF(vm.stack[3].as_i32 != 15);
 })
 
-TEST(test_inst_store, {
+TEST(test_store, {
     Vm vm = {0};
     vm.insts[0].tag = INST_STORE;
     vm.insts[0].op = 1;
@@ -61,7 +61,7 @@ TEST(test_inst_store, {
     EXIT_IF(vm.stack[2].as_i32 != 15);
 })
 
-TEST(test_inst_bury, {
+TEST(test_bury, {
     Vm vm = {0};
     vm.insts[0].tag = INST_BURY;
     vm.insts[0].op = 3;
@@ -81,7 +81,7 @@ TEST(test_inst_bury, {
     EXIT_IF(vm.stack[4].as_i32 != 2);
 })
 
-TEST(test_inst_call, {
+TEST(test_call, {
     Vm vm = {0};
     vm.insts[0].tag = INST_CALL;
     vm.insts[0].op = 99;
@@ -91,7 +91,7 @@ TEST(test_inst_call, {
     EXIT_IF(vm.stack[0].as_i32 != 1);
 })
 
-TEST(test_inst_ret, {
+TEST(test_ret, {
     Vm vm = {0};
     vm.insts[0].tag = INST_RET;
     vm.stack[0].as_i32 = 68;
@@ -101,7 +101,7 @@ TEST(test_inst_ret, {
     EXIT_IF(vm.index.stack_top != 0);
 })
 
-TEST(test_inst_save, {
+TEST(test_save, {
     Vm vm = {0};
     vm.insts[0].tag = INST_SAVE;
     vm.index.stack_base = 76;
@@ -111,7 +111,7 @@ TEST(test_inst_save, {
     EXIT_IF(vm.stack[0].as_i32 != 76);
 })
 
-TEST(test_inst_frame, {
+TEST(test_frame, {
     Vm vm = {0};
     vm.insts[0].tag = INST_FRAME;
     vm.insts[0].op = 5;
@@ -122,7 +122,7 @@ TEST(test_inst_frame, {
     EXIT_IF(vm.index.stack_base != 6);
 })
 
-TEST(test_inst_reset, {
+TEST(test_reset, {
     Vm vm = {0};
     vm.insts[0].tag = INST_RESET;
     vm.index.stack_top = 29;
@@ -134,7 +134,7 @@ TEST(test_inst_reset, {
     EXIT_IF(vm.index.stack_base != 10);
 })
 
-TEST(test_inst_jpz, {
+TEST(test_jpz, {
     Vm vm = {0};
     vm.insts[0].tag = INST_JPZ;
     vm.insts[0].op = 17;
@@ -152,7 +152,7 @@ TEST(test_inst_jpz, {
     EXIT_IF(vm.index.stack_top != 0);
 })
 
-TEST(test_inst_jump, {
+TEST(test_jump, {
     Vm vm = {0};
     vm.index.inst = 101;
     vm.insts[101].tag = INST_JUMP;
@@ -161,7 +161,7 @@ TEST(test_inst_jump, {
     EXIT_IF(vm.index.inst != 92);
 })
 
-TEST(test_inst_not, {
+TEST(test_not, {
     Vm vm = {0};
     vm.insts[0].tag = INST_NOT;
     vm.index.stack_top = 1;
@@ -177,7 +177,7 @@ TEST(test_inst_not, {
     EXIT_IF(vm.stack[2].as_i32 != 1);
 })
 
-TEST(test_inst_eq, {
+TEST(test_eq, {
     Vm vm = {0};
     vm.insts[0].tag = INST_EQ;
     vm.index.stack_top = 2;
@@ -209,49 +209,49 @@ TEST(test_inst_eq, {
         EXIT_IF(vm.stack[2].as_##out != (expected));    \
     })
 
-TEST_BINARY_OP(test_inst_addi, INST_ADDI, i32, i32, 24)
-TEST_BINARY_OP(test_inst_subi, INST_SUBI, i32, i32, 6)
-TEST_BINARY_OP(test_inst_muli, INST_MULI, i32, i32, 135)
-TEST_BINARY_OP(test_inst_divi, INST_DIVI, i32, i32, 1)
+TEST_BINARY_OP(test_addi, INST_ADDI, i32, i32, 24)
+TEST_BINARY_OP(test_subi, INST_SUBI, i32, i32, 6)
+TEST_BINARY_OP(test_muli, INST_MULI, i32, i32, 135)
+TEST_BINARY_OP(test_divi, INST_DIVI, i32, i32, 1)
 
-TEST_BINARY_OP(test_inst_lti, INST_LTI, i32, i32, 0)
-TEST_BINARY_OP(test_inst_lei, INST_LEI, i32, i32, 0)
-TEST_BINARY_OP(test_inst_gti, INST_GTI, i32, i32, 1)
-TEST_BINARY_OP(test_inst_gei, INST_GEI, i32, i32, 1)
+TEST_BINARY_OP(test_lti, INST_LTI, i32, i32, 0)
+TEST_BINARY_OP(test_lei, INST_LEI, i32, i32, 0)
+TEST_BINARY_OP(test_gti, INST_GTI, i32, i32, 1)
+TEST_BINARY_OP(test_gei, INST_GEI, i32, i32, 1)
 
-TEST_BINARY_OP(test_inst_ltf, INST_LTF, f32, i32, 0)
-TEST_BINARY_OP(test_inst_lef, INST_LEF, f32, i32, 0)
-TEST_BINARY_OP(test_inst_gtf, INST_GTF, f32, i32, 1)
-TEST_BINARY_OP(test_inst_gef, INST_GEF, f32, i32, 1)
+TEST_BINARY_OP(test_ltf, INST_LTF, f32, i32, 0)
+TEST_BINARY_OP(test_lef, INST_LEF, f32, i32, 0)
+TEST_BINARY_OP(test_gtf, INST_GTF, f32, i32, 1)
+TEST_BINARY_OP(test_gef, INST_GEF, f32, i32, 1)
 
 i32 main(void) {
-    test_inst_push();
-    test_inst_rsrv();
-    test_inst_drop();
-    test_inst_copy();
-    test_inst_store();
-    test_inst_bury();
-    test_inst_call();
-    test_inst_ret();
-    test_inst_save();
-    test_inst_frame();
-    test_inst_reset();
-    test_inst_jpz();
-    test_inst_jump();
-    test_inst_not();
-    test_inst_eq();
-    test_inst_addi();
-    test_inst_subi();
-    test_inst_muli();
-    test_inst_divi();
-    test_inst_lti();
-    test_inst_lei();
-    test_inst_gti();
-    test_inst_gei();
-    test_inst_ltf();
-    test_inst_lef();
-    test_inst_gtf();
-    test_inst_gef();
+    test_push();
+    test_rsrv();
+    test_drop();
+    test_copy();
+    test_store();
+    test_bury();
+    test_call();
+    test_ret();
+    test_save();
+    test_frame();
+    test_reset();
+    test_jpz();
+    test_jump();
+    test_not();
+    test_eq();
+    test_addi();
+    test_subi();
+    test_muli();
+    test_divi();
+    test_lti();
+    test_lei();
+    test_gti();
+    test_gei();
+    test_ltf();
+    test_lef();
+    test_gtf();
+    test_gef();
     printf("\n");
     return EXIT_SUCCESS;
 }
