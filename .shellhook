@@ -2,6 +2,8 @@
 
 export WD=$PWD
 
-if [ ! -d "$WD/bin" ]; then
-    mkdir "$WD/bin"
-fi
+for x in bin out; do
+    if [ ! -d "$WD/$x" ]; then
+        mkdir "$WD/$x"
+    fi
+done
