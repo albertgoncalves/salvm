@@ -61,24 +61,24 @@ TEST(test_store, {
     EXIT_IF(vm.stack[2].as_i32 != 15);
 })
 
-TEST(test_bury, {
+TEST(test_swap, {
     Vm vm = {0};
-    vm.insts[0].tag = INST_BURY;
-    vm.insts[0].op = 3;
-    vm.stack[0].as_i32 = 5;
-    vm.stack[1].as_i32 = 4;
-    vm.stack[2].as_i32 = 3;
-    vm.stack[3].as_i32 = 2;
-    vm.stack[4].as_i32 = 1;
-    vm.index.stack_top = 5;
+    vm.insts[0].tag = INST_SWAP;
+    vm.insts[0].op = 1;
+    vm.stack[0].as_i32 = 4;
+    vm.stack[1].as_i32 = 3;
+    vm.stack[2].as_i32 = 2;
+    vm.stack[3].as_i32 = 1;
+    vm.index.stack_top = 4;
+    vm.index.stack_base = 1;
     do_inst(&vm);
     EXIT_IF(vm.index.inst != 1);
-    EXIT_IF(vm.index.stack_top != 5);
-    EXIT_IF(vm.stack[0].as_i32 != 5);
-    EXIT_IF(vm.stack[1].as_i32 != 1);
-    EXIT_IF(vm.stack[2].as_i32 != 4);
-    EXIT_IF(vm.stack[3].as_i32 != 3);
-    EXIT_IF(vm.stack[4].as_i32 != 2);
+    EXIT_IF(vm.index.stack_top != 4);
+    EXIT_IF(vm.index.stack_base != 1);
+    EXIT_IF(vm.stack[0].as_i32 != 4);
+    EXIT_IF(vm.stack[1].as_i32 != 3);
+    EXIT_IF(vm.stack[2].as_i32 != 1);
+    EXIT_IF(vm.stack[3].as_i32 != 2);
 })
 
 TEST(test_call, {
@@ -230,7 +230,7 @@ i32 main(void) {
     test_drop();
     test_copy();
     test_store();
-    test_bury();
+    test_swap();
     test_call();
     test_ret();
     test_save();
