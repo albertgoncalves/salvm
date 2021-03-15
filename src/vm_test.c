@@ -206,7 +206,7 @@ TEST(test_eq, {
         do_inst(&vm);                                   \
         EXIT_IF(vm.index.inst != 1);                    \
         EXIT_IF(vm.index.stack_top != 1);               \
-        EXIT_IF(vm.stack[2].as_##out != (expected));    \
+        EXIT_IF(vm.stack[0].as_##out != (expected));    \
     })
 
 TEST_BINARY_OP(test_addi, INST_ADDI, i32, i32, 24)

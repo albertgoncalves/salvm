@@ -72,5 +72,5 @@ now () {
     python3 -c "print(\"Compiled! ({:.3f}s)\".format(${end} - ${start}))"
 )
 
-"$WD/bin/vm_test" || echo "$?"
+"$WD/bin/vm_test"
 "$WD/bin/main" "$WD/out/main.sal" || echo "$?"

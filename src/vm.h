@@ -92,7 +92,7 @@ typedef struct {
     #define BINARY_OP(vm, op, in, out)                             \
         {                                                          \
             EXIT_IF(vm->index.stack_top < 2);                      \
-            vm->stack[vm->index.stack_top].as_##out =              \
+            vm->stack[vm->index.stack_top - 2].as_##out =          \
                 vm->stack[vm->index.stack_top - 2]                 \
                     .as_##in op vm->stack[vm->index.stack_top - 1] \
                     .as_##in;                                      \
