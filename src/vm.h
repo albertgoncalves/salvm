@@ -94,6 +94,7 @@ typedef struct {
         }
     #define BINARY_OP(vm, op, in, out)                             \
         {                                                          \
+            EXIT_IF(CAP_STACK <= (vm->index.stack_top - 1))        \
             EXIT_IF(vm->index.stack_top < 2);                      \
             vm->stack[vm->index.stack_top - 2].as_##out =          \
                 vm->stack[vm->index.stack_top - 2]                 \
@@ -157,9 +158,9 @@ static void do_inst(Vm* vm) {
     }
     case INST_STORE: {
         DEBUG_BOUNDS_CHECK_STACK(vm->index.stack_top - 2);
-        DEBUG_BOUNDS_CHECK_STACK(vm->index.stack_base + inst.op);
         --vm->index.stack_top;
         DEBUG_BOUNDS_CHECK_STACK(vm->index.stack_top);
+        DEBUG_BOUNDS_CHECK_STACK(vm->index.stack_base + inst.op);
         vm->stack[vm->index.stack_base + inst.op].as_i32 =
             vm->stack[vm->index.stack_top].as_i32;
         ++vm->index.inst;
@@ -222,6 +223,7 @@ static void do_inst(Vm* vm) {
         break;
     }
     case INST_NOT: {
+        DEBUG_BOUNDS_CHECK_STACK(vm->index.stack_top - 1);
         vm->stack[vm->index.stack_top - 1].as_i32 =
             !vm->stack[vm->index.stack_top - 1].as_i32;
         ++vm->index.inst;
