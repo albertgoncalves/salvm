@@ -185,13 +185,15 @@ TEST(test_inst_eq, {
     vm.stack[1].as_i32 = 0;
     do_inst(&vm);
     EXIT_IF(vm.index.inst != 1);
-    EXIT_IF(vm.index.stack_top != 3);
-    EXIT_IF(vm.stack[2].as_i32 != 0);
+    EXIT_IF(vm.index.stack_top != 1);
+    EXIT_IF(vm.stack[0].as_i32 != 0);
     vm.insts[1].tag = INST_EQ;
+    vm.index.stack_top = 2;
+    vm.stack[1].as_i32 = 0;
     do_inst(&vm);
     EXIT_IF(vm.index.inst != 2);
-    EXIT_IF(vm.index.stack_top != 4);
-    EXIT_IF(vm.stack[3].as_i32 != 1);
+    EXIT_IF(vm.index.stack_top != 1);
+    EXIT_IF(vm.stack[0].as_i32 != 1);
 })
 
 #define TEST_BINARY_OP(fn, inst_tag, in, out, expected) \
@@ -203,7 +205,7 @@ TEST(test_inst_eq, {
         vm.stack[1].as_##in = 9;                        \
         do_inst(&vm);                                   \
         EXIT_IF(vm.index.inst != 1);                    \
-        EXIT_IF(vm.index.stack_top != 3);               \
+        EXIT_IF(vm.index.stack_top != 1);               \
         EXIT_IF(vm.stack[2].as_##out != (expected));    \
     })
 

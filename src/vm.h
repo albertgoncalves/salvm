@@ -91,13 +91,12 @@ typedef struct {
         }
     #define BINARY_OP(vm, op, in, out)                             \
         {                                                          \
-            EXIT_IF(CAP_STACK <= vm->index.stack_top);             \
             EXIT_IF(vm->index.stack_top < 2);                      \
             vm->stack[vm->index.stack_top].as_##out =              \
                 vm->stack[vm->index.stack_top - 2]                 \
                     .as_##in op vm->stack[vm->index.stack_top - 1] \
                     .as_##in;                                      \
-            ++vm->index.stack_top;                                 \
+            --vm->index.stack_top;                                 \
             ++vm->index.inst;                                      \
             break;                                                 \
         }
@@ -106,11 +105,11 @@ typedef struct {
         {}
     #define BINARY_OP(vm, op, in, out)                             \
         {                                                          \
-            vm->stack[vm->index.stack_top].as_##out =              \
+            vm->stack[vm->index.stack_top - 2].as_##out =          \
                 vm->stack[vm->index.stack_top - 2]                 \
                     .as_##in op vm->stack[vm->index.stack_top - 1] \
                     .as_##in;                                      \
-            ++vm->index.stack_top;                                 \
+            --vm->index.stack_top;                                 \
             ++vm->index.inst;                                      \
             break;                                                 \
         }
@@ -228,14 +227,14 @@ static void do_inst(Vm* vm) {
         break;
     }
     case INST_EQ: {
-        DEBUG_BOUNDS_CHECK_STACK(vm->index.stack_top);
+        DEBUG_BOUNDS_CHECK_STACK(vm->index.stack_top - 1);
         DEBUG_BOUNDS_CHECK_STACK(vm->index.stack_top - 2);
-        vm->stack[vm->index.stack_top].as_i32 =
+        vm->stack[vm->index.stack_top - 2].as_i32 =
             vm->stack[vm->index.stack_top - 2].as_i32 ==
                     vm->stack[vm->index.stack_top - 1].as_i32
                 ? 1
                 : 0;
-        ++vm->index.stack_top;
+        --vm->index.stack_top;
         ++vm->index.inst;
         break;
     }
