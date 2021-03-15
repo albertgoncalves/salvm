@@ -3,8 +3,8 @@
 
 #include "prelude.h"
 
-#define CAP_INST  64
-#define CAP_STACK 128
+#define CAP_INST  256
+#define CAP_STACK 256
 
 typedef enum {
     INST_HALT = 0,
