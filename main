@@ -50,16 +50,17 @@ now () {
     date +%s.%N
 }
 
-for x in "$WD"/src/*.h; do
-    cppcheck "$x" | sed 's/\/.*\/\(.*\) \.\.\./\1/g'
-done
-cppcheck \
-    --enable=all \
-    --suppress=missingIncludeSystem \
-    "$WD/src" \
-    | sed 's/\/.*\/\(.*\) \.\.\./\1/g'
-clang-format -i -verbose "$WD/src"/*.c 2>&1 | sed 's/\/.*\///g'
-clang-format -i -verbose "$WD/src"/*.h 2>&1 | sed 's/\/.*\///g'
+(
+    for x in "$WD"/src/*.h; do
+        cppcheck "$x"
+    done
+    cppcheck \
+        --enable=all \
+        --suppress=missingIncludeSystem \
+        "$WD/src"
+    clang-format -i -verbose "$WD/src"/*.c
+    clang-format -i -verbose "$WD/src"/*.h
+)
 
 (
     start=$(now)
@@ -68,4 +69,4 @@ clang-format -i -verbose "$WD/src"/*.h 2>&1 | sed 's/\/.*\///g'
     python3 -c "print(\"Compiled! ({:.3f}s)\".format(${end} - ${start}))"
 )
 
-"$WD/bin/main"
+"$WD/bin/main" || echo "$?"
