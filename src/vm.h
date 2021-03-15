@@ -52,6 +52,9 @@ typedef enum {
     INST_GTF,
     INST_GEF,
 
+    INST_PRINTI,
+    INST_PRINTF,
+
     COUNT_INST_TAG,
 } InstTag;
 
@@ -285,6 +288,16 @@ static void do_inst(Vm* vm) {
     }
     case INST_GEF: {
         BINARY_OP(vm, >=, f32, i32)
+    }
+    case INST_PRINTI: {
+        printf("%d\n", vm->stack[--vm->index.stack_top].as_i32);
+        ++vm->index.inst;
+        break;
+    }
+    case INST_PRINTF: {
+        printf("%.2f\n", (f64)vm->stack[--vm->index.stack_top].as_f32);
+        ++vm->index.inst;
+        break;
     }
     case COUNT_INST_TAG:
     default: {
