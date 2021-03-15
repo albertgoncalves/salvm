@@ -79,9 +79,6 @@ i32 main(i32 n, const char** args) {
         vm.insts[i].tag = INST_JUMP;
         vm.insts[i++].op = -20;
 
-        vm.insts[i].tag = INST_STORE;
-        vm.insts[i++].op = 0;
-
         vm.insts[i++].tag = INST_HALT;
 
         set_insts_to_file(&vm, i, args[1]);

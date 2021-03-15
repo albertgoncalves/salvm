@@ -168,13 +168,13 @@ TEST(test_not, {
     vm.stack[0].as_i32 = 1;
     do_inst(&vm);
     EXIT_IF(vm.index.inst != 1);
-    EXIT_IF(vm.index.stack_top != 2);
-    EXIT_IF(vm.stack[1].as_i32 != 0);
+    EXIT_IF(vm.index.stack_top != 1);
+    EXIT_IF(vm.stack[0].as_i32 != 0);
     vm.insts[1].tag = INST_NOT;
     do_inst(&vm);
     EXIT_IF(vm.index.inst != 2);
-    EXIT_IF(vm.index.stack_top != 3);
-    EXIT_IF(vm.stack[2].as_i32 != 1);
+    EXIT_IF(vm.index.stack_top != 1);
+    EXIT_IF(vm.stack[0].as_i32 != 1);
 })
 
 TEST(test_eq, {

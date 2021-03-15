@@ -156,6 +156,7 @@ static void do_inst(Vm* vm) {
         break;
     }
     case INST_STORE: {
+        DEBUG_BOUNDS_CHECK_STACK(vm->index.stack_top - 2);
         DEBUG_BOUNDS_CHECK_STACK(vm->index.stack_base + inst.op);
         --vm->index.stack_top;
         DEBUG_BOUNDS_CHECK_STACK(vm->index.stack_top);
@@ -221,11 +222,8 @@ static void do_inst(Vm* vm) {
         break;
     }
     case INST_NOT: {
-        DEBUG_BOUNDS_CHECK_STACK(vm->index.stack_top);
-        DEBUG_BOUNDS_CHECK_STACK(vm->index.stack_top - 1);
-        vm->stack[vm->index.stack_top].as_i32 =
+        vm->stack[vm->index.stack_top - 1].as_i32 =
             !vm->stack[vm->index.stack_top - 1].as_i32;
-        ++vm->index.stack_top;
         ++vm->index.inst;
         break;
     }
@@ -290,12 +288,16 @@ static void do_inst(Vm* vm) {
         BINARY_OP(vm, >=, f32, i32)
     }
     case INST_PRINTI: {
-        printf("%d\n", vm->stack[--vm->index.stack_top].as_i32);
+        --vm->index.stack_top;
+        DEBUG_BOUNDS_CHECK_STACK(vm->index.stack_top);
+        printf("%d\n", vm->stack[vm->index.stack_top].as_i32);
         ++vm->index.inst;
         break;
     }
     case INST_PRINTF: {
-        printf("%.2f\n", (f64)vm->stack[--vm->index.stack_top].as_f32);
+        --vm->index.stack_top;
+        DEBUG_BOUNDS_CHECK_STACK(vm->index.stack_top);
+        printf("%.2f\n", (f64)vm->stack[vm->index.stack_top].as_f32);
         ++vm->index.inst;
         break;
     }
