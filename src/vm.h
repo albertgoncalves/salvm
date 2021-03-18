@@ -17,8 +17,6 @@ typedef enum {
     INST_COPY,
     INST_STORE,
 
-    INST_SWAP,
-
     INST_CALL,
     INST_RET,
 
@@ -163,18 +161,6 @@ static void do_inst(Vm* vm) {
         DEBUG_BOUNDS_CHECK_STACK(vm->index.stack_base + inst.op);
         vm->stack[vm->index.stack_base + inst.op].as_i32 =
             vm->stack[vm->index.stack_top].as_i32;
-        ++vm->index.inst;
-        break;
-    }
-    case INST_SWAP: {
-        DEBUG_BOUNDS_CHECK_STACK(vm->index.stack_top - 2);
-        i32 i = vm->index.stack_top - 1;
-        i32 j = vm->index.stack_base + inst.op;
-        DEBUG_BOUNDS_CHECK_STACK(i);
-        DEBUG_BOUNDS_CHECK_STACK(j);
-        i32 t = vm->stack[i].as_i32;
-        vm->stack[i].as_i32 = vm->stack[j].as_i32;
-        vm->stack[j].as_i32 = t;
         ++vm->index.inst;
         break;
     }
