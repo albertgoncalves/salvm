@@ -128,7 +128,7 @@ TEST(test_jpz, {
     vm.index.stack_top = 1;
     vm.stack[0].as_i32 = 0;
     do_inst(&vm);
-    EXIT_IF(vm.index.inst != 24);
+    EXIT_IF(vm.index.inst != 23);
     EXIT_IF(vm.index.stack_top != 0);
 })
 
@@ -136,9 +136,9 @@ TEST(test_jump, {
     Vm vm = {0};
     vm.index.inst = 101;
     vm.insts[101].tag = INST_JUMP;
-    vm.insts[101].op = -9;
+    vm.insts[101].op = 9;
     do_inst(&vm);
-    EXIT_IF(vm.index.inst != 92);
+    EXIT_IF(vm.index.inst != 9);
 })
 
 TEST(test_not, {

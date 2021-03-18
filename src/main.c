@@ -30,7 +30,7 @@ i32 main(i32 n, const char** args) {
         vm.insts[i++].tag = INST_EQ;
 
         vm.insts[i].tag = INST_JPZ;
-        vm.insts[i++].op = 4;
+        vm.insts[i++].op = 10;
 
         vm.insts[i].tag = INST_COPY;
         vm.insts[i++].op = 0;
@@ -38,7 +38,7 @@ i32 main(i32 n, const char** args) {
         vm.insts[i++].tag = INST_PRINTI;
 
         vm.insts[i].tag = INST_JUMP;
-        vm.insts[i++].op = 15;
+        vm.insts[i++].op = 24;
 
         vm.insts[i].tag = INST_COPY;
         vm.insts[i++].op = 0;
@@ -60,16 +60,16 @@ i32 main(i32 n, const char** args) {
         vm.insts[i++].tag = INST_EQ;
 
         vm.insts[i].tag = INST_JPZ;
-        vm.insts[i++].op = 4;
+        vm.insts[i++].op = 21;
 
         vm.insts[i].tag = INST_JUMP;
-        vm.insts[i++].op = 2;
+        vm.insts[i++].op = 20;
 
         vm.insts[i].tag = INST_JUMP;
-        vm.insts[i++].op = -1;
+        vm.insts[i++].op = 18;
 
         vm.insts[i].tag = INST_JUMP;
-        vm.insts[i++].op = -17;
+        vm.insts[i++].op = 3;
 
         vm.insts[i].tag = INST_COPY;
         vm.insts[i++].op = 0;
@@ -77,7 +77,7 @@ i32 main(i32 n, const char** args) {
         vm.insts[i++].tag = INST_PRINTI;
 
         vm.insts[i].tag = INST_JUMP;
-        vm.insts[i++].op = -20;
+        vm.insts[i++].op = 3;
 
         vm.insts[i++].tag = INST_HALT;
 

@@ -198,14 +198,14 @@ static void do_inst(Vm* vm) {
         --vm->index.stack_top;
         DEBUG_BOUNDS_CHECK_STACK(vm->index.stack_top);
         if (vm->stack[vm->index.stack_top].as_i32 == 0) {
-            vm->index.inst += inst.op;
+            vm->index.inst = inst.op;
         } else {
             ++vm->index.inst;
         }
         break;
     }
     case INST_JUMP: {
-        vm->index.inst += inst.op;
+        vm->index.inst = inst.op;
         break;
     }
     case INST_NOT: {
