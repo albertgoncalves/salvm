@@ -16,20 +16,10 @@ TEST(test_push, {
     EXIT_IF(vm.stack[0].as_i32 != 12345);
 })
 
-TEST(test_rsrv, {
+TEST(test_top, {
     Vm vm = {0};
-    vm.insts[0].tag = INST_RSRV;
+    vm.insts[0].tag = INST_TOP;
     vm.insts[0].op = 5;
-    do_inst(&vm);
-    EXIT_IF(vm.index.inst != 1);
-    EXIT_IF(vm.index.stack_top != 5);
-})
-
-TEST(test_drop, {
-    Vm vm = {0};
-    vm.insts[0].tag = INST_DROP;
-    vm.insts[0].op = 3;
-    vm.index.stack_top = 8;
     do_inst(&vm);
     EXIT_IF(vm.index.inst != 1);
     EXIT_IF(vm.index.stack_top != 5);
@@ -206,8 +196,7 @@ TEST_BINARY_OP(test_gef, INST_GEF, f32, i32, 1)
 
 i32 main(void) {
     test_push();
-    test_rsrv();
-    test_drop();
+    test_top();
     test_copy();
     test_store();
     test_call();

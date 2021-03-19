@@ -11,8 +11,7 @@ typedef enum {
 
     INST_PUSH,
 
-    INST_RSRV,
-    INST_DROP,
+    INST_TOP,
 
     INST_COPY,
     INST_STORE,
@@ -136,13 +135,8 @@ static void do_inst(Vm* vm) {
         ++vm->index.inst;
         break;
     }
-    case INST_RSRV: {
+    case INST_TOP: {
         vm->index.stack_top += inst.op;
-        ++vm->index.inst;
-        break;
-    }
-    case INST_DROP: {
-        vm->index.stack_top -= inst.op;
         ++vm->index.inst;
         break;
     }

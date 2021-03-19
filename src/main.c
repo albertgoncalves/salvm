@@ -12,7 +12,7 @@ i32 main(i32 n, const char** args) {
         Vm  vm = {0};
         u32 i = 0;
 
-        vm.insts[i].tag = INST_RSRV;
+        vm.insts[i].tag = INST_TOP;
         vm.insts[i++].op = 1;
 
         vm.insts[i].tag = INST_PUSH;
