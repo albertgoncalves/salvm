@@ -1,0 +1,46 @@
+            top     1
+            push    0
+            store   0
+loop_0:     copy    0
+            push    5
+            eq
+            jpz     if_0    ; 10
+            copy    0
+            native  1       ; NATIVE_PRINTI
+            jump    break_0 ; 24
+if_0:       copy    0
+            push    1
+            addi
+            store   0
+            push    3
+            copy    0
+            eq
+            jpz     if_1    ; 21
+loop_1:     jump    break_1 ; 20
+            jump    loop_1  ; 18
+break_1:    jump    loop_0  ; 3, "continue"
+if_1:       copy    0
+            native  1       ; NATIVE_PRINTI
+            jump    loop_0  ; 3
+break_0:    push    10      ; '\n'
+            native  0       ; NATIVE_PRINTC
+            halt
+
+; {
+;     i64 i;
+;     i = 0;
+;     loop {
+;         if i == 5 {
+;             print(i);
+;             break;
+;         }
+;         i = i + 1;
+;         if 3 == i {
+;             loop {
+;                 break;
+;             }
+;             continue;
+;         }
+;         print(i);
+;     }
+; }

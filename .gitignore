@@ -3,9 +3,13 @@
 !shell.nix
 !.shellhook
 !.clang-format
+!vim/
+!*.vim
 !src/
 !src/app/
 !src/lib/
 !*.h
 !*.c
+!examples/
+!*.sals
 !main
