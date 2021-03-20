@@ -49,8 +49,7 @@ typedef enum {
     INST_GTF,
     INST_GEF,
 
-    INST_PRINTI,
-    INST_PRINTF,
+    INST_NATIVE,
 
     COUNT_INST_TAG,
 } InstTag;
@@ -82,6 +81,15 @@ typedef struct {
     Index index;
     Bool  alive;
 } Vm;
+
+typedef enum {
+    NATIVE_PRINTC = 0,
+    NATIVE_PRINTI,
+    NATIVE_PRINTF,
+    COUNT_NATIVE,
+} Natives;
+
+typedef void (*Native)(Vm*);
 
 #ifdef DEBUG_BOUNDS_CHECK
     #define DEBUG_BOUNDS_CHECK_STACK(index) \
@@ -115,6 +123,28 @@ typedef struct {
             break;                                                 \
         }
 #endif
+
+#define NATIVE_1(fn, block)                            \
+    static void fn(Vm* vm) {                           \
+        --vm->index.stack_top;                         \
+        DEBUG_BOUNDS_CHECK_STACK(vm->index.stack_top); \
+        block;                                         \
+    }
+
+NATIVE_1(native_printc,
+         { printf("%c", vm->stack[vm->index.stack_top].as_i32); })
+
+NATIVE_1(native_printi,
+         { printf("%d", vm->stack[vm->index.stack_top].as_i32); })
+
+NATIVE_1(native_printf,
+         { printf("%.2f", (f64)vm->stack[vm->index.stack_top].as_f32); })
+
+static const Native NATIVES[COUNT_NATIVE] = {
+    [NATIVE_PRINTC] = native_printc,
+    [NATIVE_PRINTI] = native_printi,
+    [NATIVE_PRINTF] = native_printf,
+};
 
 static void do_inst(Vm* vm) {
 #ifdef DEBUG_BOUNDS_CHECK
@@ -269,17 +299,8 @@ static void do_inst(Vm* vm) {
     case INST_GEF: {
         BINARY_OP(vm, >=, f32, i32)
     }
-    case INST_PRINTI: {
-        --vm->index.stack_top;
-        DEBUG_BOUNDS_CHECK_STACK(vm->index.stack_top);
-        printf("%d\n", vm->stack[vm->index.stack_top].as_i32);
-        ++vm->index.inst;
-        break;
-    }
-    case INST_PRINTF: {
-        --vm->index.stack_top;
-        DEBUG_BOUNDS_CHECK_STACK(vm->index.stack_top);
-        printf("%.2f\n", (f64)vm->stack[vm->index.stack_top].as_f32);
+    case INST_NATIVE: {
+        NATIVES[inst.op](vm);
         ++vm->index.inst;
         break;
     }
