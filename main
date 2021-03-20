@@ -53,15 +53,11 @@ now () {
 }
 
 (
-    for x in "$WD"/src/*.h; do
-        cppcheck "$x"
-    done
     cppcheck \
         --enable=all \
         --suppress=missingIncludeSystem \
         "$WD/src"
-    clang-format -i -verbose "$WD/src"/*.c
-    clang-format -i -verbose "$WD/src"/*.h
+    clang-format -i -verbose "$WD/src/"*/*
 )
 
 (
