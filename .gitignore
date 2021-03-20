@@ -4,6 +4,8 @@
 !.shellhook
 !.clang-format
 !src/
+!src/app/
+!src/lib/
 !*.h
 !*.c
 !main

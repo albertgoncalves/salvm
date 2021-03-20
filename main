@@ -2,12 +2,14 @@
 
 set -euo pipefail
 
+lib="$WD/src/lib"
 flags=(
     "-DDEBUG_BOUNDS_CHECK"
     "-DDEBUG_PRINT_VM"
     "-fanalyzer"
     "-fshort-enums"
     "-g"
+    "-I$lib"
     "-march=native"
     "-O1"
     "-static"
@@ -53,20 +55,17 @@ now () {
 }
 
 (
-    cppcheck \
-        --enable=all \
-        --suppress=missingIncludeSystem \
-        "$WD/src"
+    cppcheck "-I$lib" --enable=all --suppress=missingIncludeSystem "$WD/src"
     clang-format -i -verbose "$WD/src/"*/*
 )
 
 (
     start=$(now)
-    gcc "${flags[@]}" -o "$WD/bin/vm_test" "$WD/src/vm_test.c"
-    gcc "${flags[@]}" -o "$WD/bin/main" "$WD/src/main.c"
+    gcc "${flags[@]}" -o "$WD/bin/vm_test" "$WD/src/app/vm_test.c"
+    gcc "${flags[@]}" -o "$WD/bin/demo" "$WD/src/app/demo.c"
     end=$(now)
     python3 -c "print(\"Compiled! ({:.3f}s)\".format(${end} - ${start}))"
 )
 
 "$WD/bin/vm_test"
-"$WD/bin/main" "$WD/out/main.sal" || echo "$?"
+"$WD/bin/demo" "$WD/out/demo.sal" || echo "$?"
