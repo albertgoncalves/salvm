@@ -43,7 +43,7 @@ typedef struct {
 
 typedef struct {
     String string;
-    i32    inst_index;
+    i32    index_inst;
 } Label;
 
 typedef struct {
@@ -312,10 +312,10 @@ static void set_tokens(Memory* memory) {
                 .chars = &memory->chars[i],
                 .len = j - i,
             };
-            for (i32 l = 0; l < COUNT_INST_TAG; ++l) {
-                String inst_string = get_inst_tag_as_string(l);
+            for (InstTag t = 0; t < COUNT_INST_TAG; ++t) {
+                String inst_string = get_inst_tag_as_string(t);
                 if (EQ_STRINGS(token_string, inst_string)) {
-                    token->body.as_inst_tag = (InstTag)l;
+                    token->body.as_inst_tag = t;
                     token->tag = TOKEN_INST;
                     goto loop_end;
                 }
@@ -336,14 +336,14 @@ static void set_tokens(Memory* memory) {
     }
 
 static void set_insts(Memory* memory) {
-    i32 inst_index = 0;
-    for (u32 i = 0; i < memory->len_tokens;) {
+    i32 index_inst = 0;
+    for (u32 i = 0; i < memory->len_tokens; ++i) {
         Token token = memory->tokens[i];
         switch (token.tag) {
         case TOKEN_INST: {
             PreInst* pre_inst = alloc_pre_inst(memory);
             pre_inst->inst.tag = token.body.as_inst_tag;
-            ++inst_index;
+            ++index_inst;
             switch (token.body.as_inst_tag) {
             case INST_HALT:
             case INST_RET:
@@ -372,7 +372,6 @@ static void set_insts(Memory* memory) {
             case INST_GTF:
             case INST_GEF: {
                 pre_inst->resolved = TRUE;
-                ++i;
                 break;
             }
             case INST_PUSH: {
@@ -390,7 +389,6 @@ static void set_insts(Memory* memory) {
                     ERROR_TOKEN(token);
                 }
                 }
-                ++i;
                 break;
             }
             case INST_TOP:
@@ -412,7 +410,6 @@ static void set_insts(Memory* memory) {
                     ERROR_TOKEN(token);
                 }
                 }
-                ++i;
                 break;
             }
             case INST_CALL:
@@ -436,7 +433,6 @@ static void set_insts(Memory* memory) {
                     ERROR_TOKEN(token);
                 }
                 }
-                ++i;
                 break;
             }
             case COUNT_INST_TAG: {
@@ -446,13 +442,11 @@ static void set_insts(Memory* memory) {
             break;
         }
         case TOKEN_STR: {
-            Label* label = alloc_label(memory);
             String string = token.body.as_string;
-            token = memory->tokens[++i];
-            EXIT_IF(token.tag != TOKEN_COLON);
+            EXIT_IF(memory->tokens[++i].tag != TOKEN_COLON);
+            Label* label = alloc_label(memory);
             label->string = string;
-            label->inst_index = inst_index;
-            ++i;
+            label->index_inst = index_inst;
             break;
         }
         case TOKEN_I32:
@@ -463,19 +457,19 @@ static void set_insts(Memory* memory) {
         }
     }
     for (u32 i = 0; i < memory->len_pre_insts; ++i) {
-        PreInst pre_inst = memory->pre_insts[i];
-        if (!pre_inst.resolved) {
+        PreInst* pre_inst = &memory->pre_insts[i];
+        if (!pre_inst->resolved) {
             for (u32 j = 0; j < memory->len_labels; ++j) {
                 Label label = memory->labels[j];
-                if (EQ_STRINGS(label.string, pre_inst.label)) {
-                    pre_inst.inst.op = label.inst_index;
-                    pre_inst.resolved = TRUE;
+                if (EQ_STRINGS(label.string, pre_inst->label)) {
+                    pre_inst->inst.op = label.index_inst;
+                    pre_inst->resolved = TRUE;
                     break;
                 }
             }
         }
-        EXIT_IF(!pre_inst.resolved);
-        memory->vm.insts[i] = pre_inst.inst;
+        EXIT_IF(!pre_inst->resolved);
+        memory->vm.insts[i] = pre_inst->inst;
     }
 }
 

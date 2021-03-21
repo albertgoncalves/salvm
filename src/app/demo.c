@@ -20,8 +20,8 @@ i32 main(i32 n, const char** args) {
     {
         Memory* memory = calloc(1, sizeof(Memory));
         EXIT_IF(!memory);
-        set_chars_from_file(memory, args[1]);
         {
+            set_chars_from_file(memory, args[1]);
             set_tokens(memory);
             set_insts(memory);
             reset(&memory->vm);
