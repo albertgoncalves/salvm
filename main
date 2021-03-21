@@ -74,4 +74,4 @@ now () {
 )
 
 "$WD/bin/vm_test"
-"$WD/bin/demo" "$WD/examples/jumps.sals" || echo "$?"
+"$WD/bin/demo" "$WD/examples/addf.sals" || echo "$?"
