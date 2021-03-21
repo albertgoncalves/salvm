@@ -3,14 +3,11 @@
 
 #include "vm.h"
 
-static void reset(Vm* vm) {
+static void run(Vm* vm) {
     vm->index.inst = 0;
     vm->index.stack_top = 0;
     vm->index.stack_base = 0;
     vm->alive = TRUE;
-}
-
-static void run(Vm* vm) {
     while (vm->alive) {
 #ifdef DEBUG_PRINT_VM
         {

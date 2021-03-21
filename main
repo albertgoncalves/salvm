@@ -65,7 +65,7 @@ now () {
 
 (
     start=$(now)
-    for x in vm_test demo; do
+    for x in vm_test vm; do
         gcc "${paths[@]}" "${flags[@]}" -o "$WD/bin/$x" "$WD/src/app/$x.c"
     done
     end=$(now)
@@ -73,4 +73,4 @@ now () {
 )
 
 "$WD/bin/vm_test"
-"$WD/bin/demo" "$WD/examples/addf.sals" || echo "$?"
+"$WD/bin/vm" "$WD/examples/jumps.sals" || echo "$?"
