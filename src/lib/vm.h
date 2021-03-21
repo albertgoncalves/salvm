@@ -94,17 +94,16 @@ typedef void (*Native)(Vm*);
         EXIT_IF((index) < 0);          \
     }
 
-#define BINARY_OP(vm, op, in, out)                             \
-    {                                                          \
-        EXIT_IF(CAP_STACK <= (vm->index.stack_top - 1))        \
-        EXIT_IF(vm->index.stack_top < 2);                      \
-        vm->stack[vm->index.stack_top - 2].as_##out =          \
-            vm->stack[vm->index.stack_top - 2]                 \
-                .as_##in op vm->stack[vm->index.stack_top - 1] \
-                .as_##in;                                      \
-        --vm->index.stack_top;                                 \
-        ++vm->index.inst;                                      \
-        break;                                                 \
+#define BINARY_OP(vm, op, in, out)                                            \
+    {                                                                         \
+        EXIT_IF(vm->index.stack_top < 2);                                     \
+        i32 i = vm->index.stack_top - 1;                                      \
+        i32 j = vm->index.stack_top - 2;                                      \
+        EXIT_IF(CAP_STACK <= i)                                               \
+        vm->stack[j].as_##out = vm->stack[j].as_##in op vm->stack[i].as_##in; \
+        --vm->index.stack_top;                                                \
+        ++vm->index.inst;                                                     \
+        break;                                                                \
     }
 
 #define NATIVE_1(fn, block)                      \
@@ -153,19 +152,19 @@ static void do_inst(Vm* vm) {
     }
     case INST_COPY: {
         BOUNDS_CHECK_STACK(vm->index.stack_top);
-        BOUNDS_CHECK_STACK(vm->index.stack_base + inst.op);
-        vm->stack[vm->index.stack_top++].as_i32 =
-            vm->stack[vm->index.stack_base + inst.op].as_i32;
+        i32 i = vm->index.stack_base + inst.op;
+        BOUNDS_CHECK_STACK(i);
+        vm->stack[vm->index.stack_top++].as_i32 = vm->stack[i].as_i32;
         ++vm->index.inst;
         break;
     }
     case INST_STORE: {
-        BOUNDS_CHECK_STACK(vm->index.stack_top - 2);
+        EXIT_IF(vm->index.stack_top < 2);
         --vm->index.stack_top;
         BOUNDS_CHECK_STACK(vm->index.stack_top);
-        BOUNDS_CHECK_STACK(vm->index.stack_base + inst.op);
-        vm->stack[vm->index.stack_base + inst.op].as_i32 =
-            vm->stack[vm->index.stack_top].as_i32;
+        i32 i = vm->index.stack_base + inst.op;
+        BOUNDS_CHECK_STACK(i);
+        vm->stack[i].as_i32 = vm->stack[vm->index.stack_top].as_i32;
         ++vm->index.inst;
         break;
     }
@@ -214,20 +213,19 @@ static void do_inst(Vm* vm) {
         break;
     }
     case INST_NOT: {
-        BOUNDS_CHECK_STACK(vm->index.stack_top - 1);
-        vm->stack[vm->index.stack_top - 1].as_i32 =
-            !vm->stack[vm->index.stack_top - 1].as_i32;
+        i32 i = vm->index.stack_top - 1;
+        BOUNDS_CHECK_STACK(i);
+        vm->stack[i].as_i32 = !vm->stack[i].as_i32;
         ++vm->index.inst;
         break;
     }
     case INST_EQ: {
-        BOUNDS_CHECK_STACK(vm->index.stack_top - 1);
-        BOUNDS_CHECK_STACK(vm->index.stack_top - 2);
-        vm->stack[vm->index.stack_top - 2].as_i32 =
-            vm->stack[vm->index.stack_top - 2].as_i32 ==
-                    vm->stack[vm->index.stack_top - 1].as_i32
-                ? 1
-                : 0;
+        EXIT_IF(vm->index.stack_top < 2);
+        i32 i = vm->index.stack_top - 1;
+        i32 j = vm->index.stack_top - 2;
+        EXIT_IF(CAP_STACK <= i)
+        vm->stack[j].as_i32 =
+            vm->stack[j].as_i32 == vm->stack[i].as_i32 ? 1 : 0;
         --vm->index.stack_top;
         ++vm->index.inst;
         break;
