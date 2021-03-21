@@ -244,11 +244,13 @@ static void set_chars_from_file(Memory* memory, const char* path) {
 }
 
 static i32 parse_digits_i32(const char* chars, u32* i) {
-    i32 x = 0;
+    i32 a = 0;
     while (IS_DIGIT(chars[*i])) {
-        x = (x * 10) + ((i32)(chars[(*i)++] - '0'));
+        i32 b = (a * 10) + ((i32)(chars[(*i)++] - '0'));
+        EXIT_IF(b < a);
+        a = b;
     }
-    return x;
+    return a;
 }
 
 static f32 parse_decimal_f32(const char* chars, u32* i) {
