@@ -1,6 +1,4 @@
     call    f
-    push    10  ; '\n'
-    native  0   ; NATIVE_PRINTC
     halt
 f:  push    1.0
     push    3.0
