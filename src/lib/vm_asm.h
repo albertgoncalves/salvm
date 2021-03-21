@@ -3,8 +3,8 @@
 
 #include "vm.h"
 
-#define CAP_CHAR  2048
-#define CAP_TOKEN 128
+#define CAP_CHAR  4096
+#define CAP_TOKEN 256
 #define CAP_LABEL 64
 
 typedef enum {
