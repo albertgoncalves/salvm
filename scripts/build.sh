@@ -61,6 +61,12 @@ now () {
     for x in vm_test vm; do
         gcc "${paths[@]}" "${flags[@]}" -o "$WD/bin/$x" "$WD/src/app/$x.c"
     done
+    gcc \
+        "${paths[@]}" \
+        "${flags[@]}" \
+        "-DDEBUG_PRINT_VM" \
+        -o "$WD/bin/vm_debug" \
+        "$WD/src/app/vm.c"
     end=$(now)
     python3 -c "print(\"Compiled! ({:.3f}s)\".format(${end} - ${start}))"
 )
