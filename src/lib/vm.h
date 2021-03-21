@@ -281,6 +281,10 @@ static void do_inst(Vm* vm) {
         BINARY_OP(vm, >=, f32, i32)
     }
     case INST_NATIVE: {
+        {
+            EXIT_IF(COUNT_NATIVE <= inst.op);
+            EXIT_IF(inst.op < 0);
+        }
         NATIVES[inst.op](vm);
         ++vm->index.inst;
         break;
