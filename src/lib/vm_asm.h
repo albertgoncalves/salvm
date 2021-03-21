@@ -15,6 +15,7 @@ typedef enum {
     TOKEN_F32,
 
     TOKEN_COLON,
+    TOKEN_MINUS,
 } TokenTag;
 
 typedef struct {
@@ -223,6 +224,10 @@ static void println_token(File* stream, Token token) {
         fprintf(stream, ":\n");
         break;
     }
+    case TOKEN_MINUS: {
+        fprintf(stream, "-\n");
+        break;
+    }
     }
 }
 
@@ -281,6 +286,13 @@ static void set_tokens(Memory* memory) {
         case ':': {
             Token* token = alloc_token(memory);
             token->tag = TOKEN_COLON;
+            token->line = line;
+            ++i;
+            break;
+        }
+        case '-': {
+            Token* token = alloc_token(memory);
+            token->tag = TOKEN_MINUS;
             token->line = line;
             ++i;
             break;
@@ -383,6 +395,29 @@ static void set_insts(Memory* memory) {
                     pre_inst->resolved = TRUE;
                     break;
                 }
+                case TOKEN_MINUS: {
+                    token = memory->tokens[++i];
+                    switch (token.tag) {
+                    case TOKEN_I32: {
+                        pre_inst->inst.op = -token.body.as_i32;
+                        pre_inst->resolved = TRUE;
+                        break;
+                    }
+                    case TOKEN_F32: {
+                        token.body.as_f32 = -token.body.as_f32;
+                        pre_inst->inst.op = token.body.as_i32;
+                        pre_inst->resolved = TRUE;
+                        break;
+                    }
+                    case TOKEN_INST:
+                    case TOKEN_STR:
+                    case TOKEN_COLON:
+                    case TOKEN_MINUS: {
+                        ERROR_TOKEN(token);
+                    }
+                    }
+                    break;
+                }
                 case TOKEN_INST:
                 case TOKEN_STR:
                 case TOKEN_COLON: {
@@ -394,7 +429,41 @@ static void set_insts(Memory* memory) {
             case INST_TOP:
             case INST_COPY:
             case INST_STORE:
-            case INST_FRAME:
+            case INST_FRAME: {
+                token = memory->tokens[++i];
+                switch (token.tag) {
+                case TOKEN_I32: {
+                    pre_inst->inst.op = token.body.as_i32;
+                    pre_inst->resolved = TRUE;
+                    break;
+                }
+                case TOKEN_MINUS: {
+                    token = memory->tokens[++i];
+                    switch (token.tag) {
+                    case TOKEN_I32: {
+                        pre_inst->inst.op = -token.body.as_i32;
+                        pre_inst->resolved = TRUE;
+                        break;
+                    }
+                    case TOKEN_F32:
+                    case TOKEN_INST:
+                    case TOKEN_STR:
+                    case TOKEN_COLON:
+                    case TOKEN_MINUS: {
+                        ERROR_TOKEN(token);
+                    }
+                    }
+                    break;
+                }
+                case TOKEN_F32:
+                case TOKEN_INST:
+                case TOKEN_STR:
+                case TOKEN_COLON: {
+                    ERROR_TOKEN(token);
+                }
+                }
+                break;
+            }
             case INST_NATIVE: {
                 token = memory->tokens[++i];
                 switch (token.tag) {
@@ -406,7 +475,8 @@ static void set_insts(Memory* memory) {
                 case TOKEN_F32:
                 case TOKEN_INST:
                 case TOKEN_STR:
-                case TOKEN_COLON: {
+                case TOKEN_COLON:
+                case TOKEN_MINUS: {
                     ERROR_TOKEN(token);
                 }
                 }
@@ -429,7 +499,8 @@ static void set_insts(Memory* memory) {
                 }
                 case TOKEN_F32:
                 case TOKEN_INST:
-                case TOKEN_COLON: {
+                case TOKEN_COLON:
+                case TOKEN_MINUS: {
                     ERROR_TOKEN(token);
                 }
                 }
@@ -451,7 +522,8 @@ static void set_insts(Memory* memory) {
         }
         case TOKEN_I32:
         case TOKEN_F32:
-        case TOKEN_COLON: {
+        case TOKEN_COLON:
+        case TOKEN_MINUS: {
             ERROR_TOKEN(token);
         }
         }

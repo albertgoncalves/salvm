@@ -6,7 +6,7 @@
     halt
 f:
     push    1
-    push    2
+    push    -3
     addi
     native  1   ; NATIVE_PRINTI
     push    10  ; '\n'

@@ -1,7 +1,7 @@
     call    f
     halt
 f:  push    1.0
-    push    3.0
+    push    -3.0
     divf
     native  2   ; NATIVE_PRINTF
     push    10  ; '\n'
