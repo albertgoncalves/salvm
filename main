@@ -8,14 +8,13 @@ paths=(
 flags=(
     "-DDEBUG_BOUNDS_CHECK"
     "-DDEBUG_PRINT_VM"
-    "-fanalyzer"
     "-fshort-enums"
     "-fsingle-precision-constant"
     "-g"
     "-march=native"
     "-O1"
     "-static"
-    "-std=c99"
+    "-std=c11"
     "-Wall"
     "-Wcast-align"
     "-Wcast-align=strict"
@@ -75,4 +74,4 @@ now () {
 )
 
 "$WD/bin/vm_test"
-"$WD/bin/demo" "$WD/out/demo.sal" || echo "$?"
+"$WD/bin/demo" "$WD/examples/jumps.sals" || echo "$?"

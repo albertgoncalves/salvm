@@ -60,11 +60,6 @@ typedef struct {
 } Inst;
 
 typedef struct {
-    u32 magic;
-    u32 count_inst;
-} Header;
-
-typedef struct {
     i32 inst;
     i32 stack_top;
     i32 stack_base;
@@ -74,6 +69,8 @@ typedef union {
     i32 as_i32;
     f32 as_f32;
 } Word;
+
+STATIC_ASSERT(sizeof(i32) == sizeof(f32), "sizeof(i32) != sizeof(f32)");
 
 typedef struct {
     Inst  insts[CAP_INST];
@@ -304,8 +301,7 @@ static void do_inst(Vm* vm) {
         ++vm->index.inst;
         break;
     }
-    case COUNT_INST_TAG:
-    default: {
+    case COUNT_INST_TAG: {
         ERROR();
     }
     }
