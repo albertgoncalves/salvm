@@ -6,7 +6,6 @@ paths=(
     "-I$WD/src/lib"
 )
 flags=(
-    "-DDEBUG_BOUNDS_CHECK"
     "-DDEBUG_PRINT_VM"
     "-fshort-enums"
     "-fsingle-precision-constant"

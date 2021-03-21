@@ -88,44 +88,30 @@ typedef enum {
 
 typedef void (*Native)(Vm*);
 
-#ifdef DEBUG_BOUNDS_CHECK
-    #define DEBUG_BOUNDS_CHECK_STACK(index) \
-        {                                   \
-            EXIT_IF(CAP_STACK <= (index));  \
-            EXIT_IF((index) < 0);           \
-        }
-    #define BINARY_OP(vm, op, in, out)                             \
-        {                                                          \
-            EXIT_IF(CAP_STACK <= (vm->index.stack_top - 1))        \
-            EXIT_IF(vm->index.stack_top < 2);                      \
-            vm->stack[vm->index.stack_top - 2].as_##out =          \
-                vm->stack[vm->index.stack_top - 2]                 \
-                    .as_##in op vm->stack[vm->index.stack_top - 1] \
-                    .as_##in;                                      \
-            --vm->index.stack_top;                                 \
-            ++vm->index.inst;                                      \
-            break;                                                 \
-        }
-#else
-    #define DEBUG_BOUNDS_CHECK_STACK(_) \
-        {}
-    #define BINARY_OP(vm, op, in, out)                             \
-        {                                                          \
-            vm->stack[vm->index.stack_top - 2].as_##out =          \
-                vm->stack[vm->index.stack_top - 2]                 \
-                    .as_##in op vm->stack[vm->index.stack_top - 1] \
-                    .as_##in;                                      \
-            --vm->index.stack_top;                                 \
-            ++vm->index.inst;                                      \
-            break;                                                 \
-        }
-#endif
+#define BOUNDS_CHECK_STACK(index)      \
+    {                                  \
+        EXIT_IF(CAP_STACK <= (index)); \
+        EXIT_IF((index) < 0);          \
+    }
 
-#define NATIVE_1(fn, block)                            \
-    static void fn(Vm* vm) {                           \
-        --vm->index.stack_top;                         \
-        DEBUG_BOUNDS_CHECK_STACK(vm->index.stack_top); \
-        block;                                         \
+#define BINARY_OP(vm, op, in, out)                             \
+    {                                                          \
+        EXIT_IF(CAP_STACK <= (vm->index.stack_top - 1))        \
+        EXIT_IF(vm->index.stack_top < 2);                      \
+        vm->stack[vm->index.stack_top - 2].as_##out =          \
+            vm->stack[vm->index.stack_top - 2]                 \
+                .as_##in op vm->stack[vm->index.stack_top - 1] \
+                .as_##in;                                      \
+        --vm->index.stack_top;                                 \
+        ++vm->index.inst;                                      \
+        break;                                                 \
+    }
+
+#define NATIVE_1(fn, block)                      \
+    static void fn(Vm* vm) {                     \
+        --vm->index.stack_top;                   \
+        BOUNDS_CHECK_STACK(vm->index.stack_top); \
+        block;                                   \
     }
 
 NATIVE_1(native_printc,
@@ -144,12 +130,10 @@ static const Native NATIVES[COUNT_NATIVE] = {
 };
 
 static void do_inst(Vm* vm) {
-#ifdef DEBUG_BOUNDS_CHECK
     {
         EXIT_IF(CAP_INST <= vm->index.inst);
         EXIT_IF(vm->index.inst < 0);
     }
-#endif
     Inst inst = vm->insts[vm->index.inst];
     switch (inst.tag) {
     case INST_HALT: {
@@ -157,7 +141,7 @@ static void do_inst(Vm* vm) {
         break;
     }
     case INST_PUSH: {
-        DEBUG_BOUNDS_CHECK_STACK(vm->index.stack_top);
+        BOUNDS_CHECK_STACK(vm->index.stack_top);
         vm->stack[vm->index.stack_top++].as_i32 = inst.op;
         ++vm->index.inst;
         break;
@@ -168,37 +152,37 @@ static void do_inst(Vm* vm) {
         break;
     }
     case INST_COPY: {
-        DEBUG_BOUNDS_CHECK_STACK(vm->index.stack_top);
-        DEBUG_BOUNDS_CHECK_STACK(vm->index.stack_base + inst.op);
+        BOUNDS_CHECK_STACK(vm->index.stack_top);
+        BOUNDS_CHECK_STACK(vm->index.stack_base + inst.op);
         vm->stack[vm->index.stack_top++].as_i32 =
             vm->stack[vm->index.stack_base + inst.op].as_i32;
         ++vm->index.inst;
         break;
     }
     case INST_STORE: {
-        DEBUG_BOUNDS_CHECK_STACK(vm->index.stack_top - 2);
+        BOUNDS_CHECK_STACK(vm->index.stack_top - 2);
         --vm->index.stack_top;
-        DEBUG_BOUNDS_CHECK_STACK(vm->index.stack_top);
-        DEBUG_BOUNDS_CHECK_STACK(vm->index.stack_base + inst.op);
+        BOUNDS_CHECK_STACK(vm->index.stack_top);
+        BOUNDS_CHECK_STACK(vm->index.stack_base + inst.op);
         vm->stack[vm->index.stack_base + inst.op].as_i32 =
             vm->stack[vm->index.stack_top].as_i32;
         ++vm->index.inst;
         break;
     }
     case INST_CALL: {
-        DEBUG_BOUNDS_CHECK_STACK(vm->index.stack_top);
+        BOUNDS_CHECK_STACK(vm->index.stack_top);
         vm->stack[vm->index.stack_top++].as_i32 = vm->index.inst + 1;
         vm->index.inst = inst.op;
         break;
     }
     case INST_RET: {
         --vm->index.stack_top;
-        DEBUG_BOUNDS_CHECK_STACK(vm->index.stack_top);
+        BOUNDS_CHECK_STACK(vm->index.stack_top);
         vm->index.inst = vm->stack[vm->index.stack_top].as_i32;
         break;
     }
     case INST_SAVE: {
-        DEBUG_BOUNDS_CHECK_STACK(vm->index.stack_top);
+        BOUNDS_CHECK_STACK(vm->index.stack_top);
         vm->stack[vm->index.stack_top++].as_i32 = vm->index.stack_base;
         ++vm->index.inst;
         break;
@@ -210,14 +194,14 @@ static void do_inst(Vm* vm) {
     }
     case INST_RESET: {
         --vm->index.stack_top;
-        DEBUG_BOUNDS_CHECK_STACK(vm->index.stack_top);
+        BOUNDS_CHECK_STACK(vm->index.stack_top);
         vm->index.stack_base = vm->stack[vm->index.stack_top].as_i32;
         ++vm->index.inst;
         break;
     }
     case INST_JPZ: {
         --vm->index.stack_top;
-        DEBUG_BOUNDS_CHECK_STACK(vm->index.stack_top);
+        BOUNDS_CHECK_STACK(vm->index.stack_top);
         if (vm->stack[vm->index.stack_top].as_i32 == 0) {
             vm->index.inst = inst.op;
         } else {
@@ -230,15 +214,15 @@ static void do_inst(Vm* vm) {
         break;
     }
     case INST_NOT: {
-        DEBUG_BOUNDS_CHECK_STACK(vm->index.stack_top - 1);
+        BOUNDS_CHECK_STACK(vm->index.stack_top - 1);
         vm->stack[vm->index.stack_top - 1].as_i32 =
             !vm->stack[vm->index.stack_top - 1].as_i32;
         ++vm->index.inst;
         break;
     }
     case INST_EQ: {
-        DEBUG_BOUNDS_CHECK_STACK(vm->index.stack_top - 1);
-        DEBUG_BOUNDS_CHECK_STACK(vm->index.stack_top - 2);
+        BOUNDS_CHECK_STACK(vm->index.stack_top - 1);
+        BOUNDS_CHECK_STACK(vm->index.stack_top - 2);
         vm->stack[vm->index.stack_top - 2].as_i32 =
             vm->stack[vm->index.stack_top - 2].as_i32 ==
                     vm->stack[vm->index.stack_top - 1].as_i32
