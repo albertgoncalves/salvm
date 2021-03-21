@@ -1,12 +1,11 @@
 #!/usr/bin/env bash
 
-set -euo pipefail
+set -eu
 
 paths=(
     "-I$WD/src/lib"
 )
 flags=(
-    "-DDEBUG_PRINT_VM"
     "-fshort-enums"
     "-fsingle-precision-constant"
     "-g"
@@ -55,15 +54,9 @@ now () {
 }
 
 (
-    cppcheck \
-        "${paths[@]}" \
-        --enable=all \
-        --suppress=missingIncludeSystem \
-        "$WD/src"
-    clang-format -i -verbose "$WD/src/"*/*
-)
-
-(
+    if [ ! -d "$WD/bin" ]; then
+        mkdir "$WD/bin"
+    fi
     start=$(now)
     for x in vm_test vm; do
         gcc "${paths[@]}" "${flags[@]}" -o "$WD/bin/$x" "$WD/src/app/$x.c"
@@ -73,4 +66,3 @@ now () {
 )
 
 "$WD/bin/vm_test"
-"$WD/bin/vm" "$WD/examples/jumps.sals" || echo "$?"

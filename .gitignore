@@ -5,6 +5,8 @@
 !.clang-format
 !vim/
 !*.vim
+!scripts/
+!*.sh
 !src/
 !src/app/
 !src/lib/
@@ -12,4 +14,3 @@
 !*.c
 !examples/
 !*.sals
-!main
