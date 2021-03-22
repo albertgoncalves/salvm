@@ -9,6 +9,7 @@
 
 typedef uint32_t u32;
 typedef int32_t  i32;
+typedef size_t   usize;
 typedef float    f32;
 typedef double   f64;
 
@@ -36,6 +37,12 @@ typedef FILE File;
                 __LINE__,          \
                 #condition);       \
         exit(EXIT_FAILURE);        \
+    }
+
+#define TEST(fn, block)    \
+    static void fn(void) { \
+        block;             \
+        printf(".");       \
     }
 
 #endif

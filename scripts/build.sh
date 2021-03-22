@@ -50,6 +50,7 @@ flags=(
 )
 bins=(
     test_vm_inst
+    test_vm_asm
     vm_asm
     vm_run
 )
@@ -79,3 +80,4 @@ now () {
 )
 
 "$WD/bin/test_vm_inst"
+"$WD/bin/test_vm_asm"

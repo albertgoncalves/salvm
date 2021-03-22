@@ -85,6 +85,12 @@ ALLOC_MEMORY(alloc_token, CAP_TOKEN, tokens, Token)
 ALLOC_MEMORY(alloc_pre_inst, CAP_INST, pre_insts, PreInst)
 ALLOC_MEMORY(alloc_label, CAP_LABEL, labels, Label)
 
+#define ERROR_TOKEN(token)            \
+    {                                 \
+        println_token(stderr, token); \
+        ERROR();                      \
+    }
+
 static String get_inst_tag_as_string(InstTag tag) {
     switch (tag) {
 
@@ -231,18 +237,6 @@ static void println_token(File* stream, Token token) {
     }
 }
 
-static void set_chars_from_file(Memory* memory, const char* path) {
-    File* file = fopen(path, "r");
-    EXIT_IF(!file);
-    fseek(file, 0, SEEK_END);
-    memory->len_chars = (u32)ftell(file);
-    EXIT_IF(CAP_CHAR <= memory->len_chars);
-    rewind(file);
-    EXIT_IF(fread(memory->chars, sizeof(char), memory->len_chars, file) !=
-            memory->len_chars);
-    fclose(file);
-}
-
 static i32 parse_digits_i32(const char* chars, u32* i) {
     i32 a = 0;
     while (IS_DIGIT(chars[*i])) {
@@ -342,12 +336,6 @@ static void set_tokens(Memory* memory) {
         }
     }
 }
-
-#define ERROR_TOKEN(token)            \
-    {                                 \
-        println_token(stderr, token); \
-        ERROR();                      \
-    }
 
 static void set_insts(Memory* memory) {
     i32 index_inst = 0;

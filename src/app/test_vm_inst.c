@@ -1,11 +1,5 @@
 #include "vm_inst.h"
 
-#define TEST(fn, block)    \
-    static void fn(void) { \
-        block;             \
-        printf(".");       \
-    }
-
 TEST(test_push, {
     Vm vm = {0};
     vm.insts[0].tag = INST_PUSH;
