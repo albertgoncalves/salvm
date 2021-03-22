@@ -48,27 +48,34 @@ flags=(
     "-Wunused-macros"
     "-Wwrite-strings"
 )
+bins=(
+    test_vm_inst
+    vm_asm
+    vm_run
+)
 
 now () {
     date +%s.%N
 }
 
 (
-    if [ ! -d "$WD/bin" ]; then
-        mkdir "$WD/bin"
-    fi
+    for x in bin out; do
+        if [ ! -d "$WD/$x" ]; then
+            mkdir "$WD/$x"
+        fi
+    done
     start=$(now)
-    for x in vm_test vm; do
+    for x in "${bins[@]}"; do
         gcc "${paths[@]}" "${flags[@]}" -o "$WD/bin/$x" "$WD/src/app/$x.c"
     done
     gcc \
         "${paths[@]}" \
         "${flags[@]}" \
         "-DDEBUG_PRINT_VM" \
-        -o "$WD/bin/vm_debug" \
-        "$WD/src/app/vm.c"
+        -o "$WD/bin/vm_run_debug" \
+        "$WD/src/app/vm_run.c"
     end=$(now)
     python3 -c "print(\"Compiled! ({:.3f}s)\".format(${end} - ${start}))"
 )
 
-"$WD/bin/vm_test"
+"$WD/bin/test_vm_inst"

@@ -1,7 +1,7 @@
 #ifndef __VM_IO_H__
 #define __VM_IO_H__
 
-#include "vm.h"
+#include "vm_inst.h"
 
 static void run(Vm* vm) {
     vm->index.inst = 0;

@@ -1,4 +1,4 @@
-#include "vm.h"
+#include "vm_inst.h"
 
 #define TEST(fn, block)    \
     static void fn(void) { \
