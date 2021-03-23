@@ -3,12 +3,12 @@
 set -eu
 
 paths=(
-    "-I$WD/src/lib"
+    "-I$WD/src/vm/lib"
 )
 
 cppcheck \
     "${paths[@]}" \
     --enable=all \
     --suppress=missingIncludeSystem \
-    "$WD/src"
-clang-format -i -verbose "$WD/src/"*/*
+    "$WD/src/vm"
+clang-format -i -verbose "$WD/src/vm/"*/*

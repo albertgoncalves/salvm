@@ -3,7 +3,7 @@
 set -eu
 
 paths=(
-    "-I$WD/src/lib"
+    "-I$WD/src/vm/lib"
 )
 flags=(
     "-fshort-enums"
@@ -65,14 +65,14 @@ now () {
     fi
     start=$(now)
     for x in "${bins[@]}"; do
-        gcc "${paths[@]}" "${flags[@]}" -o "$WD/bin/$x" "$WD/src/app/$x.c"
+        gcc "${paths[@]}" "${flags[@]}" -o "$WD/bin/$x" "$WD/src/vm/app/$x.c"
     done
     gcc \
         "${paths[@]}" \
         "${flags[@]}" \
         "-DDEBUG_PRINT_VM" \
         -o "$WD/bin/vm_run_debug" \
-        "$WD/src/app/vm_run.c"
+        "$WD/src/vm/app/vm_run.c"
     end=$(now)
     python3 -c "print(\"Compiled! ({:.3f}s)\".format(${end} - ${start}))"
 )
