@@ -49,8 +49,8 @@ flags=(
     "-Wwrite-strings"
 )
 bins=(
-    test_vm_inst
     test_vm_asm
+    test_vm_inst
     vm_asm
     vm_run
 )
@@ -60,11 +60,9 @@ now () {
 }
 
 (
-    for x in bin out; do
-        if [ ! -d "$WD/$x" ]; then
-            mkdir "$WD/$x"
-        fi
-    done
+    if [ ! -d "$WD/bin" ]; then
+        mkdir "$WD/bin"
+    fi
     start=$(now)
     for x in "${bins[@]}"; do
         gcc "${paths[@]}" "${flags[@]}" -o "$WD/bin/$x" "$WD/src/app/$x.c"
@@ -79,5 +77,5 @@ now () {
     python3 -c "print(\"Compiled! ({:.3f}s)\".format(${end} - ${start}))"
 )
 
-"$WD/bin/test_vm_inst"
 "$WD/bin/test_vm_asm"
+"$WD/bin/test_vm_inst"
