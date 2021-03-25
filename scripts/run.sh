@@ -11,4 +11,4 @@ handle=$(echo "$asm" | sed 's/^.\+\/\(.\+\)\..\+$/\1/')
 bytes="$WD/out/$handle.salb"
 
 "$WD/bin/vm_asm" "$asm" "$bytes"
-"$WD/bin/vm_run" "$bytes"
+"$WD/bin/vm" "$bytes"

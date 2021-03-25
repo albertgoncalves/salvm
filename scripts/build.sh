@@ -2,9 +2,6 @@
 
 set -eu
 
-paths=(
-    "-I$WD/src/vm/lib"
-)
 flags=(
     "-fshort-enums"
     "-fsingle-precision-constant"
@@ -52,7 +49,7 @@ bins=(
     test_vm_asm
     test_vm_inst
     vm_asm
-    vm_run
+    vm
 )
 
 now () {
@@ -65,14 +62,9 @@ now () {
     fi
     start=$(now)
     for x in "${bins[@]}"; do
-        gcc "${paths[@]}" "${flags[@]}" -o "$WD/bin/$x" "$WD/src/vm/app/$x.c"
+        gcc "${flags[@]}" -o "$WD/bin/$x" "$WD/src/$x.c"
     done
-    gcc \
-        "${paths[@]}" \
-        "${flags[@]}" \
-        "-DDEBUG_PRINT_VM" \
-        -o "$WD/bin/vm_run_debug" \
-        "$WD/src/vm/app/vm_run.c"
+    gcc "${flags[@]}" "-DDEBUG_PRINT_VM" -o "$WD/bin/vm_debug" "$WD/src/vm.c"
     end=$(now)
     python3 -c "print(\"Compiled! ({:.3f}s)\".format(${end} - ${start}))"
 )
