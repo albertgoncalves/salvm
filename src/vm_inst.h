@@ -95,7 +95,7 @@ static void do_inst(Vm* vm) {
         vm->index.inst = vm->stack[vm->index.stack_top].as_i32;
         break;
     }
-    case INST_SAVE: {
+    case INST_BASE: {
         BOUNDS_CHECK_STACK(vm->index.stack_top);
         vm->stack[vm->index.stack_top++].as_i32 = vm->index.stack_base;
         ++vm->index.inst;

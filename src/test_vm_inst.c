@@ -74,9 +74,9 @@ TEST(test_ret, {
     EXIT_IF(VM->index.stack_top != 0);
 })
 
-TEST(test_save, {
+TEST(test_base, {
     RESET();
-    VM->insts[0].tag = INST_SAVE;
+    VM->insts[0].tag = INST_BASE;
     VM->index.stack_base = 76;
     do_inst(VM);
     EXIT_IF(VM->index.inst != 1);
@@ -205,7 +205,7 @@ i32 main(void) {
     test_put();
     test_call();
     test_ret();
-    test_save();
+    test_base();
     test_frame();
     test_reset();
     test_jpz();

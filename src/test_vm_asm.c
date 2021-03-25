@@ -73,9 +73,9 @@ TEST(test_ret, {
     EXIT_IF(MEMORY->vm.insts[0].tag != INST_RET);
 })
 
-TEST(test_save, {
-    INJECT("save\n");
-    EXIT_IF(MEMORY->vm.insts[0].tag != INST_SAVE);
+TEST(test_base, {
+    INJECT("base\n");
+    EXIT_IF(MEMORY->vm.insts[0].tag != INST_BASE);
 })
 
 TEST(test_frame, {
@@ -210,7 +210,7 @@ i32 main(void) {
     test_put();
     test_call();
     test_ret();
-    test_save();
+    test_base();
     test_frame();
     test_reset();
     test_jpz();

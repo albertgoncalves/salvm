@@ -19,7 +19,7 @@ typedef enum {
     INST_CALL,
     INST_RET,
 
-    INST_SAVE,
+    INST_BASE,
     INST_FRAME,
     INST_RESET,
 

@@ -4,7 +4,7 @@
         push    10      ; [10]              '\n'
         native  0       ; []                NATIVE_PRINTC
         halt            ; []
-fib:    save            ; [..., a0, i, b]
+fib:    base            ; [..., a0, i, b]
         frame   3       ; [a0, i, b]
         copy    0       ; [a0, i, b, a0]
         push    0       ; [a0, i, b, a0, 0]

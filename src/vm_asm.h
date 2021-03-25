@@ -120,8 +120,8 @@ static String get_inst_tag_as_string(InstTag tag) {
         return (String){.chars = "ret", .len = 3};
     }
 
-    case INST_SAVE: {
-        return (String){.chars = "save", .len = 4};
+    case INST_BASE: {
+        return (String){.chars = "base", .len = 4};
     }
     case INST_FRAME: {
         return (String){.chars = "frame", .len = 5};
@@ -349,7 +349,7 @@ static void set_insts(Memory* memory) {
             switch (token.body.as_inst_tag) {
             case INST_HALT:
             case INST_RET:
-            case INST_SAVE:
+            case INST_BASE:
             case INST_RESET:
             case INST_NOT:
             case INST_EQ:

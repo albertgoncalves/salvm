@@ -20,7 +20,7 @@ syn keyword Keyword
     \ put
     \ call
     \ ret
-    \ save
+    \ base
     \ frame
     \ reset
     \ jpz
