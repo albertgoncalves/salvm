@@ -41,9 +41,9 @@ TEST(test_copy, {
     EXIT_IF(VM->stack[3].as_i32 != 15);
 })
 
-TEST(test_store, {
+TEST(test_put, {
     RESET();
-    VM->insts[0].tag = INST_STORE;
+    VM->insts[0].tag = INST_PUT;
     VM->insts[0].op = 1;
     VM->stack[3].as_i32 = 15;
     VM->index.stack_top = 4;
@@ -202,7 +202,7 @@ i32 main(void) {
     test_push();
     test_top();
     test_copy();
-    test_store();
+    test_put();
     test_call();
     test_ret();
     test_save();

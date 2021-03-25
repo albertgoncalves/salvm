@@ -14,7 +14,7 @@ typedef enum {
     INST_TOP,
 
     INST_COPY,
-    INST_STORE,
+    INST_PUT,
 
     INST_CALL,
     INST_RET,

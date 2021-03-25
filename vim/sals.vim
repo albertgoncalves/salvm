@@ -17,7 +17,7 @@ syn keyword Keyword
     \ push
     \ top
     \ copy
-    \ store
+    \ put
     \ call
     \ ret
     \ save

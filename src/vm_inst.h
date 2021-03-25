@@ -73,7 +73,7 @@ static void do_inst(Vm* vm) {
         ++vm->index.inst;
         break;
     }
-    case INST_STORE: {
+    case INST_PUT: {
         EXIT_IF(vm->index.stack_top < 2);
         --vm->index.stack_top;
         BOUNDS_CHECK_STACK(vm->index.stack_top);

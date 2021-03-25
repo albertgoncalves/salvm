@@ -51,11 +51,11 @@ TEST(test_copy, {
     EXIT_IF(MEMORY->vm.insts[1].op != -1);
 })
 
-TEST(test_store, {
-    INJECT("store -3\nstore 4\n");
-    EXIT_IF(MEMORY->vm.insts[0].tag != INST_STORE);
+TEST(test_put, {
+    INJECT("put -3\nput 4\n");
+    EXIT_IF(MEMORY->vm.insts[0].tag != INST_PUT);
     EXIT_IF(MEMORY->vm.insts[0].op != -3);
-    EXIT_IF(MEMORY->vm.insts[1].tag != INST_STORE);
+    EXIT_IF(MEMORY->vm.insts[1].tag != INST_PUT);
     EXIT_IF(MEMORY->vm.insts[1].op != 4);
 })
 
@@ -207,7 +207,7 @@ i32 main(void) {
     test_push();
     test_top();
     test_copy();
-    test_store();
+    test_put();
     test_call();
     test_ret();
     test_save();

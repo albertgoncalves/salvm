@@ -109,8 +109,8 @@ static String get_inst_tag_as_string(InstTag tag) {
     case INST_COPY: {
         return (String){.chars = "copy", .len = 4};
     }
-    case INST_STORE: {
-        return (String){.chars = "store", .len = 5};
+    case INST_PUT: {
+        return (String){.chars = "put", .len = 3};
     }
 
     case INST_CALL: {
@@ -418,7 +418,7 @@ static void set_insts(Memory* memory) {
             }
             case INST_TOP:
             case INST_COPY:
-            case INST_STORE:
+            case INST_PUT:
             case INST_FRAME: {
                 token = memory->tokens[++i];
                 switch (token.tag) {

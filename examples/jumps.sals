@@ -1,6 +1,6 @@
             top     1
             push    0
-            store   0
+            put     0
 loop_0:     copy    0
             push    5
             eq
@@ -11,7 +11,7 @@ loop_0:     copy    0
 if_0:       copy    0
             push    1
             addi
-            store   0
+            put     0
             push    3
             copy    0
             eq
