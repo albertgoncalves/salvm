@@ -130,6 +130,26 @@ static String get_inst_tag_as_string(InstTag tag) {
         return (String){.chars = "reset", .len = 5};
     }
 
+    case INST_RD8: {
+        return (String){.chars = "rd8", .len = 3};
+    }
+    case INST_RD16: {
+        return (String){.chars = "rd16", .len = 4};
+    }
+    case INST_RD32: {
+        return (String){.chars = "rd32", .len = 4};
+    }
+
+    case INST_SV8: {
+        return (String){.chars = "sv8", .len = 3};
+    }
+    case INST_SV16: {
+        return (String){.chars = "sv16", .len = 4};
+    }
+    case INST_SV32: {
+        return (String){.chars = "sv32", .len = 4};
+    }
+
     case INST_JPZ: {
         return (String){.chars = "jpz", .len = 3};
     }
@@ -351,6 +371,12 @@ static void set_insts(Memory* memory) {
             case INST_RET:
             case INST_BASE:
             case INST_RESET:
+            case INST_RD8:
+            case INST_RD16:
+            case INST_RD32:
+            case INST_SV8:
+            case INST_SV16:
+            case INST_SV32:
             case INST_NOT:
             case INST_EQ:
 

@@ -12,7 +12,6 @@ flags=(
     "-std=c11"
     "-Wall"
     "-Wcast-align"
-    "-Wcast-align=strict"
     "-Wcast-qual"
     "-Wconversion"
     "-Wdate-time"

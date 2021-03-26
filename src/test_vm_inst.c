@@ -134,6 +134,82 @@ TEST(test_jump, {
     EXIT_IF(VM->index.inst != 9);
 })
 
+TEST(test_rd8, {
+    RESET();
+    VM->insts[0].tag = INST_RD8;
+    VM->index.stack_top = 1;
+    VM->stack[0].as_i32 = 10;
+    VM->heap[10] = -123;
+    do_inst(VM);
+    EXIT_IF(VM->index.inst != 1);
+    EXIT_IF(VM->index.stack_top != 1);
+    EXIT_IF(VM->stack[0].as_i32 != -123);
+})
+
+TEST(test_rd16, {
+    RESET();
+    VM->insts[0].tag = INST_RD16;
+    VM->index.stack_top = 1;
+    VM->stack[0].as_i32 = 7;
+    i16* heap = (i16*)VM->heap;
+    heap[7] = -30000;
+    do_inst(VM);
+    EXIT_IF(VM->index.inst != 1);
+    EXIT_IF(VM->index.stack_top != 1);
+    EXIT_IF(VM->stack[0].as_i32 != -30000);
+})
+
+TEST(test_rd32, {
+    RESET();
+    VM->insts[0].tag = INST_RD32;
+    VM->index.stack_top = 1;
+    VM->stack[0].as_i32 = 3;
+    i32* heap = (i32*)VM->heap;
+    heap[3] = -2000000123;
+    do_inst(VM);
+    EXIT_IF(VM->index.inst != 1);
+    EXIT_IF(VM->index.stack_top != 1);
+    EXIT_IF(VM->stack[0].as_i32 != -2000000123);
+})
+
+TEST(test_sv8, {
+    RESET();
+    VM->insts[0].tag = INST_SV8;
+    VM->index.stack_top = 2;
+    VM->stack[0].as_i32 = -113;
+    VM->stack[1].as_i32 = 11;
+    do_inst(VM);
+    EXIT_IF(VM->index.inst != 1);
+    EXIT_IF(VM->index.stack_top != 0);
+    EXIT_IF(VM->heap[11] != -113);
+})
+
+TEST(test_sv16, {
+    RESET();
+    VM->insts[0].tag = INST_SV16;
+    VM->index.stack_top = 2;
+    VM->stack[0].as_i32 = -30012;
+    VM->stack[1].as_i32 = 2;
+    do_inst(VM);
+    EXIT_IF(VM->index.inst != 1);
+    EXIT_IF(VM->index.stack_top != 0);
+    i16* heap = (i16*)VM->heap;
+    EXIT_IF(heap[2] != -30012);
+})
+
+TEST(test_sv32, {
+    RESET();
+    VM->insts[0].tag = INST_SV32;
+    VM->index.stack_top = 2;
+    VM->stack[0].as_i32 = -2000100123;
+    VM->stack[1].as_i32 = 1;
+    do_inst(VM);
+    EXIT_IF(VM->index.inst != 1);
+    EXIT_IF(VM->index.stack_top != 0);
+    i32* heap = (i32*)VM->heap;
+    EXIT_IF(heap[1] != -2000100123);
+})
+
 TEST(test_not, {
     RESET();
     VM->insts[0].tag = INST_NOT;
@@ -210,6 +286,12 @@ i32 main(void) {
     test_reset();
     test_jpz();
     test_jump();
+    test_rd8();
+    test_rd16();
+    test_rd32();
+    test_sv8();
+    test_sv16();
+    test_sv32();
     test_not();
     test_eq();
     test_addi();

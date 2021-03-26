@@ -25,6 +25,12 @@ syn keyword Keyword
     \ reset
     \ jpz
     \ jump
+    \ rd8
+    \ rd16
+    \ rd32
+    \ sv8
+    \ sv16
+    \ sv32
     \ not
     \ eq
     \ addi

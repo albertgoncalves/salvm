@@ -3,8 +3,14 @@
 
 #include "prelude.h"
 
+STATIC_ASSERT(sizeof(i32) == sizeof(f32), "sizeof(i32) != sizeof(f32)");
+STATIC_ASSERT(alignof(i8) == 1, "alignof(i8) != 1");
+STATIC_ASSERT(alignof(i16) == 2, "alignof(i16) != 2");
+STATIC_ASSERT(alignof(i32) == 4, "alignof(i32) != 4");
+
 #define CAP_INST  256
 #define CAP_STACK 256
+#define CAP_HEAP8 256
 
 typedef enum {
     INST_HALT = 0,
@@ -22,6 +28,14 @@ typedef enum {
     INST_BASE,
     INST_FRAME,
     INST_RESET,
+
+    INST_RD8,
+    INST_RD16,
+    INST_RD32,
+
+    INST_SV8,
+    INST_SV16,
+    INST_SV32,
 
     INST_JPZ,
     INST_JUMP,
@@ -70,11 +84,10 @@ typedef union {
     f32 as_f32;
 } Word;
 
-STATIC_ASSERT(sizeof(i32) == sizeof(f32), "sizeof(i32) != sizeof(f32)");
-
 typedef struct {
     Inst  insts[CAP_INST];
     Word  stack[CAP_STACK];
+    i8    heap[CAP_HEAP8];
     Index index;
     Bool  alive;
 } Vm;

@@ -9,6 +9,12 @@
         EXIT_IF((index) < 0);          \
     }
 
+#define BOUNDS_CHECK_HEAP8(index)      \
+    {                                  \
+        EXIT_IF(CAP_HEAP8 <= (index)); \
+        EXIT_IF((index) < 0);          \
+    }
+
 #define BINARY_OP(vm, op, in, out)                                            \
     {                                                                         \
         EXIT_IF(vm->index.stack_top < 2);                                     \
@@ -110,6 +116,73 @@ static void do_inst(Vm* vm) {
         --vm->index.stack_top;
         BOUNDS_CHECK_STACK(vm->index.stack_top);
         vm->index.stack_base = vm->stack[vm->index.stack_top].as_i32;
+        ++vm->index.inst;
+        break;
+    }
+    case INST_RD8: {
+        i32 i = vm->index.stack_top - 1;
+        BOUNDS_CHECK_STACK(i);
+        i32 j = vm->stack[i].as_i32;
+        BOUNDS_CHECK_HEAP8(j);
+        vm->stack[i].as_i32 = (i32)(vm->heap[j]);
+        ++vm->index.inst;
+        break;
+    }
+    case INST_RD16: {
+        i32 i = vm->index.stack_top - 1;
+        BOUNDS_CHECK_STACK(i);
+        i32 j = vm->stack[i].as_i32;
+        BOUNDS_CHECK_HEAP8(j * 2);
+        i16* heap = (i16*)vm->heap;
+        vm->stack[i].as_i32 = (i32)(heap[j]);
+        ++vm->index.inst;
+        break;
+    }
+    case INST_RD32: {
+        i32 i = vm->index.stack_top - 1;
+        BOUNDS_CHECK_STACK(i);
+        i32 j = vm->stack[i].as_i32;
+        BOUNDS_CHECK_HEAP8(j * 4);
+        i32* heap = (i32*)vm->heap;
+        vm->stack[i].as_i32 = heap[j];
+        ++vm->index.inst;
+        break;
+    }
+    case INST_SV8: {
+        EXIT_IF(vm->index.stack_top < 2);
+        i32 i = vm->index.stack_top - 1;
+        i32 j = vm->index.stack_top - 2;
+        EXIT_IF(CAP_STACK <= i)
+        i32 l = vm->stack[i].as_i32;
+        BOUNDS_CHECK_HEAP8(l);
+        vm->heap[l] = (i8)(vm->stack[j].as_i32);
+        vm->index.stack_top -= 2;
+        ++vm->index.inst;
+        break;
+    }
+    case INST_SV16: {
+        EXIT_IF(vm->index.stack_top < 2);
+        i32 i = vm->index.stack_top - 1;
+        i32 j = vm->index.stack_top - 2;
+        EXIT_IF(CAP_STACK <= i)
+        i32 l = vm->stack[i].as_i32;
+        BOUNDS_CHECK_HEAP8(l * 2);
+        i16* heap = (i16*)vm->heap;
+        heap[l] = (i16)(vm->stack[j].as_i32);
+        vm->index.stack_top -= 2;
+        ++vm->index.inst;
+        break;
+    }
+    case INST_SV32: {
+        EXIT_IF(vm->index.stack_top < 2);
+        i32 i = vm->index.stack_top - 1;
+        i32 j = vm->index.stack_top - 2;
+        EXIT_IF(CAP_STACK <= i)
+        i32 l = vm->stack[i].as_i32;
+        BOUNDS_CHECK_HEAP8(l * 4);
+        i32* heap = (i32*)vm->heap;
+        heap[l] = vm->stack[j].as_i32;
+        vm->index.stack_top -= 2;
         ++vm->index.inst;
         break;
     }

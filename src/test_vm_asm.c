@@ -105,6 +105,36 @@ TEST(test_jump, {
     EXIT_IF(MEMORY->vm.insts[1].op != 1);
 })
 
+TEST(test_rd8, {
+    INJECT("rd8\n");
+    EXIT_IF(MEMORY->vm.insts[0].tag != INST_RD8);
+})
+
+TEST(test_rd16, {
+    INJECT("rd16\n");
+    EXIT_IF(MEMORY->vm.insts[0].tag != INST_RD16);
+})
+
+TEST(test_rd32, {
+    INJECT("rd32\n");
+    EXIT_IF(MEMORY->vm.insts[0].tag != INST_RD32);
+})
+
+TEST(test_sv8, {
+    INJECT("sv8\n");
+    EXIT_IF(MEMORY->vm.insts[0].tag != INST_SV8);
+})
+
+TEST(test_sv16, {
+    INJECT("sv16\n");
+    EXIT_IF(MEMORY->vm.insts[0].tag != INST_SV16);
+})
+
+TEST(test_sv32, {
+    INJECT("sv32\n");
+    EXIT_IF(MEMORY->vm.insts[0].tag != INST_SV32);
+})
+
 TEST(test_not, {
     INJECT("not\n");
     EXIT_IF(MEMORY->vm.insts[0].tag != INST_NOT);
@@ -215,6 +245,12 @@ i32 main(void) {
     test_reset();
     test_jpz();
     test_jump();
+    test_rd8();
+    test_rd16();
+    test_rd32();
+    test_sv8();
+    test_sv16();
+    test_sv32();
     test_not();
     test_eq();
     test_addi();

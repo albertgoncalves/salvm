@@ -2,16 +2,21 @@
 #define __PRELUDE_H__
 
 #include <assert.h>
+#include <stdalign.h>
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
 typedef uint32_t u32;
-typedef int32_t  i32;
 typedef size_t   usize;
-typedef float    f32;
-typedef double   f64;
+
+typedef int8_t  i8;
+typedef int16_t i16;
+typedef int32_t i32;
+
+typedef float  f32;
+typedef double f64;
 
 typedef enum {
     FALSE = 0,
