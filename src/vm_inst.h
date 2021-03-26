@@ -43,10 +43,28 @@ NATIVE_1(native_printi,
 NATIVE_1(native_printf,
          { printf("%.2f", (f64)vm->stack[vm->index.stack_top].as_f32); })
 
+static void native_prints(Vm* vm) {
+    EXIT_IF(vm->index.stack_top < 2);
+    i32 i = vm->index.stack_top - 1;
+    i32 j = vm->index.stack_top - 2;
+    EXIT_IF(CAP_STACK <= i)
+    i32 k = vm->stack[i].as_i32;
+    BOUNDS_CHECK_HEAP8(k);
+    i32 l = vm->stack[j].as_i32;
+    EXIT_IF(CAP_HEAP8 <= (k + l));
+    printf("%.*s", l, (char*)&vm->heap[k]);
+    vm->index.stack_top -= 2;
+}
+
+static void native_nop(Vm* _) {
+}
+
 static const Native NATIVES[COUNT_NATIVE] = {
+    [NATIVE_NOP] = native_nop,
     [NATIVE_PRINTC] = native_printc,
     [NATIVE_PRINTI] = native_printi,
     [NATIVE_PRINTF] = native_printf,
+    [NATIVE_PRINTS] = native_prints,
 };
 
 static void do_inst(Vm* vm) {

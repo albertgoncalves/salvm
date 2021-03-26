@@ -1,8 +1,8 @@
         push    30      ; [30]
         call    fib     ; [fib]
-        native  1       ; []                NATIVE_PRINTI
+        native  2       ; []                NATIVE_PRINTI
         push    10      ; [10]              '\n'
-        native  0       ; []                NATIVE_PRINTC
+        native  1       ; []                NATIVE_PRINTC
         halt            ; []
 fib:    base            ; [..., a0, i, b]
         frame   3       ; [a0, i, b]

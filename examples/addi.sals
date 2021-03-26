@@ -1,14 +1,14 @@
     call    f
     push    0
-    native  1   ; NATIVE_PRINTI
+    native  2   ; NATIVE_PRINTI
     push    10  ; '\n'
-    native  0   ; NATIVE_PRINTC
+    native  1   ; NATIVE_PRINTC
     halt
 f:
     push    1
     push    -3
     addi
-    native  1   ; NATIVE_PRINTI
+    native  2   ; NATIVE_PRINTI
     push    10  ; '\n'
-    native  0   ; NATIVE_PRINTC
+    native  1   ; NATIVE_PRINTC
     ret

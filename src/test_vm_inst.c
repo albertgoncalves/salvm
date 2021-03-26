@@ -273,6 +273,14 @@ TEST_BINARY_OP(test_lef, INST_LEF, f32, i32, 0)
 TEST_BINARY_OP(test_gtf, INST_GTF, f32, i32, 1)
 TEST_BINARY_OP(test_gef, INST_GEF, f32, i32, 1)
 
+TEST(test_native_nop, {
+    RESET();
+    VM->insts[0].tag = INST_NATIVE;
+    VM->insts[0].op = 0;
+    do_inst(VM);
+    EXIT_IF(VM->index.inst != 1);
+})
+
 i32 main(void) {
     VM = calloc(1, sizeof(Vm));
     test_push();
@@ -306,6 +314,7 @@ i32 main(void) {
     test_lef();
     test_gtf();
     test_gef();
+    test_native_nop();
     printf("\n");
     free(VM);
     return EXIT_SUCCESS;

@@ -29,6 +29,7 @@ flags=(
     "-Wmissing-declarations"
     "-Wmissing-include-dirs"
     "-Wmissing-prototypes"
+    "-Wno-unused-parameter"
     "-Wnull-dereference"
     "-Wpacked"
     "-Wpedantic"

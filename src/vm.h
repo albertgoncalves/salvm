@@ -93,9 +93,11 @@ typedef struct {
 } Vm;
 
 typedef enum {
-    NATIVE_PRINTC = 0,
+    NATIVE_NOP = 0,
+    NATIVE_PRINTC,
     NATIVE_PRINTI,
     NATIVE_PRINTF,
+    NATIVE_PRINTS,
     COUNT_NATIVE,
 } Natives;
 
