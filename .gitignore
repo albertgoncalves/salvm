@@ -3,6 +3,7 @@
 !shell.nix
 !.shellhook
 !.clang-format
+!.ocp-indent
 !vim/
 !*.vim
 !scripts/
@@ -15,3 +16,9 @@
 !*.c
 !examples/
 !*.sals
+
+!*.hs
+!*.ml
+!sketches/
+!sketches/haskell/
+!sketches/ocaml/
