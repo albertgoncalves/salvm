@@ -59,6 +59,12 @@ typedef struct {
     u32     len_labels;
 } Memory;
 
+#define TO_STRING(literal)          \
+    ((String){                      \
+        .len = sizeof(literal) - 1, \
+        .chars = literal,           \
+    })
+
 #define EQ_STRINGS(a, b) \
     ((a.len == b.len) && (!memcmp(a.chars, b.chars, a.len)))
 
@@ -95,129 +101,129 @@ static String get_inst_tag_as_string(InstTag tag) {
     switch (tag) {
 
     case INST_HALT: {
-        return (String){.chars = "halt", .len = 4};
+        return TO_STRING("halt");
     }
 
     case INST_PUSH: {
-        return (String){.chars = "push", .len = 4};
+        return TO_STRING("push");
     }
 
     case INST_TOP: {
-        return (String){.chars = "top", .len = 3};
+        return TO_STRING("top");
     }
 
     case INST_COPY: {
-        return (String){.chars = "copy", .len = 4};
+        return TO_STRING("copy");
     }
     case INST_PUT: {
-        return (String){.chars = "put", .len = 3};
+        return TO_STRING("put");
     }
 
     case INST_CALL: {
-        return (String){.chars = "call", .len = 4};
+        return TO_STRING("call");
     }
     case INST_RET: {
-        return (String){.chars = "ret", .len = 3};
+        return TO_STRING("ret");
     }
 
     case INST_BASE: {
-        return (String){.chars = "base", .len = 4};
+        return TO_STRING("base");
     }
     case INST_FRAME: {
-        return (String){.chars = "frame", .len = 5};
+        return TO_STRING("frame");
     }
     case INST_RESET: {
-        return (String){.chars = "reset", .len = 5};
+        return TO_STRING("reset");
     }
 
     case INST_RD8: {
-        return (String){.chars = "rd8", .len = 3};
+        return TO_STRING("rd8");
     }
     case INST_RD16: {
-        return (String){.chars = "rd16", .len = 4};
+        return TO_STRING("rd16");
     }
     case INST_RD32: {
-        return (String){.chars = "rd32", .len = 4};
+        return TO_STRING("rd32");
     }
 
     case INST_SV8: {
-        return (String){.chars = "sv8", .len = 3};
+        return TO_STRING("sv8");
     }
     case INST_SV16: {
-        return (String){.chars = "sv16", .len = 4};
+        return TO_STRING("sv16");
     }
     case INST_SV32: {
-        return (String){.chars = "sv32", .len = 4};
+        return TO_STRING("sv32");
     }
 
     case INST_JPZ: {
-        return (String){.chars = "jpz", .len = 3};
+        return TO_STRING("jpz");
     }
     case INST_JUMP: {
-        return (String){.chars = "jump", .len = 4};
+        return TO_STRING("jump");
     }
 
     case INST_NOT: {
-        return (String){.chars = "not", .len = 3};
+        return TO_STRING("not");
     }
     case INST_EQ: {
-        return (String){.chars = "eq", .len = 2};
+        return TO_STRING("eq");
     }
 
     case INST_ADDI: {
-        return (String){.chars = "addi", .len = 4};
+        return TO_STRING("addi");
     }
     case INST_SUBI: {
-        return (String){.chars = "subi", .len = 4};
+        return TO_STRING("subi");
     }
     case INST_MULI: {
-        return (String){.chars = "muli", .len = 4};
+        return TO_STRING("muli");
     }
     case INST_DIVI: {
-        return (String){.chars = "divi", .len = 4};
+        return TO_STRING("divi");
     }
 
     case INST_ADDF: {
-        return (String){.chars = "addf", .len = 4};
+        return TO_STRING("addf");
     }
     case INST_SUBF: {
-        return (String){.chars = "subf", .len = 4};
+        return TO_STRING("subf");
     }
     case INST_MULF: {
-        return (String){.chars = "mulf", .len = 4};
+        return TO_STRING("mulf");
     }
     case INST_DIVF: {
-        return (String){.chars = "divf", .len = 4};
+        return TO_STRING("divf");
     }
 
     case INST_LTI: {
-        return (String){.chars = "lti", .len = 3};
+        return TO_STRING("lti");
     }
     case INST_LEI: {
-        return (String){.chars = "lei", .len = 3};
+        return TO_STRING("lei");
     }
     case INST_GTI: {
-        return (String){.chars = "gti", .len = 3};
+        return TO_STRING("gti");
     }
     case INST_GEI: {
-        return (String){.chars = "gei", .len = 3};
+        return TO_STRING("gei");
     }
 
     case INST_LTF: {
-        return (String){.chars = "ltf", .len = 3};
+        return TO_STRING("ltf");
     }
     case INST_LEF: {
-        return (String){.chars = "lef", .len = 3};
+        return TO_STRING("lef");
     }
     case INST_GTF: {
-        return (String){.chars = "gtf", .len = 3};
+        return TO_STRING("gtf");
     }
     case INST_GEF: {
-        return (String){.chars = "gef", .len = 3};
+        return TO_STRING("gef");
     }
 
     case INST_NATIVE: {
-        return (String){.chars = "native", .len = 6};
+        return TO_STRING("native");
     }
 
     case COUNT_INST_TAG: {

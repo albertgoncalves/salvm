@@ -231,6 +231,24 @@ TEST(test_native, {
     EXIT_IF(MEMORY->vm.insts[0].op != 1);
 })
 
+#define TEST_STR(inst, literal, len_)                 \
+    {                                                 \
+        String result = get_inst_tag_as_string(inst); \
+        EXIT_IF(result.len != len_);                  \
+        String expected;                              \
+        expected.len = len_;                          \
+        expected.chars = literal;                     \
+        EXIT_IF(!EQ_STRINGS(result, expected));       \
+    }
+
+TEST(test_halt_as_string, { TEST_STR(INST_HALT, "halt", 4); })
+
+TEST(test_eq_as_string, { TEST_STR(INST_EQ, "eq", 2); })
+
+TEST(test_jpz_as_string, { TEST_STR(INST_JPZ, "jpz", 3); })
+
+TEST(test_native_as_string, { TEST_STR(INST_NATIVE, "native", 6); })
+
 i32 main(void) {
     MEMORY = calloc(1, sizeof(Memory));
     test_halt();
@@ -270,6 +288,10 @@ i32 main(void) {
     test_gtf();
     test_gef();
     test_native();
+    test_halt_as_string();
+    test_eq_as_string();
+    test_jpz_as_string();
+    test_native_as_string();
     free(MEMORY);
     printf("\n");
     return EXIT_SUCCESS;
