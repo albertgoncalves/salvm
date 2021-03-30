@@ -24,7 +24,7 @@ TEST(test_halt, {
 })
 
 TEST(test_push, {
-    INJECT("push 567890\npush -12345\n\npush -12345.6789\n");
+    INJECT("push 567890\npush -12345\n\nf: push -12345.6789\npush f\n");
     EXIT_IF(MEMORY->vm.insts[0].tag != INST_PUSH);
     EXIT_IF(MEMORY->vm.insts[0].op != 567890);
     EXIT_IF(MEMORY->vm.insts[1].tag != INST_PUSH);
@@ -33,6 +33,8 @@ TEST(test_push, {
     f32 op = *((f32*)(&MEMORY->vm.insts[2].op));
     EXIT_IF(op < (-12345.6789f - EPSILON));
     EXIT_IF((-12345.6789f + EPSILON) < op);
+    EXIT_IF(MEMORY->vm.insts[3].tag != INST_PUSH);
+    EXIT_IF(MEMORY->vm.insts[3].op != 2);
 })
 
 TEST(test_top, {

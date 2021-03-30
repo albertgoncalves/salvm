@@ -444,8 +444,12 @@ static void set_insts(Memory* memory) {
                     }
                     break;
                 }
+                case TOKEN_STR: {
+                    pre_inst->label = token.body.as_string;
+                    pre_inst->resolved = FALSE;
+                    break;
+                }
                 case TOKEN_INST:
-                case TOKEN_STR:
                 case TOKEN_COLON: {
                     ERROR_TOKEN(token);
                 }
