@@ -6,7 +6,7 @@ import Parser (Input (..), parse)
 main :: IO ()
 main =
   mapM_
-    (print . parse ast . Input 1)
+    (print . (snd <$>) . parse ast . Input 1)
     [ "",
       "1234;\n\n\n",
       "-1234;",
@@ -42,5 +42,14 @@ main =
       \x = 1;\n\
       \y = f(x, x);\n\
       \z = 0.0123;\n\
-      \print(x);"
+      \print( x );",
+      --
+      "true;",
+      "false;",
+      "if true { print(1); }",
+      "if true { print(1); } else { print(0); }",
+      "loop { i32 x; x = rand(); print(x); }",
+      "return -43.21;",
+      "bool x;",
+      "bool f(f32 x) { print(x); return true; }"
     ]
