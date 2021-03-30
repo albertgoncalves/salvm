@@ -31,8 +31,8 @@ TEST(test_push, {
     EXIT_IF(MEMORY->vm.insts[1].op != -12345);
     EXIT_IF(MEMORY->vm.insts[2].tag != INST_PUSH);
     f32 op = *((f32*)(&MEMORY->vm.insts[2].op));
-    EXIT_IF(op < (-12345.6789f - EPSILON));
-    EXIT_IF((-12345.6789f + EPSILON) < op);
+    EXIT_IF((op < (-12345.6789f - EPSILON)) ||
+            ((-12345.6789f + EPSILON) < op));
     EXIT_IF(MEMORY->vm.insts[3].tag != INST_PUSH);
     EXIT_IF(MEMORY->vm.insts[3].op != 2);
 })
