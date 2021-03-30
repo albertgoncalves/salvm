@@ -9,9 +9,6 @@
 !scripts/
 !*.sh
 !src/
-!src/vm/
-!src/vm/app/
-!src/vm/lib/
 !*.h
 !*.c
 !examples/
