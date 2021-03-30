@@ -122,6 +122,9 @@ static String get_inst_tag_as_string(InstTag tag) {
     case INST_CALL: {
         return TO_STRING("call");
     }
+    case INST_SCL: {
+        return TO_STRING("scl");
+    }
     case INST_RET: {
         return TO_STRING("ret");
     }
@@ -374,6 +377,7 @@ static void set_insts(Memory* memory) {
             ++index_inst;
             switch (token.body.as_inst_tag) {
             case INST_HALT:
+            case INST_SCL:
             case INST_RET:
             case INST_BASE:
             case INST_RESET:

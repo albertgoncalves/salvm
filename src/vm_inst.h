@@ -113,6 +113,14 @@ static void do_inst(Vm* vm) {
         vm->index.inst = inst.op;
         break;
     }
+    case INST_SCL: {
+        i32 i = vm->index.stack_top - 1;
+        BOUNDS_CHECK_STACK(i);
+        i32 j = vm->stack[i].as_i32;
+        vm->stack[i].as_i32 = vm->index.inst + 1;
+        vm->index.inst = j;
+        break;
+    }
     case INST_RET: {
         --vm->index.stack_top;
         BOUNDS_CHECK_STACK(vm->index.stack_top);

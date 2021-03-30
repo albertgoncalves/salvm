@@ -19,6 +19,7 @@ syn keyword Keyword
     \ copy
     \ put
     \ call
+    \ scl
     \ ret
     \ base
     \ frame

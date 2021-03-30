@@ -64,6 +64,17 @@ TEST(test_call, {
     EXIT_IF(VM->stack[0].as_i32 != 1);
 })
 
+TEST(test_scl, {
+    RESET();
+    VM->insts[0].tag = INST_SCL;
+    VM->stack[0].as_i32 = 99;
+    VM->index.stack_top = 1;
+    do_inst(VM);
+    EXIT_IF(VM->index.inst != 99);
+    EXIT_IF(VM->index.stack_top != 1);
+    EXIT_IF(VM->stack[0].as_i32 != 1);
+})
+
 TEST(test_ret, {
     RESET();
     VM->insts[0].tag = INST_RET;
@@ -288,6 +299,7 @@ i32 main(void) {
     test_copy();
     test_put();
     test_call();
+    test_scl();
     test_ret();
     test_base();
     test_frame();

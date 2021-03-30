@@ -68,6 +68,11 @@ TEST(test_call, {
     EXIT_IF(MEMORY->vm.insts[2].op != 4);
 })
 
+TEST(test_scl, {
+    INJECT("scl\n");
+    EXIT_IF(MEMORY->vm.insts[0].tag != INST_SCL);
+})
+
 TEST(test_ret, {
     INJECT("ret\n");
     EXIT_IF(MEMORY->vm.insts[0].tag != INST_RET);
@@ -243,6 +248,8 @@ TEST(test_native, {
 
 TEST(test_halt_as_string, { TEST_STR(INST_HALT, "halt", 4); })
 
+TEST(test_scl_as_string, { TEST_STR(INST_SCL, "scl", 3); })
+
 TEST(test_eq_as_string, { TEST_STR(INST_EQ, "eq", 2); })
 
 TEST(test_jpz_as_string, { TEST_STR(INST_JPZ, "jpz", 3); })
@@ -257,6 +264,7 @@ i32 main(void) {
     test_copy();
     test_put();
     test_call();
+    test_scl();
     test_ret();
     test_base();
     test_frame();
@@ -292,6 +300,7 @@ i32 main(void) {
     test_eq_as_string();
     test_jpz_as_string();
     test_native_as_string();
+    test_scl_as_string();
     free(MEMORY);
     printf("\n");
     return EXIT_SUCCESS;

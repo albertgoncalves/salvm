@@ -23,6 +23,7 @@ typedef enum {
     INST_PUT,
 
     INST_CALL,
+    INST_SCL,
     INST_RET,
 
     INST_BASE,

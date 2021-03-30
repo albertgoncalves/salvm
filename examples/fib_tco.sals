@@ -1,7 +1,8 @@
         push    30      ; [30]
         push    0       ; [30, 0]
         push    1       ; [30, 0, 1]
-        call    fib     ; [r0]
+        push    9       ; [30, 0, 1, `fib`]
+        scl             ; [r0]
         native  2       ; []                NATIVE_PRINTI
         push    10      ; [10]              '\n'
         native  1       ; []                NATIVE_PRINTC
