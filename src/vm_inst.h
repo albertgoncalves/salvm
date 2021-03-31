@@ -57,6 +57,7 @@ static void native_prints(Vm* vm) {
 }
 
 static void native_nop(Vm* _) {
+    (void)_;
 }
 
 static const Native NATIVES[COUNT_NATIVE] = {
