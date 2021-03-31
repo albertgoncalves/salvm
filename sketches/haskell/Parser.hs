@@ -4,9 +4,11 @@ module Parser where
 
 import Control.Applicative (Alternative, empty, many, (<|>))
 import Data.Semigroup (Min (..))
+import Data.Text (Text, null, pack, uncons)
+import Prelude hiding (null)
 
 newtype ParseError = ParseError Int
-  deriving (Show)
+  deriving (Eq, Show)
 
 instance Alternative (Either ParseError) where
   empty = Left $ ParseError 1
@@ -15,9 +17,9 @@ instance Alternative (Either ParseError) where
 
 data Input = Input
   { line :: Int,
-    rest :: String
+    rest :: Text
   }
-  deriving (Show)
+  deriving (Eq, Show)
 
 type Line a = (Min Int, a)
 
@@ -42,9 +44,14 @@ instance Alternative Parser where
   (Parser p1) <|> (Parser p2) = Parser $ \i -> p1 i <|> p2 i
 
 adv :: Input -> Maybe (Char, Input)
-adv (Input _ "") = Nothing
-adv (Input l ('\n' : xs)) = Just ('\n', Input (l + 1) xs)
-adv (Input l (x : xs)) = Just (x, Input l xs)
+adv (Input l xs) =
+  ( \(x, xs') ->
+      let l' = case x of
+            '\n' -> l + 1
+            _ -> l
+       in (x, Input l' xs')
+  )
+    <$> uncons xs
 
 satisfy :: (Char -> Bool) -> Parser (Line Char)
 satisfy f = Parser $ \i ->
@@ -59,8 +66,8 @@ satisfy f = Parser $ \i ->
 char :: Char -> Parser (Line Char)
 char = satisfy . (==)
 
-string :: String -> Parser (Line String)
-string = (sequenceA <$>) . traverse char
+string :: String -> Parser (Line Text)
+string = ((pack <$>) . sequenceA <$>) . traverse char
 
 sepBy :: Parser a -> Parser b -> Parser [b]
 sepBy sep item = (:) <$> item <*> many (sep *> item) <|> pure []

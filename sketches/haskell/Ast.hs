@@ -1,41 +1,59 @@
 module Ast where
 
 import Control.Applicative (many, some, (<|>))
+import Control.Monad (void)
 import Data.Char (isAlpha, isAlphaNum, isDigit, isSpace)
 import Parser (Line, Parser (..), char, end, satisfy, sepBy, string)
 
 data Type
   = TBool
-  | TInt
   | TFloat
-  deriving (Show)
+  | TInt
+  deriving (Eq, Show)
 
 data Lit
-  = LInt Int
+  = LBool Bool
   | LFloat Float
-  | LBool Bool
-  deriving (Show)
+  | LInt Int
+  deriving (Eq, Show)
 
 data Expr
-  = EType (Line Type)
+  = ECall Expr [Expr]
   | ELit (Line Lit)
+  | EType (Line Type)
   | EVar (Line String)
-  | ECall Expr [Expr]
-  deriving (Show)
+  deriving (Eq, Show)
 
 data Stmt
-  = SEffect Expr
+  = SAssign Expr Expr
   | SDecl (Line Type) Expr
-  | SAssign Expr Expr
-  | SIf Expr [Stmt]
+  | SEffect Expr
+  | SFn Expr [Stmt] [Stmt]
   | SIfElse Expr [Stmt] [Stmt]
+  | SIf Expr [Stmt]
   | SLoop [Stmt]
   | SRet Expr
-  | SFn Expr [Stmt] [Stmt]
-  deriving (Show)
+  deriving (Eq, Show)
 
-anySpace :: Parser [Line Char]
-anySpace = many (satisfy isSpace)
+comment :: Parser (Line ())
+comment =
+  void
+    <$> ( string "--"
+            <* many (satisfy (/= '\n'))
+            <* ((void <$> char '\n') <|> (pure <$> end))
+        )
+
+space :: Parser (Line ())
+space = void <$> satisfy isSpace
+
+anySpace :: Parser [Line ()]
+anySpace = many (comment <|> space)
+
+someSpace :: Parser [Line ()]
+someSpace = some (comment <|> space)
+
+sepAnySpace :: Parser a -> Parser [a]
+sepAnySpace p = anySpace *> sepBy anySpace p <* anySpace
 
 underscore :: Parser (Line Char)
 underscore = char '_'
@@ -102,51 +120,55 @@ call = ECall <$> var <*> (lParen *> sepBy comma expr <* rParen)
 expr :: Parser Expr
 expr = (EType <$> type') <|> lit <|> call <|> var
 
+ret :: Parser Stmt
+ret = SRet <$> (string "return" *> someSpace *> expr <* semicolon)
+
 assign :: Parser Stmt
 assign =
-  SAssign <$> (var <* anySpace <* char '=' <* anySpace) <*> (expr <* semicolon)
+  SAssign
+    <$> (var <* someSpace <* char '=' <* someSpace) <*> (expr <* semicolon)
 
 if' :: Parser Stmt
-if' = SIf <$> (string "if" *> anySpace *> expr) <*> (lBrace *> stmts <* rBrace)
+if' =
+  SIf <$> (string "if" *> someSpace *> expr) <*> (lBrace *> stmts <* rBrace)
 
 ifelse :: Parser Stmt
 ifelse =
   SIfElse
-    <$> (string "if" *> anySpace *> expr)
+    <$> (string "if" *> someSpace *> expr)
     <*> (lBrace *> stmts <* rBrace <* string "else")
-    <*> (lBrace *> stmts <* rBrace)
+    <*> ( (lBrace *> stmts <* rBrace)
+            <|> ((: []) <$> (someSpace *> (ifelse <|> if')))
+        )
 
 loop :: Parser Stmt
 loop = SLoop <$> (string "loop" *> lBrace *> stmts <* rBrace)
 
 decl :: Parser Stmt
-decl = SDecl <$> (type' <* anySpace) <*> var
-
-effect :: Parser Stmt
-effect = SEffect <$> (expr <* semicolon)
-
-ret :: Parser Stmt
-ret = SRet <$> (string "return" *> anySpace *> expr <* semicolon)
+decl = SDecl <$> (type' <* someSpace) <*> var
 
 fn :: Parser Stmt
 fn =
   SFn
-    <$> (type' *> anySpace *> var)
+    <$> (type' *> someSpace *> var)
     <*> (lParen *> sepBy comma decl <* rParen)
     <*> (lBrace *> stmts <* rBrace)
+
+effect :: Parser Stmt
+effect = SEffect <$> (expr <* semicolon)
 
 stmt :: Parser Stmt
 stmt =
   ret
-    <|> assign
     <|> ifelse
     <|> if'
     <|> loop
+    <|> assign
     <|> (decl <* semicolon)
     <|> effect
 
 stmts :: Parser [Stmt]
-stmts = anySpace *> sepBy anySpace stmt <* anySpace
+stmts = sepAnySpace stmt
 
 ast :: Parser [Stmt]
-ast = anySpace *> sepBy anySpace (fn <|> stmt) <* anySpace <* end
+ast = sepAnySpace (fn <|> stmt) <* end
