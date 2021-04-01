@@ -16,6 +16,7 @@
 
 !*.hs
 !*.ml
+!*.sall
 !sketches/
 !sketches/haskell/
 !sketches/ocaml/

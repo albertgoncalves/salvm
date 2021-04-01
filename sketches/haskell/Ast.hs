@@ -2,7 +2,7 @@ module Ast where
 
 import Control.Applicative (many, some, (<|>))
 import Control.Monad (void)
-import Data.Char (isAlpha, isAlphaNum, isDigit, isSpace)
+import Data.Char (isAlphaNum, isDigit, isLower, isSpace)
 import Parser (Line, Parser (..), char, end, satisfy, sepBy, string)
 
 data Type
@@ -26,9 +26,10 @@ data Expr
 
 data Stmt
   = SAssign Expr Expr
+  | SBreak
   | SDecl (Line Type) Expr
   | SEffect Expr
-  | SFn Expr [Stmt] [Stmt]
+  | SFn [Line Type] Expr [Stmt] [Stmt] [Stmt]
   | SIfElse Expr [Stmt] [Stmt]
   | SIf Expr [Stmt]
   | SLoop [Stmt]
@@ -53,7 +54,7 @@ someSpace :: Parser [Line ()]
 someSpace = some (comment <|> space)
 
 sepAnySpace :: Parser a -> Parser [a]
-sepAnySpace p = anySpace *> sepBy anySpace p <* anySpace
+sepAnySpace p = anySpace *> p `sepBy` anySpace <* anySpace
 
 underscore :: Parser (Line Char)
 underscore = char '_'
@@ -110,15 +111,18 @@ var :: Parser Expr
 var =
   EVar . sequenceA
     <$> ( (:)
-            <$> (satisfy isAlpha <|> underscore)
+            <$> satisfy isLower
             <*> many (satisfy isAlphaNum <|> underscore)
         )
 
 call :: Parser Expr
-call = ECall <$> var <*> (lParen *> sepBy comma expr <* rParen)
+call = ECall <$> var <*> (lParen *> expr `sepBy` comma <* rParen)
 
 expr :: Parser Expr
 expr = (EType <$> type') <|> lit <|> call <|> var
+
+break :: Parser Stmt
+break = SBreak <$ (string "break" <* semicolon)
 
 ret :: Parser Stmt
 ret = SRet <$> (string "return" *> someSpace *> expr <* semicolon)
@@ -150,25 +154,20 @@ decl = SDecl <$> (type' <* someSpace) <*> var
 fn :: Parser Stmt
 fn =
   SFn
-    <$> (type' *> someSpace *> var)
-    <*> (lParen *> sepBy comma decl <* rParen)
-    <*> (lBrace *> stmts <* rBrace)
+    <$> (many (type' <* someSpace) <|> pure [])
+    <*> var
+    <*> (lParen *> decl `sepBy` comma <* rParen)
+    <*> (lBrace *> sepAnySpace (decl <* semicolon))
+    <*> (stmts <* rBrace)
 
 effect :: Parser Stmt
 effect = SEffect <$> (expr <* semicolon)
 
 stmt :: Parser Stmt
-stmt =
-  ret
-    <|> ifelse
-    <|> if'
-    <|> loop
-    <|> assign
-    <|> (decl <* semicolon)
-    <|> effect
+stmt = ret <|> ifelse <|> if' <|> loop <|> assign <|> effect
 
 stmts :: Parser [Stmt]
 stmts = sepAnySpace stmt
 
 ast :: Parser [Stmt]
-ast = sepAnySpace (fn <|> stmt) <* end
+ast = sepAnySpace fn <* end

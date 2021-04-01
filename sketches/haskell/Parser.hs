@@ -69,8 +69,8 @@ char = satisfy . (==)
 string :: String -> Parser (Line Text)
 string = ((pack <$>) . sequenceA <$>) . traverse char
 
-sepBy :: Parser a -> Parser b -> Parser [b]
-sepBy sep item = (:) <$> item <*> many (sep *> item) <|> pure []
+sepBy :: Parser a -> Parser b -> Parser [a]
+sepBy item sep = (:) <$> item <*> many (sep *> item) <|> pure []
 
 end :: Parser ()
 end = Parser $ \i ->

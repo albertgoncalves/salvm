@@ -1,0 +1,14 @@
+i32 f(i32 a, i32 b) {
+    return a;
+}
+
+main() {
+    i32 i;
+    i = 0;
+    loop {
+        if 5 < i {
+            break;
+        }
+        print(i);
+    }
+}
