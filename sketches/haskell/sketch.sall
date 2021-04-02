@@ -1,12 +1,12 @@
-i32 f(i32 a, i32 b) {
-    return a;
+(i32, i32) f(i32 a, i32 b) {
+    return (a, b);
 }
 
 main() {
     i32 i;
     i = 0;
     loop {
-        if 5 < i {
+        if (5 < (i - 1)) + 1 < 2 {
             break;
         }
         print(i);

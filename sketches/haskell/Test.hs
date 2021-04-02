@@ -211,5 +211,48 @@ test =
                   SRet $ ELit (Min 2, LBool True)
                 ]
             ]
+        ),
+        ( ast,
+          "(i32, i32) f(i32 a, i32 b) {\n\
+          \    return (a, b);\n\
+          \}",
+          Right
+            [ SFn
+                [(Min 1, TInt), (Min 1, TInt)]
+                (EVar (Min 1, "f"))
+                [ SDecl (Min 1, TInt) (EVar (Min 1, "a")),
+                  SDecl (Min 1, TInt) (EVar (Min 1, "b"))
+                ]
+                []
+                [SRet $ ETuple [EVar (Min 2, "a"), EVar (Min 2, "b")]]
+            ]
+        ),
+        ( ast,
+          "f() { (5 > (i - 1)) + 1 < 2; }",
+          Right
+            [ SFn
+                []
+                (EVar (Min 1, "f"))
+                []
+                []
+                [ SEffect $
+                    EBinOp
+                      ( EBinOp
+                          (ELit (Min 1, LInt 5))
+                          (Min 1, ">")
+                          ( EBinOp
+                              (EVar (Min 1, "i"))
+                              (Min 1, "-")
+                              (ELit (Min 1, LInt 1))
+                          )
+                      )
+                      (Min 1, "+")
+                      ( EBinOp
+                          (ELit (Min 1, LInt 1))
+                          (Min 1, "<")
+                          (ELit (Min 1, LInt 2))
+                      )
+                ]
+            ]
         )
       ]

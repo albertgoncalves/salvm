@@ -2,8 +2,17 @@ module Ast where
 
 import Control.Applicative (many, some, (<|>))
 import Control.Monad (void)
-import Data.Char (isAlphaNum, isDigit, isLower, isSpace)
-import Parser (Line, Parser (..), char, end, satisfy, sepBy, string)
+import Data.Char (isAlphaNum, isDigit, isLower, isSpace, isSymbol)
+import Parser
+  ( Line,
+    Parser (..),
+    anySepBy,
+    char,
+    end,
+    satisfy,
+    someSepBy,
+    string,
+  )
 
 data Type
   = TBool
@@ -18,8 +27,10 @@ data Lit
   deriving (Eq, Show)
 
 data Expr
-  = ECall Expr [Expr]
+  = EBinOp Expr (Line String) Expr
+  | ECall Expr [Expr]
   | ELit (Line Lit)
+  | ETuple [Expr]
   | EType (Line Type)
   | EVar (Line String)
   deriving (Eq, Show)
@@ -48,13 +59,13 @@ space :: Parser (Line ())
 space = void <$> satisfy isSpace
 
 anySpace :: Parser [Line ()]
-anySpace = many (comment <|> space)
+anySpace = many $ comment <|> space
 
 someSpace :: Parser [Line ()]
-someSpace = some (comment <|> space)
+someSpace = some $ comment <|> space
 
 sepAnySpace :: Parser a -> Parser [a]
-sepAnySpace p = anySpace *> p `sepBy` anySpace <* anySpace
+sepAnySpace p = anySpace *> p `anySepBy` anySpace <* anySpace
 
 underscore :: Parser (Line Char)
 underscore = char '_'
@@ -78,7 +89,7 @@ rParen :: Parser (Line Char)
 rParen = anySpace *> char ')'
 
 digits :: Parser [Line Char]
-digits = some (satisfy isDigit)
+digits = some $ satisfy isDigit
 
 decimals :: Parser [Line Char]
 decimals = (++) <$> digits <*> ((:) <$> char '.' <*> digits)
@@ -116,10 +127,35 @@ var =
         )
 
 call :: Parser Expr
-call = ECall <$> var <*> (lParen *> expr `sepBy` comma <* rParen)
+call = ECall <$> var <*> (lParen *> expr `anySepBy` comma) <* rParen
+
+tuple :: Parser Expr
+tuple =
+  ETuple
+    <$> ( (:)
+            <$> (lParen *> expr <* comma)
+            <*> (expr `someSepBy` comma)
+            <* rParen
+        )
+
+term :: Parser Expr
+term =
+  (EType <$> type')
+    <|> (lParen *> anySpace *> expr <* anySpace <* rParen)
+    <|> tuple
+    <|> lit
+    <|> call
+    <|> var
+
+binOp :: Parser Expr
+binOp =
+  EBinOp
+    <$> (term <* someSpace)
+    <*> (sequenceA <$> some (satisfy isSymbol <|> char '-'))
+    <*> (someSpace *> expr)
 
 expr :: Parser Expr
-expr = (EType <$> type') <|> lit <|> call <|> var
+expr = binOp <|> term
 
 break :: Parser Stmt
 break = SBreak <$ (string "break" <* semicolon)
@@ -154,9 +190,13 @@ decl = SDecl <$> (type' <* someSpace) <*> var
 fn :: Parser Stmt
 fn =
   SFn
-    <$> (many (type' <* someSpace) <|> pure [])
-    <*> var
-    <*> (lParen *> decl `sepBy` comma <* rParen)
+    <$> ( (: [])
+            <$> type'
+            <|> (lParen *> type' `anySepBy` comma <* rParen)
+            <|> pure []
+        )
+    <*> (anySpace *> var)
+    <*> (lParen *> decl `anySepBy` comma <* rParen)
     <*> (lBrace *> sepAnySpace (decl <* semicolon))
     <*> (stmts <* rBrace)
 
