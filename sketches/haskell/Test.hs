@@ -3,9 +3,10 @@
 
 module Test where
 
-import Ast (comment, float, int, many1Space)
+import Ast (comment, float, int, space, spaceOrComments)
 import Data.Semigroup (Min (..))
-import Parser (Consumed (..), Input (..), end, parse)
+import Data.Text (Text)
+import Parser (Consumed (..), Input (..), Parser (..), end, parse)
 import System.Exit (exitFailure)
 import Text.Printf (printf)
 
@@ -22,39 +23,102 @@ eq ((s, i, l, r) : xs)
     printf "%s:%d\n -> `%s`\n -> `%s`" s i (show l) (show r)
     exitFailure
 
+parseWith :: Parser a -> Text -> Consumed a
+parseWith p = parse (p <* end) . Input 0
+
 tests :: IO ()
 tests = do
   eq
     [ ( FILE_LINE,
-        parse (comment <* end) $ Input 0 "-- foo bar baz\n",
+        parseWith comment "",
+        Empty $ Left 0
+      ),
+      ( FILE_LINE,
+        parseWith comment "--\n",
+        Consumed $ Right ((Min 1, ()), Input 3 "")
+      ),
+      ( FILE_LINE,
+        parseWith comment " --\n",
+        Empty $ Left 0
+      ),
+      ( FILE_LINE,
+        parseWith comment "-- foo bar baz\n",
         Consumed $ Right ((Min 1, ()), Input 15 "")
       ),
       ( FILE_LINE,
-        parse (comment <* end) $ Input 0 "-- foo bar baz",
+        parseWith comment "-- foo bar baz",
         Consumed $ Right ((Min 1, ()), Input 14 "")
       ),
       ( FILE_LINE,
-        parse (many1Space <* end) $ Input 0 "  \n\n\n  ",
+        parseWith comment "-- foo bar baz\n\n",
+        Consumed $ Left 15
+      ),
+      ( FILE_LINE,
+        parseWith comment "-- foo bar baz\nx",
+        Consumed $ Left 15
+      )
+    ]
+  eq
+    [ ( FILE_LINE,
+        parseWith space "",
+        Empty $ Left 0
+      ),
+      ( FILE_LINE,
+        parseWith space "  \n\n\n  ",
         Consumed $ Right ((Min 1, ()), Input 7 "")
       )
     ]
   eq
     [ ( FILE_LINE,
-        parse int $ Input 0 "1234",
-        Consumed $ Right ((Min 1, 1234), Input 4 "")
+        parseWith spaceOrComments "",
+        Empty $ Left 0
       ),
       ( FILE_LINE,
-        parse int $ Input 0 "-1234",
-        Consumed $ Right ((Min 1, -1234), Input 5 "")
+        parseWith spaceOrComments "  \n-- ...\n\n  -- ??? \n\n ",
+        Consumed $ Right ((Min 1, ()), Input 23 "")
       )
     ]
   eq
     [ ( FILE_LINE,
-        parse float $ Input 0 "0.12345",
+        parseWith int "",
+        Empty $ Left 0
+      ),
+      ( FILE_LINE,
+        parseWith int "1234",
+        Consumed $ Right ((Min 1, 1234), Input 4 "")
+      ),
+      ( FILE_LINE,
+        parseWith int "-1234",
+        Consumed $ Right ((Min 1, -1234), Input 5 "")
+      ),
+      ( FILE_LINE,
+        parseWith int "-123x4",
+        Consumed $ Left 4
+      ),
+      ( FILE_LINE,
+        parseWith int " -1234",
+        Empty $ Left 0
+      )
+    ]
+  eq
+    [ ( FILE_LINE,
+        parseWith float "",
+        Empty $ Left 0
+      ),
+      ( FILE_LINE,
+        parseWith float "0.12345",
         Consumed $ Right ((Min 1, 0.12345), Input 7 "")
       ),
       ( FILE_LINE,
-        parse float $ Input 0 "-1234.56789",
+        parseWith float "-1234.56789",
         Consumed $ Right ((Min 1, -1234.56789), Input 11 "")
+      ),
+      ( FILE_LINE,
+        parseWith float "-1234.x56789",
+        Consumed $ Left 6
+      ),
+      ( FILE_LINE,
+        parseWith float " -1234.56789",
+        Empty $ Left 0
       )
     ]

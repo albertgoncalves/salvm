@@ -3,18 +3,25 @@ module Ast where
 import Control.Applicative ((<|>))
 import Control.Monad (void)
 import Data.Char (isDigit, isSpace)
-import Parser (Parser (..), Pos, char, end, many, many1, satisfy, string)
+import Parser (Parser (..), Pos, char, end, many1, satisfy, string, until')
+
+isNewline :: Char -> Bool
+isNewline '\n' = True
+isNewline _ = False
 
 comment :: Parser (Pos ())
 comment =
   void
     <$> ( string "--"
-            <* many (satisfy (/= '\n'))
-            <* ((void <$> satisfy (== '\n')) <|> end)
+            <* until' isNewline
+            <* ((void <$> satisfy isNewline) <|> end)
         )
 
-many1Space :: Parser (Pos ())
-many1Space = void . sequenceA <$> many1 (satisfy isSpace)
+space :: Parser (Pos ())
+space = void . sequenceA <$> many1 (satisfy isSpace)
+
+spaceOrComments :: Parser (Pos ())
+spaceOrComments = void . sequenceA <$> many1 (space <|> comment)
 
 digits :: Parser [Pos Char]
 digits = many1 (satisfy isDigit)

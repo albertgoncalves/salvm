@@ -96,3 +96,6 @@ char = satisfy . (==)
 
 string :: String -> Parser (Pos String)
 string = (sequenceA <$>) . traverse char
+
+until' :: (Char -> Bool) -> Parser (Pos String)
+until' f = sequenceA <$> many (satisfy $ not . f)
