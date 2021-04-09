@@ -2,81 +2,97 @@
 
 module Parser where
 
-import Control.Applicative (Alternative, empty, many, (<|>))
+-- NOTE: See `https://www.cs.nott.ac.uk/~pszgmh/monparsing.pdf`.
+-- NOTE: See `https://www.microsoft.com/en-us/research/wp-content/uploads/2016/02/parsec-paper-letter.pdf`.
+-- NOTE: See `https://www.researchgate.net/publication/2534571_Parsec_Direct_Style_Monadic_Parser_Combinators_For_The_Real_World`.
+
+import Control.Applicative (Alternative, empty, (<|>))
+import Data.Bifunctor (first)
 import Data.Semigroup (Min (..))
-import Data.Text (Text, null, pack, uncons)
+import Data.Text (Text, null, uncons)
 import Prelude hiding (null)
 
-newtype ParseError = ParseError Int
-  deriving (Eq, Show)
-
-instance Alternative (Either ParseError) where
-  empty = Left $ ParseError 1
-  (Left _) <|> x = x
-  x <|> _ = x
-
 data Input = Input
-  { line :: Int,
+  { pos :: Int,
     rest :: Text
   }
   deriving (Eq, Show)
 
-type Line a = (Min Int, a)
+type Reply a = Either Int (a, Input)
+
+data Consumed a
+  = Consumed (Reply a)
+  | Empty (Reply a)
+  deriving (Eq, Show)
 
 newtype Parser a = Parser
-  { parse :: Input -> Either ParseError (Input, a)
+  { parse :: Input -> Consumed a
   }
 
+type Pos a = (Min Int, a)
+
+instance Functor Consumed where
+  fmap f (Consumed x) = Consumed $ first f <$> x
+  fmap f (Empty x) = Empty $ first f <$> x
+
 instance Functor Parser where
-  fmap f (Parser p) = Parser $ \i -> do
-    (i', x) <- p i
-    return (i', f x)
+  fmap f p = Parser $ fmap f . parse p
 
 instance Applicative Parser where
-  pure x = Parser $ \i -> pure (i, x)
-  (Parser p1) <*> (Parser p2) = Parser $ \i -> do
-    (i', f) <- p1 i
-    (i'', a) <- p2 i'
-    return (i'', f a)
+  pure x = Parser $ \i -> Empty (Right (x, i))
+  p1 <*> p2 = Parser $ \i ->
+    case parse p1 i of
+      Consumed (Right (f, i')) ->
+        case parse p2 i' of
+          Empty x' -> Consumed $ first f <$> x'
+          c -> f <$> c
+      Consumed (Left n) -> Consumed $ Left n
+      Empty (Right (f, i')) -> f <$> parse p2 i'
+      Empty (Left n) -> Empty $ Left n
 
 instance Alternative Parser where
-  empty = Parser $ \i -> Left $ ParseError $ line i
-  (Parser p1) <|> (Parser p2) = Parser $ \i -> p1 i <|> p2 i
+  empty = Parser $ \i -> Empty $ Left $ pos i
 
-adv :: Input -> Maybe (Char, Input)
-adv (Input l xs) =
-  ( \(x, xs') ->
-      let l' = case x of
-            '\n' -> l + 1
-            _ -> l
-       in (x, Input l' xs')
-  )
-    <$> uncons xs
+  -- NOTE: If `p` succeeds without consuming `i` the second alternative is
+  -- favored _if_ it consumes `i`. This implements the "longest match" rule.
+  p1 <|> p2 = Parser $ \i -> case parse p1 i of
+    Empty (Left _) -> parse p2 i
+    Empty ok ->
+      case parse p2 i of
+        Empty _ -> Empty ok
+        c -> c
+    c -> c
 
-satisfy :: (Char -> Bool) -> Parser (Line Char)
+satisfy :: (Char -> Bool) -> Parser (Pos Char)
 satisfy f = Parser $ \i ->
-  let l = Left $ ParseError $ line i
-   in case adv i of
-        Just (x, i') ->
-          if f x
-            then Right (i', (Min $ line i, x))
-            else l
-        Nothing -> l
+  case uncons $ rest i of
+    Just (x, rest')
+      | f x ->
+        let p = pos i + 1
+         in Consumed (Right ((Min p, x), Input p rest'))
+      | otherwise -> Empty $ Left $ pos i
+    Nothing -> Empty $ Left $ pos i
 
-char :: Char -> Parser (Line Char)
+end :: Parser (Pos ())
+end = Parser $ \i ->
+  if null $ rest i
+    then Empty $ Right ((Min $ pos i, ()), i)
+    else Empty $ Left (pos i)
+
+many1 :: Parser a -> Parser [a]
+many1 p = (:) <$> p <*> (many1 p <|> pure [])
+
+many :: Parser a -> Parser [a]
+many p = many1 p <|> pure []
+
+sepby1 :: Parser a -> Parser b -> Parser [a]
+sepby1 p sep = (:) <$> p <*> many (sep *> p)
+
+sepby :: Parser a -> Parser b -> Parser [a]
+sepby p sep = p `sepby1` sep <|> pure []
+
+char :: Char -> Parser (Pos Char)
 char = satisfy . (==)
 
-string :: String -> Parser (Line Text)
-string = ((pack <$>) . sequenceA <$>) . traverse char
-
-anySepBy :: Parser a -> Parser b -> Parser [a]
-anySepBy item sep = (:) <$> item <*> many (sep *> item) <|> pure []
-
-someSepBy :: Parser a -> Parser b -> Parser [a]
-someSepBy item sep = (:) <$> item <*> many (sep *> item)
-
-end :: Parser ()
-end = Parser $ \i ->
-  if null (rest i)
-    then pure (i, ())
-    else Left $ ParseError $ line i
+string :: String -> Parser (Pos String)
+string = (sequenceA <$>) . traverse char

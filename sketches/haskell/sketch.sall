@@ -1,5 +1,5 @@
-(i32, i32) f(i32 a, i32 b) {
-    return (a, b);
+(i32, (i32, i32)) f(i32 a, i32 b) {
+    return (a, (b, b));
 }
 
 main() {
