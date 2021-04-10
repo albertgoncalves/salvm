@@ -3,7 +3,7 @@
 
 module Test where
 
-import Ast (comment, float, int, space, spaceOrComments)
+import Ast (bool, comment, float, ident, int, space, spaceOrComments)
 import Data.Semigroup (Min (..))
 import Data.Text (Text)
 import Parser (Consumed (..), Input (..), Parser (..), end, parse)
@@ -120,5 +120,45 @@ tests = do
       ( FILE_LINE,
         parseWith float " -1234.56789",
         Empty $ Left 0
+      )
+    ]
+  eq
+    [ ( FILE_LINE,
+        parseWith bool "",
+        Empty $ Left 0
+      ),
+      ( FILE_LINE,
+        parseWith bool "true",
+        Consumed $ Right ((Min 1, True), Input 4 "")
+      ),
+      ( FILE_LINE,
+        parseWith bool "false",
+        Consumed $ Right ((Min 1, False), Input 5 "")
+      )
+    ]
+  eq
+    [ ( FILE_LINE,
+        parseWith ident "",
+        Empty $ Left 0
+      ),
+      ( FILE_LINE,
+        parseWith ident "xyz",
+        Consumed $ Right ((Min 1, "xyz"), Input 3 "")
+      ),
+      ( FILE_LINE,
+        parseWith ident "_xyz",
+        Consumed $ Right ((Min 1, "_xyz"), Input 4 "")
+      ),
+      ( FILE_LINE,
+        parseWith ident "_x_Y_Z_0",
+        Consumed $ Right ((Min 1, "_x_Y_Z_0"), Input 8 "")
+      ),
+      ( FILE_LINE,
+        parseWith ident "XYZ",
+        Empty $ Left 0
+      ),
+      ( FILE_LINE,
+        parseWith ident "abc-def",
+        Consumed $ Left 3
       )
     ]

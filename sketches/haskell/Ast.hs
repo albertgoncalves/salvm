@@ -2,8 +2,19 @@ module Ast where
 
 import Control.Applicative ((<|>))
 import Control.Monad (void)
-import Data.Char (isDigit, isSpace)
-import Parser (Parser (..), Pos, char, end, many1, satisfy, string, until')
+import Data.Char (isAlphaNum, isDigit, isLower, isSpace)
+import Data.Text (Text, pack)
+import Parser
+  ( Parser (..),
+    Pos,
+    char,
+    end,
+    many,
+    many1,
+    satisfy,
+    string,
+    until',
+  )
 
 isNewline :: Char -> Bool
 isNewline '\n' = True
@@ -37,3 +48,18 @@ int = (read <$>) . sequenceA <$> signed digits
 
 float :: Parser (Pos Float)
 float = (read <$>) . sequenceA <$> signed decimal
+
+bool :: Parser (Pos Bool)
+bool =
+  (const True <$>) <$> string "true" <|> (const False <$>) <$> string "false"
+
+underscore :: Parser (Pos Char)
+underscore = char '_'
+
+ident :: Parser (Pos Text)
+ident =
+  (pack <$>) . sequenceA
+    <$> ( (:)
+            <$> (satisfy isLower <|> underscore)
+            <*> many (satisfy isAlphaNum <|> underscore)
+        )
