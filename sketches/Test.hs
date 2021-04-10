@@ -3,7 +3,16 @@
 
 module Test where
 
-import Ast (bool, comment, float, ident, int, space, spaceOrComments)
+import Ast
+  ( bool,
+    comment,
+    float,
+    ident,
+    int,
+    space,
+    spaceOrComments,
+    stringLiteral,
+  )
 import Data.Semigroup (Min (..))
 import Data.Text (Text)
 import Parser (Consumed (..), Input (..), Parser (..), end, parse)
@@ -160,5 +169,15 @@ tests = do
       ( FILE_LINE,
         parseWith ident "abc-def",
         Consumed $ Left 3
+      )
+    ]
+  eq
+    [ ( FILE_LINE,
+        parseWith stringLiteral "",
+        Empty $ Left 0
+      ),
+      ( FILE_LINE,
+        parseWith stringLiteral "\"Hello, world!\"",
+        Consumed $ Right ((Min 2, "Hello, world!"), Input 15 "")
       )
     ]

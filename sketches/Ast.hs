@@ -63,3 +63,9 @@ ident =
             <$> (satisfy isLower <|> underscore)
             <*> many (satisfy isAlphaNum <|> underscore)
         )
+
+doubleQuote :: Parser (Pos Char)
+doubleQuote = char '"'
+
+stringLiteral :: Parser (Pos Text)
+stringLiteral = (pack <$>) <$> (doubleQuote *> until' (== '"') <* doubleQuote)
