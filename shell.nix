@@ -5,9 +5,6 @@ pkgsMusl.mkShell {
         cppcheck
         ghc
         hlint
-        linuxPackages.perf
-        ocaml
-        ocamlPackages.ocp-indent
         ormolu
         python38
         shellcheck
