@@ -68,4 +68,6 @@ doubleQuote :: Parser (Pos Char)
 doubleQuote = char '"'
 
 stringLiteral :: Parser (Pos Text)
-stringLiteral = (pack <$>) <$> (doubleQuote *> until' (== '"') <* doubleQuote)
+stringLiteral =
+  (\(n, _) (_, xs) -> (n, pack xs))
+    <$> doubleQuote <*> (until' (== '"') <* doubleQuote)
