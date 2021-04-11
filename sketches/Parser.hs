@@ -91,11 +91,14 @@ sepby1 p sep = (:) <$> p <*> many (sep *> p)
 sepby :: Parser a -> Parser b -> Parser [a]
 sepby p sep = p `sepby1` sep <|> pure []
 
+until1 :: (Char -> Bool) -> Parser (Pos String)
+until1 f = sequenceA <$> many1 (satisfy $ not . f)
+
+until' :: (Char -> Bool) -> Parser (Pos String)
+until' f = sequenceA <$> many (satisfy $ not . f)
+
 char :: Char -> Parser (Pos Char)
 char = satisfy . (==)
 
 string :: String -> Parser (Pos String)
 string = (sequenceA <$>) . traverse char
-
-until' :: (Char -> Bool) -> Parser (Pos String)
-until' f = sequenceA <$> many (satisfy $ not . f)
