@@ -71,3 +71,9 @@ stringLiteral :: Parser (Pos Text)
 stringLiteral =
   (\(n, _) (_, xs) -> (n, pack xs))
     <$> doubleQuote <*> (until' (== '"') <* doubleQuote)
+
+singleQuote :: Parser (Pos Char)
+singleQuote = char '\''
+
+charLiteral :: Parser (Pos Char)
+charLiteral = singleQuote *> satisfy (const True) <* singleQuote

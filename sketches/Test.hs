@@ -5,6 +5,7 @@ module Test where
 
 import Ast
   ( bool,
+    charLiteral,
     comment,
     float,
     ident,
@@ -185,5 +186,17 @@ tests = do
         Consumed $ Right ((Min 1, ""), Input 2 "")
       )
     ]
+  eq
+    [ ( FILE_LINE,
+        parseWith charLiteral "",
+        Empty $ Left 0
+      ),
+      ( FILE_LINE,
+        parseWith charLiteral "'\0'",
+        Consumed $ Right ((Min 2, '\0'), Input 3 "")
+      ),
+      ( FILE_LINE,
+        parseWith charLiteral "''",
+        Consumed $ Left 2
       )
     ]
