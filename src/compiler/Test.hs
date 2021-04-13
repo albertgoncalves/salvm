@@ -1,8 +1,6 @@
 {-# LANGUAGE CPP #-}
 {-# LANGUAGE OverloadedStrings #-}
 
-module Test where
-
 import Ast
   ( bool,
     charLiteral,
@@ -36,8 +34,8 @@ eq ((s, i, l, r) : xs)
 parseWith :: Parser a -> Text -> Consumed a
 parseWith p = parse (p <* end) . Input 0
 
-tests :: IO ()
-tests = do
+main :: IO ()
+main = do
   eq
     [ ( FILE_LINE,
         parseWith comment "",

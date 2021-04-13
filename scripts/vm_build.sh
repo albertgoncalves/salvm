@@ -2,9 +2,16 @@
 
 set -eu
 
+if [ ! -d "$WD/bin" ]; then
+    mkdir "$WD/bin"
+fi
+
+now () {
+    date +%s.%N
+}
+
 flags=(
-    "-fshort-enums"
-    "-fsingle-precision-constant"
+    "-fshort-enums" "-fsingle-precision-constant"
     "-g"
     "-march=native"
     "-O1"
@@ -51,19 +58,16 @@ bins=(
     vm
 )
 
-now () {
-    date +%s.%N
-}
-
 (
-    if [ ! -d "$WD/bin" ]; then
-        mkdir "$WD/bin"
-    fi
     start=$(now)
     for x in "${bins[@]}"; do
-        gcc "${flags[@]}" -o "$WD/bin/$x" "$WD/src/$x.c"
+        gcc "${flags[@]}" -o "$WD/bin/$x" "$WD/src/vm/$x.c"
     done
-    gcc "${flags[@]}" "-DDEBUG_PRINT_VM" -o "$WD/bin/vm_debug" "$WD/src/vm.c"
+    gcc \
+        "${flags[@]}" \
+        "-DDEBUG_PRINT_VM" \
+        -o "$WD/bin/vm_debug" \
+        "$WD/src/vm/vm.c"
     end=$(now)
     python3 -c "print(\"Compiled! ({:.3f}s)\".format(${end} - ${start}))"
 )

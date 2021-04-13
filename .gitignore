@@ -8,11 +8,11 @@
 !scripts/
 !*.sh
 !src/
+!src/vm/
 !*.h
 !*.c
+!src/compiler/
+!*.hs
 !examples/
 !*.sals
-
-!*.hs
 !*.sall
-!sketches/
