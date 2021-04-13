@@ -3,6 +3,7 @@
 
 import Ast
   ( Expr (..),
+    Op (..),
     bool,
     charLiteral,
     comment,
@@ -98,15 +99,11 @@ main = do
         Consumed $ Right ((Min 1, 1234), Input 4 "")
       ),
       ( FILE_LINE,
-        parseWith int "-1234",
-        Consumed $ Right ((Min 1, -1234), Input 5 "")
+        parseWith int "123x4",
+        Consumed $ Left 3
       ),
       ( FILE_LINE,
-        parseWith int "-123x4",
-        Consumed $ Left 4
-      ),
-      ( FILE_LINE,
-        parseWith int " -1234",
+        parseWith int " 1234",
         Empty $ Left 0
       )
     ]
@@ -120,15 +117,11 @@ main = do
         Consumed $ Right ((Min 1, 0.12345), Input 7 "")
       ),
       ( FILE_LINE,
-        parseWith float "-1234.56789",
-        Consumed $ Right ((Min 1, -1234.56789), Input 11 "")
+        parseWith float "1234.x56789",
+        Consumed $ Left 5
       ),
       ( FILE_LINE,
-        parseWith float "-1234.x56789",
-        Consumed $ Left 6
-      ),
-      ( FILE_LINE,
-        parseWith float " -1234.56789",
+        parseWith float " 1234.56789",
         Empty $ Left 0
       )
     ]
@@ -211,42 +204,66 @@ main = do
       ),
       ( FILE_LINE,
         parseWith expr "true",
-        Consumed $ Right ((Min 1, EBool True), Input 4 "")
+        Consumed $ Right (EBool (Min 1, True), Input 4 "")
       ),
       ( FILE_LINE,
         parseWith expr "false",
-        Consumed $ Right ((Min 1, EBool False), Input 5 "")
+        Consumed $ Right (EBool (Min 1, False), Input 5 "")
       ),
       ( FILE_LINE,
         parseWith expr "'\0'",
-        Consumed $ Right ((Min 2, EChar '\0'), Input 3 "")
+        Consumed $ Right (EChar (Min 2, '\0'), Input 3 "")
       ),
       ( FILE_LINE,
         parseWith expr "'\0\n'",
         Consumed $ Left 2
       ),
       ( FILE_LINE,
-        parseWith expr "-0.1",
-        Consumed $ Right ((Min 1, EFloat (-0.1)), Input 4 "")
+        parseWith expr "0.1",
+        Consumed $ Right (EFloat (Min 1, 0.1), Input 3 "")
       ),
       ( FILE_LINE,
-        parseWith expr "-0.1.",
-        Consumed $ Left 4
+        parseWith expr "(0.1)",
+        Consumed $ Right (EFloat (Min 2, 0.1), Input 5 "")
+      ),
+      ( FILE_LINE,
+        parseWith expr "0.1.",
+        Consumed $ Left 3
       ),
       ( FILE_LINE,
         parseWith expr "_foo_bar_0123",
-        Consumed $ Right ((Min 1, EIdent "_foo_bar_0123"), Input 13 "")
+        Consumed $ Right (EIdent (Min 1, "_foo_bar_0123"), Input 13 "")
+      ),
+      ( FILE_LINE,
+        parseWith expr "(_foo_bar_0123)",
+        Consumed $ Right (EIdent (Min 2, "_foo_bar_0123"), Input 15 "")
       ),
       ( FILE_LINE,
         parseWith expr "A_foo_bar_0123",
         Empty $ Left 0
       ),
       ( FILE_LINE,
-        parseWith expr "-1234",
-        Consumed $ Right ((Min 1, EInt (-1234)), Input 5 "")
+        parseWith expr "1234",
+        Consumed $ Right (EInt (Min 1, 1234), Input 4 "")
+      ),
+      ( FILE_LINE,
+        parseWith expr "(1234)",
+        Consumed $ Right (EInt (Min 2, 1234), Input 6 "")
       ),
       ( FILE_LINE,
         parseWith expr "\"...\\\"?\\\"\"",
-        Consumed $ Right ((Min 1, EStr "...\"?\""), Input 10 "")
+        Consumed $ Right (EStr (Min 1, "...\"?\""), Input 10 "")
+      ),
+      ( FILE_LINE,
+        parseWith expr "(-a) + 2",
+        Consumed
+          ( Right
+              ( EBinOp
+                  (EUnOp (Min 2, OpSub) (EIdent (Min 3, "a")))
+                  (Min 6, OpAdd)
+                  (EInt (Min 8, 2)),
+                Input 8 ""
+              )
+          )
       )
     ]

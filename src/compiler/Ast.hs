@@ -16,13 +16,20 @@ import Parser
     (<$$>),
   )
 
+data Op
+  = OpAdd
+  | OpSub
+  deriving (Eq, Show)
+
 data Expr
-  = EBool Bool
-  | EChar Char
-  | EFloat Float
-  | EIdent Text
-  | EInt Int
-  | EStr Text
+  = EBool (Pos Bool)
+  | EChar (Pos Char)
+  | EFloat (Pos Float)
+  | EIdent (Pos Text)
+  | EInt (Pos Int)
+  | EStr (Pos Text)
+  | EUnOp (Pos Op) Expr
+  | EBinOp Expr (Pos Op) Expr
   deriving (Eq, Show)
 
 isNewline :: Char -> Bool
@@ -49,14 +56,11 @@ digits = many1 (satisfy isDigit)
 decimal :: Parser [Pos Char]
 decimal = (++) <$> digits <*> ((:) <$> char '.' <*> digits)
 
-signed :: Parser [Pos Char] -> Parser [Pos Char]
-signed p = ((:) <$> char '-' <*> p) <|> p
-
 int :: Parser (Pos Int)
-int = (read <$>) . sequenceA <$> signed digits
+int = (read <$>) . sequenceA <$> digits
 
 float :: Parser (Pos Float)
-float = (read <$>) . sequenceA <$> signed decimal
+float = (read <$>) . sequenceA <$> decimal
 
 bool :: Parser (Pos Bool)
 bool = (const True <$$> string "true") <|> (const False <$$> string "false")
@@ -91,11 +95,23 @@ singleQuote = char '\''
 charLiteral :: Parser (Pos Char)
 charLiteral = singleQuote *> satisfy (const True) <* singleQuote
 
-expr :: Parser (Pos Expr)
-expr =
-  EBool <$$> bool
-    <|> EChar <$$> charLiteral
-    <|> EFloat <$$> float
-    <|> EIdent <$$> ident
-    <|> EInt <$$> int
-    <|> EStr <$$> stringLiteral
+exprStart :: Parser Expr
+exprStart =
+  (char '(' *> expr <* char ')')
+    <|> EUnOp <$> (const OpSub <$$> char '-') <*> expr
+    <|> EBool <$> bool
+    <|> EChar <$> charLiteral
+    <|> EFloat <$> float
+    <|> EIdent <$> ident
+    <|> EInt <$> int
+    <|> EStr <$> stringLiteral
+
+op :: Parser (Pos Op)
+op = (const OpAdd <$$> char '+') <|> (const OpSub <$$> char '-')
+
+exprEnd :: Parser (Pos Op, Expr)
+exprEnd = (,) <$> (spaceOrComments *> op) <*> (spaceOrComments *> expr)
+
+-- NOTE: See `https://github.com/glebec/left-recursion`.
+expr :: Parser Expr
+expr = (uncurry . EBinOp <$> exprStart <*> exprEnd) <|> exprStart
