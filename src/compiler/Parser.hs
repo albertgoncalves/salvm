@@ -92,11 +92,11 @@ many1 p = (:) <$> p <*> (many1 p <|> pure [])
 many :: Parser a -> Parser [a]
 many p = many1 p <|> pure []
 
-sepby1 :: Parser a -> Parser b -> Parser [a]
-sepby1 p sep = (:) <$> p <*> many (sep *> p)
+sepBy1 :: Parser a -> Parser b -> Parser [a]
+sepBy1 p sep = (:) <$> p <*> many (sep *> p)
 
-sepby :: Parser a -> Parser b -> Parser [a]
-sepby p sep = (p `sepby1` sep) <|> pure []
+sepBy :: Parser a -> Parser b -> Parser [a]
+sepBy p sep = (p `sepBy1` sep) <|> pure []
 
 char :: Char -> Parser (Pos Char)
 char = satisfy . (==)
