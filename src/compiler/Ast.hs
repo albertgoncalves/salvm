@@ -16,6 +16,15 @@ import Parser
     (<$$>),
   )
 
+data Expr
+  = EBool Bool
+  | EChar Char
+  | EFloat Float
+  | EIdent Text
+  | EInt Int
+  | EStr Text
+  deriving (Eq, Show)
+
 isNewline :: Char -> Bool
 isNewline '\n' = True
 isNewline _ = False
@@ -81,3 +90,12 @@ singleQuote = char '\''
 
 charLiteral :: Parser (Pos Char)
 charLiteral = singleQuote *> satisfy (const True) <* singleQuote
+
+expr :: Parser (Pos Expr)
+expr =
+  EBool <$$> bool
+    <|> EChar <$$> charLiteral
+    <|> EFloat <$$> float
+    <|> EIdent <$$> ident
+    <|> EInt <$$> int
+    <|> EStr <$$> stringLiteral

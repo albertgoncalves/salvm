@@ -2,9 +2,11 @@
 {-# LANGUAGE OverloadedStrings #-}
 
 import Ast
-  ( bool,
+  ( Expr (..),
+    bool,
     charLiteral,
     comment,
+    expr,
     float,
     ident,
     int,
@@ -200,5 +202,51 @@ main = do
       ( FILE_LINE,
         parseWith charLiteral "''",
         Consumed $ Left 2
+      )
+    ]
+  eq
+    [ ( FILE_LINE,
+        parseWith expr "",
+        Empty $ Left 0
+      ),
+      ( FILE_LINE,
+        parseWith expr "true",
+        Consumed $ Right ((Min 1, EBool True), Input 4 "")
+      ),
+      ( FILE_LINE,
+        parseWith expr "false",
+        Consumed $ Right ((Min 1, EBool False), Input 5 "")
+      ),
+      ( FILE_LINE,
+        parseWith expr "'\0'",
+        Consumed $ Right ((Min 2, EChar '\0'), Input 3 "")
+      ),
+      ( FILE_LINE,
+        parseWith expr "'\0\n'",
+        Consumed $ Left 2
+      ),
+      ( FILE_LINE,
+        parseWith expr "-0.1",
+        Consumed $ Right ((Min 1, EFloat (-0.1)), Input 4 "")
+      ),
+      ( FILE_LINE,
+        parseWith expr "-0.1.",
+        Consumed $ Left 4
+      ),
+      ( FILE_LINE,
+        parseWith expr "_foo_bar_0123",
+        Consumed $ Right ((Min 1, EIdent "_foo_bar_0123"), Input 13 "")
+      ),
+      ( FILE_LINE,
+        parseWith expr "A_foo_bar_0123",
+        Empty $ Left 0
+      ),
+      ( FILE_LINE,
+        parseWith expr "-1234",
+        Consumed $ Right ((Min 1, EInt (-1234)), Input 5 "")
+      ),
+      ( FILE_LINE,
+        parseWith expr "\"...\\\"?\\\"\"",
+        Consumed $ Right ((Min 1, EStr "...\"?\""), Input 10 "")
       )
     ]
