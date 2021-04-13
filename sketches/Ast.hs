@@ -75,3 +75,9 @@ stringLiteral =
     <$> doubleQuote <*> (sequenceA <$> many p <* doubleQuote)
   where
     p = (const '"' <$$> string "\\\"") <|> satisfy (/= '"')
+
+singleQuote :: Parser (Pos Char)
+singleQuote = char '\''
+
+charLiteral :: Parser (Pos Char)
+charLiteral = singleQuote *> satisfy (const True) <* singleQuote
