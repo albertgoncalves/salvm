@@ -178,6 +178,10 @@ tests = do
       ),
       ( FILE_LINE,
         parseWith stringLiteral "\"Hello, world!\"",
-        Consumed $ Right ((Min 2, "Hello, world!"), Input 15 "")
+        Consumed $ Right ((Min 1, "Hello, world!"), Input 15 "")
+      ),
+      ( FILE_LINE,
+        parseWith stringLiteral "\"\\\"Hello, world!\\\"\"",
+        Consumed $ Right ((Min 1, "\"Hello, world!\""), Input 19 "")
       )
     ]

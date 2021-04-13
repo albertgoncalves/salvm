@@ -13,7 +13,7 @@ import Parser
     many1,
     satisfy,
     string,
-    until',
+    (<$$>),
   )
 
 isNewline :: Char -> Bool
@@ -24,7 +24,7 @@ comment :: Parser (Pos ())
 comment =
   void
     <$> ( string "--"
-            <* until' isNewline
+            <* many (satisfy $ not . isNewline)
             <* ((void <$> satisfy isNewline) <|> end)
         )
 
@@ -50,8 +50,7 @@ float :: Parser (Pos Float)
 float = (read <$>) . sequenceA <$> signed decimal
 
 bool :: Parser (Pos Bool)
-bool =
-  (const True <$>) <$> string "true" <|> (const False <$>) <$> string "false"
+bool = (const True <$$> string "true") <|> (const False <$$> string "false")
 
 underscore :: Parser (Pos Char)
 underscore = char '_'
@@ -67,5 +66,12 @@ ident =
 doubleQuote :: Parser (Pos Char)
 doubleQuote = char '"'
 
+squeeze :: Pos a -> Pos b -> Pos b
+squeeze (p, _) (_, x) = (p, x)
+
 stringLiteral :: Parser (Pos Text)
-stringLiteral = (pack <$>) <$> (doubleQuote *> until' (== '"') <* doubleQuote)
+stringLiteral =
+  (pack <$$>) . squeeze
+    <$> doubleQuote <*> (sequenceA <$> many p <* doubleQuote)
+  where
+    p = (const '"' <$$> string "\\\"") <|> satisfy (/= '"')

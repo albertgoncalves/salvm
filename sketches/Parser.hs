@@ -57,11 +57,18 @@ instance Alternative Parser where
   -- favored _if_ it consumes `i`. This implements the "longest match" rule.
   p1 <|> p2 = Parser $ \i -> case parse p1 i of
     Empty (Left _) -> parse p2 i
-    Empty ok ->
+    Empty r ->
       case parse p2 i of
-        Empty _ -> Empty ok
+        Empty _ -> Empty r
         c -> c
+    c@(Consumed (Left _)) ->
+      case parse p2 i of
+        c'@(Consumed (Right _)) -> c'
+        _ -> c
     c -> c
+
+(<$$>) :: (Functor f1, Functor f2) => (a -> b) -> f1 (f2 a) -> f1 (f2 b)
+(<$$>) f = ((f <$>) <$>)
 
 satisfy :: (Char -> Bool) -> Parser (Pos Char)
 satisfy f = Parser $ \i ->
@@ -89,13 +96,10 @@ sepby1 :: Parser a -> Parser b -> Parser [a]
 sepby1 p sep = (:) <$> p <*> many (sep *> p)
 
 sepby :: Parser a -> Parser b -> Parser [a]
-sepby p sep = p `sepby1` sep <|> pure []
+sepby p sep = (p `sepby1` sep) <|> pure []
 
 char :: Char -> Parser (Pos Char)
 char = satisfy . (==)
 
 string :: String -> Parser (Pos String)
 string = (sequenceA <$>) . traverse char
-
-until' :: (Char -> Bool) -> Parser (Pos String)
-until' f = sequenceA <$> many (satisfy $ not . f)
