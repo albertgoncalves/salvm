@@ -4,6 +4,7 @@
 import Ast
   ( Expr (..),
     Op (..),
+    Stmt (..),
     bool,
     charLiteral,
     comment,
@@ -13,6 +14,7 @@ import Ast
     int,
     manySpaces,
     space,
+    stmt,
     stringLiteral,
   )
 import Data.Semigroup (Min (..))
@@ -328,5 +330,35 @@ main = do
                 Input 18 ""
               )
           )
+      )
+    ]
+  eq
+    [ ( FILE_LINE,
+        parseWith stmt "",
+        Empty $ Left 0
+      ),
+      ( FILE_LINE,
+        parseWith stmt "x = true;",
+        Consumed $
+          Right
+            ( SAssign (EIdent (Min 1, "x")) (EBool (Min 5, True)),
+              Input 9 ""
+            )
+      ),
+      ( FILE_LINE,
+        parseWith stmt "x=true  # ...\n    ;",
+        Consumed $
+          Right
+            ( SAssign (EIdent (Min 1, "x")) (EBool (Min 3, True)),
+              Input 19 ""
+            )
+      ),
+      ( FILE_LINE,
+        parseWith stmt "f();",
+        Consumed $ Right (SEffect (ECall (Min 1, "f") []), Input 4 "")
+      ),
+      ( FILE_LINE,
+        parseWith stmt "f(\n)\n;",
+        Consumed $ Right (SEffect (ECall (Min 1, "f") []), Input 6 "")
       )
     ]

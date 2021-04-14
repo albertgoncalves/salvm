@@ -12,6 +12,7 @@ import Parser
     many,
     many1,
     satisfy,
+    sepBy,
     string,
     (<$$>),
   )
@@ -31,6 +32,12 @@ data Expr
   | EInt (Pos Int)
   | EStr (Pos Text)
   | EUnOp (Pos Op) Expr
+  deriving (Eq, Show)
+
+data Stmt
+  = SAssign Expr Expr
+  | SEffect Expr
+  | SIf Expr [Stmt]
   deriving (Eq, Show)
 
 isNewline :: Char -> Bool
@@ -118,3 +125,17 @@ exprTail = (,) <$> (manySpaces *> op) <*> (manySpaces *> expr)
 -- NOTE: See `https://github.com/glebec/left-recursion`.
 expr :: Parser Expr
 expr = (uncurry . EBinOp <$> exprHead <*> exprTail) <|> exprHead
+
+semicolon :: Parser (Pos Char)
+semicolon = manySpaces *> char ';'
+
+assign :: Parser Stmt
+assign = SAssign <$> (expr <* p) <*> (expr <* semicolon)
+  where
+    p = manySpaces <* char '=' <* manySpaces
+
+effect :: Parser Stmt
+effect = SEffect <$> expr <* semicolon
+
+stmt :: Parser Stmt
+stmt = assign <|> effect
