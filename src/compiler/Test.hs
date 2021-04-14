@@ -11,8 +11,8 @@ import Ast
     float,
     ident,
     int,
+    manySpaces,
     space,
-    spaceOrComments,
     stringLiteral,
   )
 import Data.Semigroup (Min (..))
@@ -45,28 +45,28 @@ main = do
         Empty $ Left 0
       ),
       ( FILE_LINE,
-        parseWith comment "--\n",
-        Consumed $ Right ((Min 1, ()), Input 3 "")
+        parseWith comment "#\n",
+        Consumed $ Right ((Min 1, ()), Input 2 "")
       ),
       ( FILE_LINE,
-        parseWith comment " --\n",
+        parseWith comment " #\n",
         Empty $ Left 0
       ),
       ( FILE_LINE,
-        parseWith comment "-- foo bar baz\n",
-        Consumed $ Right ((Min 1, ()), Input 15 "")
-      ),
-      ( FILE_LINE,
-        parseWith comment "-- foo bar baz",
+        parseWith comment "# foo bar baz\n",
         Consumed $ Right ((Min 1, ()), Input 14 "")
       ),
       ( FILE_LINE,
-        parseWith comment "-- foo bar baz\n\n",
-        Consumed $ Left 15
+        parseWith comment "# foo bar baz",
+        Consumed $ Right ((Min 1, ()), Input 13 "")
       ),
       ( FILE_LINE,
-        parseWith comment "-- foo bar baz\nx",
-        Consumed $ Left 15
+        parseWith comment "# foo bar baz\n\n",
+        Consumed $ Left 14
+      ),
+      ( FILE_LINE,
+        parseWith comment "# foo bar baz\nx",
+        Consumed $ Left 14
       )
     ]
   eq
@@ -81,12 +81,12 @@ main = do
     ]
   eq
     [ ( FILE_LINE,
-        parseWith spaceOrComments "",
-        Empty $ Left 0
+        parseWith manySpaces "",
+        Empty $ Right ((mempty, ()), Input 0 "")
       ),
       ( FILE_LINE,
-        parseWith spaceOrComments "  \n-- ...\n\n  -- ??? \n\n ",
-        Consumed $ Right ((Min 1, ()), Input 23 "")
+        parseWith manySpaces "  \n# ...\n\n  # ??? \n\n ",
+        Consumed $ Right ((Min 1, ()), Input 21 "")
       )
     ]
   eq
@@ -263,6 +263,69 @@ main = do
                   (Min 6, OpAdd)
                   (EInt (Min 8, 2)),
                 Input 8 ""
+              )
+          )
+      ),
+      ( FILE_LINE,
+        parseWith expr "(-a) + ?",
+        Consumed $ Left 4
+      ),
+      ( FILE_LINE,
+        parseWith expr "2 - -3 + # ?\n2",
+        Consumed
+          ( Right
+              ( EBinOp
+                  (EInt (Min 1, 2))
+                  (Min 3, OpSub)
+                  ( EUnOp
+                      (Min 5, OpSub)
+                      ( EBinOp
+                          (EInt (Min 6, 3))
+                          (Min 8, OpAdd)
+                          (EInt (Min 14, 2))
+                      )
+                  ),
+                Input 14 ""
+              )
+          )
+      ),
+      ( FILE_LINE,
+        parseWith expr "2 - -3 + ?",
+        Consumed $ Left 6
+      ),
+      ( FILE_LINE,
+        parseWith expr "f()",
+        Consumed (Right (ECall (Min 1, "f") [], Input 3 ""))
+      ),
+      ( FILE_LINE,
+        parseWith expr "f( # ...\n)",
+        Consumed (Right (ECall (Min 1, "f") [], Input 10 ""))
+      ),
+      ( FILE_LINE,
+        parseWith expr "f(-2,a,true)",
+        Consumed
+          ( Right
+              ( ECall
+                  (Min 1, "f")
+                  [ EUnOp (Min 3, OpSub) (EInt (Min 4, 2)),
+                    EIdent (Min 6, "a"),
+                    EBool (Min 8, True)
+                  ],
+                Input 12 ""
+              )
+          )
+      ),
+      ( FILE_LINE,
+        parseWith expr "f( -2 , a , true )",
+        Consumed
+          ( Right
+              ( ECall
+                  (Min 1, "f")
+                  [ EUnOp (Min 4, OpSub) (EInt (Min 5, 2)),
+                    EIdent (Min 9, "a"),
+                    EBool (Min 13, True)
+                  ],
+                Input 18 ""
               )
           )
       )

@@ -22,14 +22,15 @@ data Op
   deriving (Eq, Show)
 
 data Expr
-  = EBool (Pos Bool)
+  = EBinOp Expr (Pos Op) Expr
+  | EBool (Pos Bool)
+  | ECall (Pos Text) [Expr]
   | EChar (Pos Char)
   | EFloat (Pos Float)
   | EIdent (Pos Text)
   | EInt (Pos Int)
   | EStr (Pos Text)
   | EUnOp (Pos Op) Expr
-  | EBinOp Expr (Pos Op) Expr
   deriving (Eq, Show)
 
 isNewline :: Char -> Bool
@@ -37,18 +38,16 @@ isNewline '\n' = True
 isNewline _ = False
 
 comment :: Parser (Pos ())
-comment =
-  void
-    <$> ( string "--"
-            <* many (satisfy $ not . isNewline)
-            <* ((void <$> satisfy isNewline) <|> end)
-        )
+comment = void <$> (char '#' <* p1 <* p2)
+  where
+    p1 = many (satisfy $ not . isNewline)
+    p2 = (void <$> satisfy isNewline) <|> end
 
 space :: Parser (Pos ())
 space = void . sequenceA <$> many1 (satisfy isSpace)
 
-spaceOrComments :: Parser (Pos ())
-spaceOrComments = void . sequenceA <$> many1 (space <|> comment)
+manySpaces :: Parser (Pos ())
+manySpaces = void . sequenceA <$> many (space <|> comment)
 
 digits :: Parser [Pos Char]
 digits = many1 (satisfy isDigit)
@@ -69,25 +68,20 @@ underscore :: Parser (Pos Char)
 underscore = char '_'
 
 ident :: Parser (Pos Text)
-ident =
-  (pack <$>) . sequenceA
-    <$> ( (:)
-            <$> (satisfy isLower <|> underscore)
-            <*> many (satisfy isAlphaNum <|> underscore)
-        )
+ident = (pack <$>) . sequenceA <$> ((:) <$> p1 <*> p2)
+  where
+    p1 = satisfy isLower <|> underscore
+    p2 = many (satisfy isAlphaNum <|> underscore)
 
 doubleQuote :: Parser (Pos Char)
 doubleQuote = char '"'
 
-squeeze :: Pos a -> Pos b -> Pos b
-squeeze (p, _) (_, x) = (p, x)
-
 stringLiteral :: Parser (Pos Text)
 stringLiteral =
-  (pack <$$>) . squeeze
-    <$> doubleQuote <*> (sequenceA <$> many p <* doubleQuote)
+  (\(n, _) (_, x) -> (n, pack x))
+    <$> doubleQuote <*> (sequenceA <$> p <* doubleQuote)
   where
-    p = (const '"' <$$> string "\\\"") <|> satisfy (/= '"')
+    p = many $ (const '"' <$$> string "\\\"") <|> satisfy (/= '"')
 
 singleQuote :: Parser (Pos Char)
 singleQuote = char '\''
@@ -95,10 +89,19 @@ singleQuote = char '\''
 charLiteral :: Parser (Pos Char)
 charLiteral = singleQuote *> satisfy (const True) <* singleQuote
 
-exprStart :: Parser Expr
-exprStart =
+unaryOp :: Parser Expr
+unaryOp = EUnOp <$> (const OpSub <$$> char '-') <*> expr
+
+call :: Parser Expr
+call = ECall <$> (ident <* char '(' <* manySpaces) <*> (p <* char ')')
+  where
+    p = (expr <* manySpaces) `sepBy` (char ',' <* manySpaces)
+
+exprHead :: Parser Expr
+exprHead =
   (char '(' *> expr <* char ')')
-    <|> EUnOp <$> (const OpSub <$$> char '-') <*> expr
+    <|> call
+    <|> unaryOp
     <|> EBool <$> bool
     <|> EChar <$> charLiteral
     <|> EFloat <$> float
@@ -109,9 +112,9 @@ exprStart =
 op :: Parser (Pos Op)
 op = (const OpAdd <$$> char '+') <|> (const OpSub <$$> char '-')
 
-exprEnd :: Parser (Pos Op, Expr)
-exprEnd = (,) <$> (spaceOrComments *> op) <*> (spaceOrComments *> expr)
+exprTail :: Parser (Pos Op, Expr)
+exprTail = (,) <$> (manySpaces *> op) <*> (manySpaces *> expr)
 
 -- NOTE: See `https://github.com/glebec/left-recursion`.
 expr :: Parser Expr
-expr = (uncurry . EBinOp <$> exprStart <*> exprEnd) <|> exprStart
+expr = (uncurry . EBinOp <$> exprHead <*> exprTail) <|> exprHead
