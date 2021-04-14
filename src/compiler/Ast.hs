@@ -137,5 +137,11 @@ assign = SAssign <$> (expr <* p) <*> (expr <* semicolon)
 effect :: Parser Stmt
 effect = SEffect <$> expr <* semicolon
 
+if' :: Parser Stmt
+if' = SIf <$> p1 <*> p2
+  where
+    p1 = string "if" *> manySpaces *> expr <* manySpaces
+    p2 = char '{' *> manySpaces *> many (stmt <* manySpaces) <* char '}'
+
 stmt :: Parser Stmt
-stmt = assign <|> effect
+stmt = if' <|> assign <|> effect

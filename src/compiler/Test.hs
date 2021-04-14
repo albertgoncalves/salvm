@@ -360,5 +360,33 @@ main = do
       ( FILE_LINE,
         parseWith stmt "f(\n)\n;",
         Consumed $ Right (SEffect (ECall (Min 1, "f") []), Input 6 "")
+      ),
+      ( FILE_LINE,
+        parseWith stmt "if true {\n    f();\n}",
+        Consumed $
+          Right
+            ( SIf (EBool (Min 4, True)) [SEffect (ECall (Min 15, "f") [])],
+              Input 20 ""
+            )
+      ),
+      ( FILE_LINE,
+        parseWith stmt "iftrue{f()# ...\n;g()# ...\n;}",
+        Consumed $
+          Right
+            ( SIf
+                (EBool (Min 3, True))
+                [ SEffect (ECall (Min 8, "f") []),
+                  SEffect (ECall (Min 18, "g") [])
+                ],
+              Input 28 ""
+            )
+      ),
+      ( FILE_LINE,
+        parseWith stmt "if true { if false { } }",
+        Consumed $
+          Right
+            ( SIf (EBool (Min 4, True)) [SIf (EBool (Min 14, False)) []],
+              Input 24 ""
+            )
       )
     ]
