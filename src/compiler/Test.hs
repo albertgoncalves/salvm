@@ -183,6 +183,10 @@ main = do
       ( FILE_LINE,
         parseWith stringLiteral "\"\"",
         Consumed $ Right ((Min 1, ""), Input 2 "")
+      ),
+      ( FILE_LINE,
+        parseWith stringLiteral "\"\n    \"",
+        Consumed $ Right ((Min 1, "\n    "), Input 7 "")
       )
     ]
   eq
