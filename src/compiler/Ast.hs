@@ -12,20 +12,20 @@ import Parser
     many,
     many1,
     satisfy,
-    sepBy,
     string,
     (<$$>),
   )
 
 data Op
-  = OpAdd
+  = OpDot
+  | OpAdd
   | OpSub
   deriving (Eq, Show)
 
 data Expr
-  = EBinOp Expr (Pos Op) Expr
+  = EBinOp (Pos Op) Expr Expr
   | EBool (Pos Bool)
-  | ECall (Pos Text) [Expr]
+  | ECall Expr [Expr]
   | EChar (Pos Char)
   | EFloat (Pos Float)
   | EIdent (Pos Text)
@@ -96,35 +96,42 @@ singleQuote = char '\''
 charLiteral :: Parser (Pos Char)
 charLiteral = singleQuote *> satisfy (const True) <* singleQuote
 
-unaryOp :: Parser Expr
-unaryOp = EUnOp <$> (const OpSub <$$> char '-') <*> expr
+negative :: Parser (Pos Op)
+negative = const OpSub <$$> char '-'
+
+op :: Parser (Pos Op)
+op = negative <|> (const OpDot <$$> char '.') <|> (const OpAdd <$$> char '+')
+
+unOp :: Parser Expr
+unOp = EUnOp <$> (negative <* manySpaces) <*> expr
+
+parens :: Parser a -> Parser a
+parens p = char '(' *> manySpaces *> p <* manySpaces <* char ')'
+
+binOp :: Parser Expr
+binOp = parens $ EBinOp <$> op <*> p <*> p
+  where
+    p = manySpaces *> expr
 
 call :: Parser Expr
-call = ECall <$> (ident <* char '(' <* manySpaces) <*> (p <* char ')')
-  where
-    p = (expr <* manySpaces) `sepBy` (char ',' <* manySpaces)
+call =
+  parens $
+    ECall
+      <$> (string "call" *> manySpaces *> expr <* manySpaces)
+      <*> many (expr <* manySpaces)
 
-exprHead :: Parser Expr
-exprHead =
-  (char '(' *> expr <* char ')')
+expr :: Parser Expr
+expr =
+  parens expr
+    <|> unOp
+    <|> binOp
     <|> call
-    <|> unaryOp
     <|> EBool <$> bool
     <|> EChar <$> charLiteral
     <|> EFloat <$> float
     <|> EIdent <$> ident
     <|> EInt <$> int
     <|> EStr <$> stringLiteral
-
-op :: Parser (Pos Op)
-op = (const OpAdd <$$> char '+') <|> (const OpSub <$$> char '-')
-
-exprTail :: Parser (Pos Op, Expr)
-exprTail = (,) <$> (manySpaces *> op) <*> (manySpaces *> expr)
-
--- NOTE: See `https://github.com/glebec/left-recursion`.
-expr :: Parser Expr
-expr = (uncurry . EBinOp <$> exprHead <*> exprTail) <|> exprHead
 
 semicolon :: Parser (Pos Char)
 semicolon = manySpaces *> char ';'
