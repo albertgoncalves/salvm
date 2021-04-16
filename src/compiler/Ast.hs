@@ -114,11 +114,10 @@ binOp = parens $ EBinOp <$> op <*> p <*> p
     p = manySpaces *> expr
 
 call :: Parser Expr
-call =
-  parens $
-    ECall
-      <$> (string "call" *> manySpaces *> expr <* manySpaces)
-      <*> many (expr <* manySpaces)
+call = parens $ ECall <$> p1 <*> p2
+  where
+    p1 = string "call" *> manySpaces *> expr <* manySpaces
+    p2 = many (expr <* manySpaces)
 
 expr :: Parser Expr
 expr =
@@ -137,9 +136,10 @@ semicolon :: Parser (Pos Char)
 semicolon = manySpaces *> char ';'
 
 assign :: Parser Stmt
-assign = SAssign <$> (expr <* p) <*> (expr <* semicolon)
+assign = SAssign <$> p1 <*> p2
   where
-    p = manySpaces <* char '=' <* manySpaces
+    p1 = expr <* manySpaces <* char '=' <* manySpaces
+    p2 = expr <* semicolon
 
 effect :: Parser Stmt
 effect = SEffect <$> expr <* semicolon
