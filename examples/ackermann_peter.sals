@@ -1,0 +1,47 @@
+            push    3           ; [3]
+            push    9           ; [3, 9]
+            call    ackermann   ; [r0]
+            native  2           ; []        NATIVE_PRINTI
+            push    10          ; ['\n']
+            native  1           ; []        NATIVE_PRINTC
+            halt                ; []
+
+ackermann:  base                ; [..., a0, a1, i, b]
+            frame   4           ; [a0, a1, i, b]
+
+tco:        copy    0           ; [a0, a1, i, b, a0]
+            push    0           ; [a0, a1, i, b, a0, 0]
+            eq                  ; [a0, a1, i, b, a0==0]
+            jpz     else_if     ; [a0, a1, i, b]
+
+            copy    1           ; [a0, a1, i, b, a1]
+            push    1           ; [a0, a1, i, b, a1, 1]
+            addi                ; [a0, a1, i, b, a1+1]
+            put     0           ; [a1+1, a1, i, b]
+            copy    2           ; [a1+1, a1, i, b, i]
+            put     1           ; [a1+1, i, i, b]
+            put     2           ; [a1+1, i, b]
+            reset               ; [..., a1+1, i]
+            ret                 ; [..., a1+1]
+
+else_if:    copy    0           ; [a0, a1, i, b, a0]
+            push    1           ; [a0, a1, i, b, a0, 1]
+            subi                ; [a0, a1, i, b, a0-1]
+
+            copy    1           ; [a0, a1, i, b, a0-1, a1]
+            push    0           ; [a0, a1, i, b, a0-1, a1, 0]
+            eq                  ; [a0, a1, i, b, a0-1, a1==0]
+            jpz     else        ; [a0, a1, i, b, a0-1]
+
+            push    1           ; [a0, a1, i, b, a0-1, 1]
+            jump    end         ; [a0, a1, i, b, a0-1, 1]
+
+else:       copy    0           ; [a0, a1, i, b, a0-1, a0]
+            copy    1           ; [a0, a1, i, b, a0-1, a0, a1]
+            push    1           ; [a0, a1, i, b, a0-1, a0, a1, 1]
+            subi                ; [a0, a1, i, b, a0-1, a0, a1-1]
+            call    ackermann   ; [a0, a1, i, b, a0-1, r0]
+
+end:        put     1           ; [a0, ?, i, b, a0-1]
+            put     0           ; [a0-1, ?, i, b]
+            jump    tco         ; [a0-1, ?, i, b]
