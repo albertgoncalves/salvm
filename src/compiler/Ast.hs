@@ -149,22 +149,17 @@ effect = SEffect <$> expr <* semicolon
 block :: Parser [Stmt]
 block = char '{' *> manySpaces *> many (stmt <* manySpaces) <* char '}'
 
-if'' :: Parser Expr
-if'' = string "if" *> manySpaces *> expr <* manySpaces
-
-if' :: Parser Stmt
-if' = SIf <$> if'' <*> block
-
 ifElse :: Parser Stmt
-ifElse = SIfElse <$> if'' <*> block <*> (p1 *> p2)
+ifElse = (SIfElse <$> p1 <*> block <*> (p2 *> p3)) <|> p4
   where
-    p1 = manySpaces *> string "else" *> manySpaces
-    p2 = block <|> (pure <$> ifElse) <|> (pure <$> if')
+    p1 = string "if" *> manySpaces *> expr <* manySpaces
+    p2 = manySpaces *> string "else" *> manySpaces
+    p3 = block <|> (pure <$> ifElse) <|> (pure <$> p4)
+    p4 = SIf <$> p1 <*> block
 
 stmt :: Parser Stmt
 stmt =
   SBlock <$> block
     <|> ifElse
-    <|> if'
     <|> assign
     <|> effect
