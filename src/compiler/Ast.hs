@@ -38,6 +38,8 @@ data Stmt
   = SAssign Expr Expr
   | SEffect Expr
   | SIf Expr [Stmt]
+  | SIfElse Expr [Stmt] [Stmt]
+  | SBlock [Stmt]
   deriving (Eq, Show)
 
 isNewline :: Char -> Bool
@@ -144,11 +146,25 @@ assign = SAssign <$> p1 <*> p2
 effect :: Parser Stmt
 effect = SEffect <$> expr <* semicolon
 
+block :: Parser [Stmt]
+block = char '{' *> manySpaces *> many (stmt <* manySpaces) <* char '}'
+
+if'' :: Parser Expr
+if'' = string "if" *> manySpaces *> expr <* manySpaces
+
 if' :: Parser Stmt
-if' = SIf <$> p1 <*> p2
+if' = SIf <$> if'' <*> block
+
+ifElse :: Parser Stmt
+ifElse = SIfElse <$> if'' <*> block <*> (p1 *> p2)
   where
-    p1 = string "if" *> manySpaces *> expr <* manySpaces
-    p2 = char '{' *> manySpaces *> many (stmt <* manySpaces) <* char '}'
+    p1 = manySpaces *> string "else" *> manySpaces
+    p2 = block <|> (pure <$> ifElse) <|> (pure <$> if')
 
 stmt :: Parser Stmt
-stmt = if' <|> assign <|> effect
+stmt =
+  SBlock <$> block
+    <|> ifElse
+    <|> if'
+    <|> assign
+    <|> effect

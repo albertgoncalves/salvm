@@ -378,11 +378,26 @@ main = do
         Empty $ Left 0
       ),
       ( FILE_LINE,
+        parseWith stmt "{}",
+        Consumed $ Right (SBlock [], Input 2 "")
+      ),
+      ( FILE_LINE,
         parseWith stmt "x = true;",
         Consumed $
           Right
             ( SAssign (EIdent (Min 1, "x")) (EBool (Min 5, True)),
               Input 9 ""
+            )
+      ),
+      ( FILE_LINE,
+        parseWith stmt "{#...\nx = true;\nx=false;\n}",
+        Consumed $
+          Right
+            ( SBlock
+                [ SAssign (EIdent (Min 7, "x")) (EBool (Min 11, True)),
+                  SAssign (EIdent (Min 17, "x")) (EBool (Min 19, False))
+                ],
+              Input 26 ""
             )
       ),
       ( FILE_LINE,
@@ -430,6 +445,43 @@ main = do
           Right
             ( SIf (EBool (Min 4, True)) [SIf (EBool (Min 14, False)) []],
               Input 24 ""
+            )
+      ),
+      ( FILE_LINE,
+        parseWith stmt "if true { } else { }",
+        Consumed $ Right (SIfElse (EBool (Min 4, True)) [] [], Input 20 "")
+      ),
+      ( FILE_LINE,
+        parseWith stmt "if true { } else { if false { } else { } }",
+        Consumed $
+          Right
+            ( SIfElse
+                (EBool (Min 4, True))
+                []
+                [SIfElse (EBool (Min 23, False)) [] []],
+              Input 42 ""
+            )
+      ),
+      ( FILE_LINE,
+        parseWith stmt "if true { } else if false { } else { }",
+        Consumed $
+          Right
+            ( SIfElse
+                (EBool (Min 4, True))
+                []
+                [SIfElse (EBool (Min 21, False)) [] []],
+              Input 38 ""
+            )
+      ),
+      ( FILE_LINE,
+        parseWith stmt "if true { } else if false { }",
+        Consumed $
+          Right
+            ( SIfElse
+                (EBool (Min 4, True))
+                []
+                [SIf (EBool (Min 21, False)) []],
+              Input 29 ""
             )
       )
     ]
