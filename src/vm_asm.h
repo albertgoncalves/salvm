@@ -544,7 +544,9 @@ static void set_insts(Memory* memory) {
         }
         case TOKEN_STR: {
             String string = token.body.as_string;
-            EXIT_IF(memory->tokens[++i].tag != TOKEN_COLON);
+            if (memory->tokens[++i].tag != TOKEN_COLON) {
+                ERROR_TOKEN(token);
+            }
             Label* label = alloc_label(memory);
             label->string = string;
             label->index_inst = index_inst;
