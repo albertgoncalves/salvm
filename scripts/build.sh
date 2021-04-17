@@ -63,13 +63,9 @@ bins=(
 (
     start=$(now)
     for x in "${bins[@]}"; do
-        gcc "${flags[@]}" -o "$WD/bin/$x" "$WD/src/vm/$x.c"
+        gcc "${flags[@]}" -o "$WD/bin/$x" "$WD/src/$x.c"
     done
-    gcc \
-        "${flags[@]}" \
-        "-DDEBUG_PRINT_VM" \
-        -o "$WD/bin/vm_debug" \
-        "$WD/src/vm/vm.c"
+    gcc "${flags[@]}" "-DDEBUG_PRINT_VM" -o "$WD/bin/vm_debug" "$WD/src/vm.c"
     end=$(now)
     python3 -c "print(\"Compiled! ({:.3f}s)\".format(${end} - ${start}))"
 )
