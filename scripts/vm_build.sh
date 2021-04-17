@@ -11,7 +11,8 @@ now () {
 }
 
 flags=(
-    "-fshort-enums" "-fsingle-precision-constant"
+    "-fshort-enums"
+    "-fsingle-precision-constant"
     "-g"
     "-march=native"
     "-O1"
