@@ -69,7 +69,7 @@ typedef struct {
     ((a.len == b.len) && (!memcmp(a.chars, b.chars, a.len)))
 
 #define PRINTLN_STR(stream, string) \
-    fprintf(stream, "\"%.*s\"\n", (i32)string.len, string.chars)
+    fprintf(stream, "`%.*s`\n", (i32)string.len, string.chars)
 
 #define IS_ALPHA(x) \
     ((('A' <= (x)) && ((x) <= 'Z')) || (('a' <= (x)) && ((x) <= 'z')))
@@ -237,6 +237,7 @@ static String get_inst_tag_as_string(InstTag tag) {
 }
 
 static void println_token(File* stream, Token token) {
+    fprintf(stream, "%u:", token.line);
     switch (token.tag) {
     case TOKEN_INST: {
         String string = get_inst_tag_as_string(token.body.as_inst_tag);
@@ -248,19 +249,19 @@ static void println_token(File* stream, Token token) {
         break;
     }
     case TOKEN_I32: {
-        fprintf(stream, "%d\n", token.body.as_i32);
+        fprintf(stream, "`%d`\n", token.body.as_i32);
         break;
     }
     case TOKEN_F32: {
-        fprintf(stream, "%.2f\n", (f64)token.body.as_f32);
+        fprintf(stream, "`%.2f`\n", (f64)token.body.as_f32);
         break;
     }
     case TOKEN_COLON: {
-        fprintf(stream, ":\n");
+        fprintf(stream, "`:`\n");
         break;
     }
     case TOKEN_MINUS: {
-        fprintf(stream, "-\n");
+        fprintf(stream, "`-`\n");
         break;
     }
     }
