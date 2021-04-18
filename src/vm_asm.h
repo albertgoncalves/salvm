@@ -355,12 +355,12 @@ static void set_tokens(Memory* memory) {
                 if (EQ_STRINGS(token_string, inst_string)) {
                     token->body.as_inst_tag = t;
                     token->tag = TOKEN_INST;
-                    goto loop_end;
+                    goto end;
                 }
             }
             token->body.as_string = token_string;
             token->tag = TOKEN_STR;
-        loop_end:
+        end:
             i = j;
         }
         }
