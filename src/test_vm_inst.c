@@ -293,6 +293,22 @@ TEST(test_native_nop, {
 })
 
 i32 main(void) {
+    printf("sizeof(Bool)    : %zu\n"
+           "sizeof(InstTag) : %zu\n"
+           "sizeof(Inst)    : %zu\n"
+           "sizeof(Index)   : %zu\n"
+           "sizeof(Word)    : %zu\n"
+           "sizeof(Vm)      : %zu\n"
+           "sizeof(Natives) : %zu\n"
+           "sizeof(Native)  : %zu\n\n",
+           sizeof(Bool),
+           sizeof(InstTag),
+           sizeof(Inst),
+           sizeof(Index),
+           sizeof(Word),
+           sizeof(Vm),
+           sizeof(Natives),
+           sizeof(Native));
     VM = calloc(1, sizeof(Vm));
     test_push();
     test_top();

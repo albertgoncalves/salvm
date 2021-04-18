@@ -297,6 +297,20 @@ TEST(test_jpz_as_string, { TEST_STR(INST_JPZ, "jpz", 3); })
 TEST(test_native_as_string, { TEST_STR(INST_NATIVE, "native", 6); })
 
 i32 main(void) {
+    printf("sizeof(TokenTag)  : %zu\n"
+           "sizeof(String)    : %zu\n"
+           "sizeof(TokenBody) : %zu\n"
+           "sizeof(Token)     : %zu\n"
+           "sizeof(PreInst)   : %zu\n"
+           "sizeof(Label)     : %zu\n"
+           "sizeof(Memory)    : %zu\n\n",
+           sizeof(TokenTag),
+           sizeof(String),
+           sizeof(TokenBody),
+           sizeof(Token),
+           sizeof(PreInst),
+           sizeof(Label),
+           sizeof(Memory));
     MEMORY = calloc(1, sizeof(Memory));
     test_halt();
     test_push();
