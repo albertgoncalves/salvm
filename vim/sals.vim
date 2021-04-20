@@ -10,7 +10,6 @@ syn match Comment   ";.*$"
 syn match Delimiter "[:\-]"
 syn match Number    "\<[0-9]\+\>"
 syn match Number    "\<[0-9]\+\.[0-9]\+\>"
-syn match String    "\<\"[^\"]*\"\?\>"
 
 syn keyword Keyword
     \ halt
