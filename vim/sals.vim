@@ -1,4 +1,4 @@
-" $ cp sals.vim ~/.vim/syntax/salvs.vim
+" $ cp sals.vim ~/.vim/syntax/sals.vim
 " $ grep '.sals' ~/.vimrc
 " autocmd BufNewFile,BufRead *.sals setlocal filetype=sals
 
