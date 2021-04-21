@@ -1,10 +1,21 @@
-            push    3           ; [3]
-            push    9           ; [3, 9]
-            call    ackermann   ; [r0]
-            native  2           ; []        NATIVE_PRINTI
-            push    10          ; ['\n']
-            native  1           ; []        NATIVE_PRINTC
-            halt                ; []
+            push    0           ; [l0]
+
+loop:       copy    0           ; [l0, l0]
+            push    10          ; [l0, l0, 10]
+            lti                 ; [l0]
+            jpz     exit        ; [l0]
+
+            push    3           ; [l0, 3]
+            copy    0           ; [l0, 3, l0]
+            call    ackermann   ; [l0, r0]
+            native  2           ; [l0]          NATIVE_PRINTI
+            push    10          ; [l0, '\n']
+            native  1           ; [l0]          NATIVE_PRINTC
+            push    1           ; [l0, 1]
+            addi                ; [l0+1]
+            jump    loop        ; [l0+1]
+
+exit:       halt                ; [l0+10]
 
 ackermann:  base                ; [..., a0, a1, i, b]
             frame   4           ; [a0, a1, i, b]
