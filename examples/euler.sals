@@ -1,0 +1,33 @@
+            push    0.0     ; [m]
+            push    1.0     ; [m, d]
+            push    1.0     ; [m, d, e]
+            push    0       ; [m, d, e, n]
+loop:       copy    3       ; [m, d, e, n, n]
+            push    10      ; [m, d, e, n, n, 10]
+            lti             ; [m, d, e, n, n<10]
+            jpz     end     ; [m, d, e, n]
+
+            copy    0       ; [m, d, e, n, m]
+            push    1.0     ; [m, d, e, n, m, 1.0]
+            addf            ; [m, d, e, n, m+1.0]
+            copy    4       ; [m, d, e, n, m+1.0, m+1.0]
+            put     0       ; [m+1.0, d, e, n, m+1.0]
+            copy    1       ; [m+1.0, d, e, n, m+1.0, d]
+            mulf            ; [m+1.0, d, e, n, (m+1.0)*d]
+            put     1       ; [m+1.0, (m+1.0)*d, e, n]
+            push    1.0     ; [m+1.0, (m+1.0)*d, e, n, 1.0]
+            copy    1       ; [m+1.0, (m+1.0)*d, e, n, 1.0, (m+1.0)*d]
+            divf            ; [m+1.0, (m+1.0)*d, e, n, 1.0/((m+1.0)*d)]
+            copy    2       ; [m+1.0, (m+1.0)*d, e, n, 1.0/((m+1.0)*d), e]
+            addf            ; [m+1.0, (m+1.0)*d, e, n, (1.0/((m+1.0)*d))+e]
+            put     2       ; [m+1.0, (m+1.0)*d, (1.0/((m+1.0)*d))+e, n]
+
+            push    1       ; [m+1.0, (m+1.0)*d, (1.0/((m+1.0)*d))+e, n, 1]
+            addi            ; [m+1.0, (m+1.0)*d, (1.0/((m+1.0)*d))+e, n+1]
+            jump    loop    ; [m+1.0, (m+1.0)*d, (1.0/((m+1.0)*d))+e, n+1]
+
+end:        top     -1      ; [m, d, e]
+            native  3       ; [m, d]        NATIVE_PRINTF
+            push    10      ; [m, d, '\n']
+            native  1       ; [m, d]        NATIVE_PRINTC
+            halt
