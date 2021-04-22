@@ -303,7 +303,7 @@ i32 main(void) {
            "sizeof(Token)     : %zu\n"
            "sizeof(PreInst)   : %zu\n"
            "sizeof(Label)     : %zu\n"
-           "sizeof(Memory)    : %zu\n\n",
+           "sizeof(Memory)    : %zu\n",
            sizeof(TokenTag),
            sizeof(String),
            sizeof(TokenBody),
@@ -356,6 +356,6 @@ i32 main(void) {
     test_native_as_string();
     test_scl_as_string();
     free(MEMORY);
-    printf("\n");
+    printf("\n\n");
     return EXIT_SUCCESS;
 }

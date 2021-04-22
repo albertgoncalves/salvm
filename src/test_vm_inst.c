@@ -300,7 +300,7 @@ i32 main(void) {
            "sizeof(Word)    : %zu\n"
            "sizeof(Vm)      : %zu\n"
            "sizeof(Natives) : %zu\n"
-           "sizeof(Native)  : %zu\n\n",
+           "sizeof(Native)  : %zu\n",
            sizeof(Bool),
            sizeof(InstTag),
            sizeof(Inst),
@@ -343,7 +343,7 @@ i32 main(void) {
     test_gtf();
     test_gef();
     test_native_nop();
-    printf("\n");
+    printf("\n\n");
     free(VM);
     return EXIT_SUCCESS;
 }
