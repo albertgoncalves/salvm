@@ -11,7 +11,7 @@ static void run(Vm* vm) {
     while (vm->alive) {
 #ifdef DEBUG_PRINT_VM
         {
-            printf("\n"
+            printf("\n\n"
                    "    | .index.inst       : %d\n"
                    "    |       .stack_top  : %d\n"
                    "    |       .stack_base : %d\n"
@@ -22,7 +22,7 @@ static void run(Vm* vm) {
             for (i32 i = vm->index.stack_base; i < vm->index.stack_top; ++i) {
                 printf("%d ", vm->stack[i].as_i32);
             }
-            printf("]\n\n");
+            printf("]\n");
         }
 #endif
         do_inst(vm);
