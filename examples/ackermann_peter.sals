@@ -2,7 +2,7 @@
 
 loop:       copy    0           ; [l0, l0]
             push    10          ; [l0, l0, 10]
-            lti                 ; [l0]
+            lti                 ; [l0, l0<10]
             jpz     exit        ; [l0]
 
             push    3           ; [l0, 3]
