@@ -13,11 +13,11 @@ static void set_chars_from_file(Memory* memory, const char* path) {
     fclose(file);
 }
 
-static void insts_to_bytes(Vm* vm, u32 count_inst, const char* path) {
+static void insts_to_bytes(const Vm* vm, u32 count_inst, const char* path) {
     EXIT_IF(CAP_INST <= count_inst);
     File* file = fopen(path, "wb");
     EXIT_IF(!file);
-    Header header = {
+    const Header header = {
         .magic = MAGIC,
         .count_inst = count_inst,
     };

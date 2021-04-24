@@ -4,18 +4,18 @@
 
 static Memory* MEMORY;
 
-#define INJECT(literal)                      \
-    {                                        \
-        MEMORY->len_chars = 0;               \
-        MEMORY->len_tokens = 0;              \
-        MEMORY->len_pre_insts = 0;           \
-        MEMORY->len_labels = 0;              \
-        usize len = sizeof(literal) - 1;     \
-        EXIT_IF(CAP_CHAR <= len);            \
-        memcpy(MEMORY->chars, literal, len); \
-        MEMORY->len_chars = (u32)len;        \
-        set_tokens(MEMORY);                  \
-        set_insts(MEMORY);                   \
+#define INJECT(literal)                        \
+    {                                          \
+        MEMORY->len_chars = 0;                 \
+        MEMORY->len_tokens = 0;                \
+        MEMORY->len_pre_insts = 0;             \
+        MEMORY->len_labels = 0;                \
+        const usize len = sizeof(literal) - 1; \
+        EXIT_IF(CAP_CHAR <= len);              \
+        memcpy(MEMORY->chars, literal, len);   \
+        MEMORY->len_chars = (u32)len;          \
+        set_tokens(MEMORY);                    \
+        set_insts(MEMORY);                     \
     }
 
 TEST(test_halt, {
@@ -32,7 +32,7 @@ TEST(test_push, {
     EXIT_IF(MEMORY->vm.insts[1].tag != INST_PUSH);
     EXIT_IF(MEMORY->vm.insts[1].op != -12345);
     EXIT_IF(MEMORY->vm.insts[2].tag != INST_PUSH);
-    f32 op = *((f32*)(&MEMORY->vm.insts[2].op));
+    const f32 op = *((f32*)(&MEMORY->vm.insts[2].op));
     EXIT_IF((op < (-12345.6789f - EPSILON)) ||
             ((-12345.6789f + EPSILON) < op));
     EXIT_IF(MEMORY->vm.insts[3].tag != INST_PUSH);
@@ -276,14 +276,15 @@ TEST(test_native, {
     EXIT_IF(MEMORY->vm.insts[0].op != 1);
 })
 
-#define TEST_STR(inst, literal, len_)                 \
-    {                                                 \
-        String result = get_inst_tag_as_string(inst); \
-        EXIT_IF(result.len != len_);                  \
-        String expected;                              \
-        expected.len = len_;                          \
-        expected.chars = literal;                     \
-        EXIT_IF(!EQ_STRINGS(result, expected));       \
+#define TEST_STR(inst, literal, len_)                       \
+    {                                                       \
+        const String result = get_inst_tag_as_string(inst); \
+        EXIT_IF(result.len != len_);                        \
+        const String expected = {                           \
+            .len = len_,                                    \
+            .chars = literal,                               \
+        };                                                  \
+        EXIT_IF(!EQ_STRINGS(result, expected));             \
     }
 
 TEST(test_halt_as_string, { TEST_STR(INST_HALT, "halt", 4); })

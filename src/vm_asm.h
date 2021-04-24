@@ -240,7 +240,7 @@ static void println_token(File* stream, Token token) {
     fprintf(stream, "%u:", token.line);
     switch (token.tag) {
     case TOKEN_INST: {
-        String string = get_inst_tag_as_string(token.body.as_inst_tag);
+        const String string = get_inst_tag_as_string(token.body.as_inst_tag);
         PRINTLN_STR(stream, string);
         break;
     }
@@ -346,12 +346,12 @@ static void set_tokens(Memory* memory) {
                 }
             }
             EXIT_IF(i == j);
-            String token_string = {
+            const String token_string = {
                 .chars = &memory->chars[i],
                 .len = j - i,
             };
             for (InstTag t = 0; t < COUNT_INST_TAG; ++t) {
-                String inst_string = get_inst_tag_as_string(t);
+                const String inst_string = get_inst_tag_as_string(t);
                 if (EQ_STRINGS(token_string, inst_string)) {
                     token->body.as_inst_tag = t;
                     token->tag = TOKEN_INST;
@@ -544,7 +544,7 @@ static void set_insts(Memory* memory) {
             break;
         }
         case TOKEN_STR: {
-            String string = token.body.as_string;
+            const String string = token.body.as_string;
             if (memory->tokens[++i].tag != TOKEN_COLON) {
                 ERROR_TOKEN(token);
             }
@@ -565,7 +565,7 @@ static void set_insts(Memory* memory) {
         PreInst* pre_inst = &memory->pre_insts[i];
         if (!pre_inst->resolved) {
             for (u32 j = 0; j < memory->len_labels; ++j) {
-                Label label = memory->labels[j];
+                const Label label = memory->labels[j];
                 if (EQ_STRINGS(label.string, pre_inst->label)) {
                     pre_inst->inst.op = label.index_inst;
                     pre_inst->resolved = TRUE;
