@@ -3,9 +3,9 @@
 
 #include "vm.h"
 
-#define CAP_CHAR  4096
-#define CAP_TOKEN 256
-#define CAP_LABEL 64
+#define CAP_CHARS  4096
+#define CAP_TOKENS 256
+#define CAP_LABELS 64
 
 typedef enum {
     TOKEN_INST,
@@ -49,10 +49,10 @@ typedef struct {
 
 typedef struct {
     Vm      vm;
-    char    chars[CAP_CHAR];
-    Token   tokens[CAP_TOKEN];
-    PreInst pre_insts[CAP_INST];
-    Label   labels[CAP_LABEL];
+    char    chars[CAP_CHARS];
+    Token   tokens[CAP_TOKENS];
+    PreInst pre_insts[CAP_INSTS];
+    Label   labels[CAP_LABELS];
     u32     len_chars;
     u32     len_tokens;
     u32     len_pre_insts;
@@ -87,9 +87,9 @@ typedef struct {
         return &memory->field[memory->len_##field++]; \
     }
 
-ALLOC_MEMORY(alloc_token, CAP_TOKEN, tokens, Token)
-ALLOC_MEMORY(alloc_pre_inst, CAP_INST, pre_insts, PreInst)
-ALLOC_MEMORY(alloc_label, CAP_LABEL, labels, Label)
+ALLOC_MEMORY(alloc_token, CAP_TOKENS, tokens, Token)
+ALLOC_MEMORY(alloc_pre_inst, CAP_INSTS, pre_insts, PreInst)
+ALLOC_MEMORY(alloc_label, CAP_LABELS, labels, Label)
 
 #define ERROR_TOKEN(token)            \
     {                                 \

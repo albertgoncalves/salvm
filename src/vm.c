@@ -7,7 +7,7 @@ static void insts_from_bytes(Vm* vm, const char* path) {
     Header header;
     EXIT_IF(fread(&header, sizeof(Header), 1, file) != 1);
     EXIT_IF(header.magic != MAGIC);
-    EXIT_IF(CAP_INST <= header.count_inst);
+    EXIT_IF(CAP_INSTS <= header.count_inst);
     EXIT_IF(fread(&vm->insts, sizeof(Inst), header.count_inst, file) !=
             header.count_inst);
     fclose(file);

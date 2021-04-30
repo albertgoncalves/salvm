@@ -70,7 +70,7 @@ static const Native NATIVES[COUNT_NATIVE] = {
 
 static void do_inst(Vm* vm) {
     {
-        EXIT_IF(CAP_INST <= vm->index.inst);
+        EXIT_IF(CAP_INSTS <= vm->index.inst);
         EXIT_IF(vm->index.inst < 0);
     }
     const Inst inst = vm->insts[vm->index.inst];

@@ -11,7 +11,7 @@ static Memory* MEMORY;
         MEMORY->len_pre_insts = 0;             \
         MEMORY->len_labels = 0;                \
         const usize len = sizeof(literal) - 1; \
-        EXIT_IF(CAP_CHAR <= len);              \
+        EXIT_IF(CAP_CHARS <= len);             \
         memcpy(MEMORY->chars, literal, len);   \
         MEMORY->len_chars = (u32)len;          \
         set_tokens(MEMORY);                    \

@@ -8,7 +8,7 @@ STATIC_ASSERT(alignof(i8) == 1, "alignof(i8) != 1");
 STATIC_ASSERT(alignof(i16) == 2, "alignof(i16) != 2");
 STATIC_ASSERT(alignof(i32) == 4, "alignof(i32) != 4");
 
-#define CAP_INST  256
+#define CAP_INSTS 256
 #define CAP_STACK 32768
 #define CAP_HEAP8 256
 
@@ -86,7 +86,7 @@ typedef union {
 } Word;
 
 typedef struct {
-    Inst  insts[CAP_INST];
+    Inst  insts[CAP_INSTS];
     Word  stack[CAP_STACK];
     i8    heap[CAP_HEAP8];
     Index index;
