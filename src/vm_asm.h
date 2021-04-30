@@ -61,8 +61,8 @@ typedef struct {
 
 #define TO_STRING(literal)          \
     ((String){                      \
-        .len = sizeof(literal) - 1, \
         .chars = literal,           \
+        .len = sizeof(literal) - 1, \
     })
 
 #define EQ_STRINGS(a, b) \
