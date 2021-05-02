@@ -99,7 +99,6 @@ ALLOC_MEMORY(alloc_label, CAP_LABELS, labels, Label)
 
 static String get_inst_tag_as_string(InstTag tag) {
     switch (tag) {
-
     case INST_HALT: {
         return TO_STRING("halt");
     }
@@ -229,11 +228,11 @@ static String get_inst_tag_as_string(InstTag tag) {
         return TO_STRING("native");
     }
 
-    case COUNT_INST_TAG: {
-        break;
+    case COUNT_INST_TAG:
+    default: {
+        ERROR();
     }
     }
-    ERROR();
 }
 
 static void println_token(File* stream, Token token) {
@@ -263,6 +262,9 @@ static void println_token(File* stream, Token token) {
     case TOKEN_MINUS: {
         fprintf(stream, "`-`\n");
         break;
+    }
+    default: {
+        ERROR();
     }
     }
 }
@@ -439,7 +441,8 @@ static void set_insts(Memory* memory) {
                     case TOKEN_INST:
                     case TOKEN_STR:
                     case TOKEN_COLON:
-                    case TOKEN_MINUS: {
+                    case TOKEN_MINUS:
+                    default: {
                         ERROR_TOKEN(token);
                     }
                     }
@@ -451,7 +454,8 @@ static void set_insts(Memory* memory) {
                     break;
                 }
                 case TOKEN_INST:
-                case TOKEN_COLON: {
+                case TOKEN_COLON:
+                default: {
                     ERROR_TOKEN(token);
                 }
                 }
@@ -480,7 +484,8 @@ static void set_insts(Memory* memory) {
                     case TOKEN_INST:
                     case TOKEN_STR:
                     case TOKEN_COLON:
-                    case TOKEN_MINUS: {
+                    case TOKEN_MINUS:
+                    default: {
                         ERROR_TOKEN(token);
                     }
                     }
@@ -489,7 +494,8 @@ static void set_insts(Memory* memory) {
                 case TOKEN_F32:
                 case TOKEN_INST:
                 case TOKEN_STR:
-                case TOKEN_COLON: {
+                case TOKEN_COLON:
+                default: {
                     ERROR_TOKEN(token);
                 }
                 }
@@ -507,7 +513,8 @@ static void set_insts(Memory* memory) {
                 case TOKEN_INST:
                 case TOKEN_STR:
                 case TOKEN_COLON:
-                case TOKEN_MINUS: {
+                case TOKEN_MINUS:
+                default: {
                     ERROR_TOKEN(token);
                 }
                 }
@@ -531,13 +538,15 @@ static void set_insts(Memory* memory) {
                 case TOKEN_F32:
                 case TOKEN_INST:
                 case TOKEN_COLON:
-                case TOKEN_MINUS: {
+                case TOKEN_MINUS:
+                default: {
                     ERROR_TOKEN(token);
                 }
                 }
                 break;
             }
-            case COUNT_INST_TAG: {
+            case COUNT_INST_TAG:
+            default: {
                 ERROR_TOKEN(token);
             }
             }
@@ -556,7 +565,8 @@ static void set_insts(Memory* memory) {
         case TOKEN_I32:
         case TOKEN_F32:
         case TOKEN_COLON:
-        case TOKEN_MINUS: {
+        case TOKEN_MINUS:
+        default: {
             ERROR_TOKEN(token);
         }
         }

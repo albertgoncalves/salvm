@@ -302,7 +302,8 @@ static void do_inst(Vm* vm) {
         ++vm->index.inst;
         break;
     }
-    case COUNT_INST_TAG: {
+    case COUNT_INST_TAG:
+    default: {
         ERROR();
     }
     }
