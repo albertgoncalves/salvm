@@ -17,6 +17,7 @@ i32 main(i32 n, const char** args) {
     EXIT_IF(n < 2);
     {
         Vm* vm = calloc(1, sizeof(Vm));
+        EXIT_IF(!vm);
         insts_from_bytes(vm, args[1]);
         run(vm);
         free(vm);

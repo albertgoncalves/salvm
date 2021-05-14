@@ -310,6 +310,7 @@ i32 main(void) {
            sizeof(Natives),
            sizeof(Native));
     VM = calloc(1, sizeof(Vm));
+    EXIT_IF(!VM);
     test_push();
     test_top();
     test_copy();

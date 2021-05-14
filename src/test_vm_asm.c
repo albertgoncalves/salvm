@@ -313,6 +313,7 @@ i32 main(void) {
            sizeof(Label),
            sizeof(Memory));
     MEMORY = calloc(1, sizeof(Memory));
+    EXIT_IF(!MEMORY);
     test_halt();
     test_push();
     test_top();
