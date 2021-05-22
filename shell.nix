@@ -1,9 +1,9 @@
 with import <nixpkgs> {};
 pkgsMusl.mkShell {
     buildInputs = [
-        clang_10
+        clang_11
         cppcheck
-        python38
+        python3
         shellcheck
         valgrind
     ];

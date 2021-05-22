@@ -2,5 +2,5 @@
 
 set -eu
 
-cppcheck --enable=all --suppress=missingIncludeSystem "$WD/src"
+cppcheck --enable=all "$WD/src"
 clang-format -i -verbose "$WD/src/"*

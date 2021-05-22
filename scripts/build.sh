@@ -11,61 +11,39 @@ now () {
 }
 
 flags=(
-    "-fno-strict-aliasing"
+    "-ferror-limit=1"
     "-fshort-enums"
-    "-fsingle-precision-constant"
     "-g"
     "-march=native"
-    "-O1"
-    "-static"
     "-std=c11"
-    "-Wall"
-    "-Wcast-align"
-    "-Wcast-qual"
-    "-Wconversion"
-    "-Wdate-time"
-    "-Wdouble-promotion"
-    "-Wduplicated-branches"
-    "-Wduplicated-cond"
     "-Werror"
-    "-Wextra"
-    "-Wfatal-errors"
-    "-Wfloat-equal"
-    "-Wformat-signedness"
-    "-Wformat=2"
-    "-Winline"
-    "-Wlogical-op"
-    "-Wmissing-declarations"
-    "-Wmissing-include-dirs"
-    "-Wmissing-prototypes"
-    "-Wnull-dereference"
-    "-Wpacked"
-    "-Wpedantic"
-    "-Wpointer-arith"
-    "-Wredundant-decls"
-    "-Wshadow"
-    "-Wstack-protector"
-    "-Wstrict-prototypes"
-    "-Wswitch-enum"
-    "-Wtrampolines"
-    "-Wundef"
-    "-Wunused"
-    "-Wunused-macros"
-    "-Wwrite-strings"
+    "-Weverything"
+    "-Wno-c++98-compat"
+    "-Wno-cast-align"
+    "-Wno-covered-switch-default"
+    "-Wno-disabled-macro-expansion"
+    "-Wno-extra-semi-stmt"
+    "-Wno-padded"
+    "-Wno-reserved-id-macro"
 )
 bins=(
     test_vm_asm
     test_vm_inst
     vm_asm
-    vm
 )
 
 (
     start=$(now)
     for x in "${bins[@]}"; do
-        gcc "${flags[@]}" -o "$WD/bin/$x" "$WD/src/$x.c"
+        clang "${flags[@]}" -O0 -o "$WD/bin/$x" "$WD/src/$x.c"
     done
-    gcc "${flags[@]}" "-DDEBUG_PRINT_VM" -o "$WD/bin/vm_debug" "$WD/src/vm.c"
+    clang \
+        "${flags[@]}" \
+        "-DDEBUG_PRINT_VM" \
+        -O0 \
+        -o "$WD/bin/vm_debug" \
+        "$WD/src/vm.c"
+    clang "${flags[@]}" -O3 -o "$WD/bin/vm" "$WD/src/vm.c"
     end=$(now)
     python3 -c "print(\"Compiled! ({:.3f}s)\".format(${end} - ${start}))"
 )
