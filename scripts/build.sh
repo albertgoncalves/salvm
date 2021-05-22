@@ -18,6 +18,7 @@ flags=(
     "-std=c11"
     "-Werror"
     "-Weverything"
+    "-Wno-#warnings"
     "-Wno-c++98-compat"
     "-Wno-cast-align"
     "-Wno-covered-switch-default"
