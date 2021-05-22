@@ -252,7 +252,7 @@ static void println_token(File* stream, Token token) {
         break;
     }
     case TOKEN_F32: {
-        fprintf(stream, "`%.2f`\n", (f64)token.body.as_f32);
+        fprintf(stream, "`%.2f`\n", token.body.as_f32);
         break;
     }
     case TOKEN_COLON: {
