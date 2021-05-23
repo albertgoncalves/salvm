@@ -216,10 +216,10 @@ static void do_inst(Vm* vm) {
     case INST_JPZ: {
         --vm->index.stack_top;
         BOUNDS_CHECK_STACK(vm->index.stack_top);
-        // NOTE: See `https://www.chessprogramming.org/Avoiding_Branches#Conditional_Assignment`.
-        ++vm->index.inst;
         if (vm->stack[vm->index.stack_top].as_i32 == 0) {
-            vm->index.inst += inst.op - vm->index.inst;
+            vm->index.inst = inst.op;
+        } else {
+            ++vm->index.inst;
         }
         break;
     }
