@@ -3,9 +3,9 @@
 
 #include "vm.h"
 
-#define CAP_CHARS  4096
-#define CAP_TOKENS 256
-#define CAP_LABELS 64
+#define CAP_CHARS  (2 << 11)
+#define CAP_TOKENS (2 << 7)
+#define CAP_LABELS (2 << 5)
 
 typedef enum {
     TOKEN_INST,
