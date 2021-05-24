@@ -22,7 +22,7 @@ static void run(Vm* vm) {
                    "    |       .stack_top  : %d\n"
                    "    |       .stack_base : %d\n"
                    "    | .inst.tag         : " FMT_STR "\n"
-                   "    | .inst.op          : %d\n"
+                   "    |      .op          : %d\n"
                    "    | .stack            : [ ",
                    vm->index.inst,
                    vm->index.stack_top,
