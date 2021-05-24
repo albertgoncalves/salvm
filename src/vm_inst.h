@@ -41,7 +41,7 @@ NATIVE_1(native_printi,
          { printf("%d", vm->stack[vm->index.stack_top].as_i32); })
 
 NATIVE_1(native_printf,
-         { printf("%.7f", vm->stack[vm->index.stack_top].as_f32); })
+         { printf("%.7f", (f64)vm->stack[vm->index.stack_top].as_f32); })
 
 static void native_prints(Vm* vm) {
     EXIT_IF(vm->index.stack_top < 2);
