@@ -3,10 +3,10 @@
 
 #include "prelude.h"
 
-STATIC_ASSERT(sizeof(i32) == sizeof(f32), "sizeof(i32) != sizeof(f32)");
-STATIC_ASSERT(alignof(i8) == 1, "alignof(i8) != 1");
-STATIC_ASSERT(alignof(i16) == 2, "alignof(i16) != 2");
-STATIC_ASSERT(alignof(i32) == 4, "alignof(i32) != 4");
+static_assert(sizeof(i32) == sizeof(f32), "sizeof(i32) != sizeof(f32)");
+static_assert(alignof(i8) == 1, "alignof(i8) != 1");
+static_assert(alignof(i16) == 2, "alignof(i16) != 2");
+static_assert(alignof(i32) == 4, "alignof(i32) != 4");
 
 #define CAP_INSTS (2 << 7)
 #define CAP_STACK (2 << 14)

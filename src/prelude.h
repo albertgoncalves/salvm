@@ -1,8 +1,6 @@
 #ifndef __PRELUDE_H__
 #define __PRELUDE_H__
 
-#include <assert.h>
-#include <stdalign.h>
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -24,8 +22,6 @@ enum Bool {
 };
 
 typedef FILE File;
-
-#define STATIC_ASSERT _Static_assert
 
 #define ERROR()                                                      \
     {                                                                \
