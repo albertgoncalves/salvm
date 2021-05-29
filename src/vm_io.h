@@ -15,7 +15,7 @@ static void run(Vm* vm) {
     while (vm->alive) {
 #ifdef DEBUG_PRINT_VM
         {
-            String inst =
+            const String inst =
                 get_inst_tag_as_string(vm->insts[vm->index.inst].tag);
             printf("\n\n"
                    "    | .index.inst       : %d\n"

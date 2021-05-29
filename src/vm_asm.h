@@ -174,7 +174,7 @@ static void set_tokens(Memory* memory) {
             Token* token = alloc_token(memory);
             token->line = line;
             if (IS_DIGIT(memory->chars[i])) {
-                i32 x = parse_digits_i32(memory->chars, &i);
+                const i32 x = parse_digits_i32(memory->chars, &i);
                 if (memory->chars[i] == '.') {
                     ++i;
                     token->body.as_f32 = static_cast<f32>(x) +
