@@ -12,24 +12,6 @@ now () {
 
 flags=(
     "-ferror-limit=1"
-    "-fshort-enums"
-    "-g"
-    "-march=native"
-    "-O0"
-    "-std=c11"
-    "-Werror"
-    "-Weverything"
-    "-Wno-c++98-compat"
-    "-Wno-cast-align"
-    "-Wno-covered-switch-default"
-    "-Wno-disabled-macro-expansion"
-    "-Wno-error=#warnings"
-    "-Wno-extra-semi-stmt"
-    "-Wno-padded"
-    "-Wno-reserved-id-macro"
-)
-flags_cpp=(
-    "-ferror-limit=1"
     "-ffast-math"
     "-fno-exceptions"
     "-fno-math-errno"
@@ -38,17 +20,16 @@ flags_cpp=(
     "-fshort-enums"
     "-g"
     "-march=native"
-    "-O3"
+    "-std=c++11"
     "-Werror"
     "-Weverything"
     "-Wno-c++98-compat-pedantic"
-    "-Wno-c11-extensions"
-    "-Wno-c99-designator"
-    "-Wno-cast-align"
+    "-Wno-c99-extensions"
     "-Wno-covered-switch-default"
     "-Wno-deprecated"
+    "-Wno-disabled-macro-expansion"
+    "-Wno-error=#warnings"
     "-Wno-extra-semi-stmt"
-    "-Wno-old-style-cast"
     "-Wno-padded"
     "-Wno-reserved-id-macro"
 )
@@ -62,10 +43,14 @@ bins=(
     clang-format -i -verbose "$WD/src/"*
     start=$(now)
     for x in "${bins[@]}"; do
-        clang "${flags[@]}" -o "$WD/bin/$x" "$WD/src/$x.c"
+        clang++ "${flags[@]}" -O0 -o "$WD/bin/$x" "$WD/src/$x.c"
     done
-    clang "${flags[@]}" "-DDEBUG_PRINT_VM" -o "$WD/bin/vm_debug" "$WD/src/vm.c"
-    clang++ "${flags_cpp[@]}" -o "$WD/bin/vm" "$WD/src/vm.c"
+    clang++ \
+        "${flags[@]}" \
+        "-DDEBUG_PRINT_VM" \
+        -o "$WD/bin/vm_debug" \
+        "$WD/src/vm.c"
+    clang++ "${flags[@]}" -O3 -o "$WD/bin/vm" "$WD/src/vm.c"
     end=$(now)
     python3 -c "print(\"Compiled! ({:.3f}s)\".format(${end} - ${start}))"
 )
