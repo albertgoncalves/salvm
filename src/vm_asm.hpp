@@ -194,11 +194,11 @@ static void set_tokens(Memory* memory) {
             }
             EXIT_IF(i == j);
             const String token_string = {&memory->chars[i], j - i};
-            for (i32 t = 0; t < COUNT_INST_TAG; ++t) {
-                const String inst_string =
-                    get_inst_tag_as_string(static_cast<InstTag>(t));
+            for (u32 k = 0; k < COUNT_INST_TAG; ++k) {
+                const InstTag tag = static_cast<InstTag>(k);
+                const String  inst_string = get_inst_tag_as_string(tag);
                 if (EQ_STRINGS(token_string, inst_string)) {
-                    token->body.as_inst_tag = static_cast<InstTag>(t);
+                    token->body.as_inst_tag = tag;
                     token->tag = TOKEN_INST;
                     goto end;
                 }
