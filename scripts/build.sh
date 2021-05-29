@@ -46,6 +46,7 @@ bins=(
     done
     clang++ \
         "${flags[@]}" \
+        -O0 \
         "-DDEBUG_PRINT_VM" \
         -o "$WD/bin/vm_debug" \
         "$WD/src/vm.cpp"
