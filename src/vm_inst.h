@@ -34,6 +34,10 @@
         block;                                   \
     }
 
+static void native_nop(Vm* _) {
+    (void)_;
+}
+
 NATIVE_1(native_printc,
          { printf("%c", vm->stack[vm->index.stack_top].as_i32); })
 
@@ -55,10 +59,6 @@ static void native_prints(Vm* vm) {
     EXIT_IF(CAP_HEAP8 <= (k + l));
     printf("%.*s", l, reinterpret_cast<char*>(&vm->heap[k]));
     vm->index.stack_top -= 2;
-}
-
-static void native_nop(Vm* _) {
-    (void)_;
 }
 
 static const Native NATIVES[COUNT_NATIVE] = {

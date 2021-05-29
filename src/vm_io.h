@@ -8,9 +8,7 @@
 #endif
 
 static void run(Vm* vm) {
-    vm->index.inst = 0;
-    vm->index.stack_top = 0;
-    vm->index.stack_base = 0;
+    vm->index = {};
     vm->alive = TRUE;
     while (vm->alive) {
 #ifdef DEBUG_PRINT_VM
