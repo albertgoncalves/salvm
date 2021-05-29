@@ -7,7 +7,7 @@
 #define CAP_TOKENS (2 << 7)
 #define CAP_LABELS (2 << 5)
 
-typedef enum {
+enum TokenTag {
     TOKEN_INST,
 
     TOKEN_STR,
@@ -16,33 +16,33 @@ typedef enum {
 
     TOKEN_COLON,
     TOKEN_MINUS,
-} TokenTag;
+};
 
-typedef union {
+union TokenBody {
     String  as_string;
     InstTag as_inst_tag;
     i32     as_i32;
     f32     as_f32;
-} TokenBody;
+};
 
-typedef struct {
+struct Token {
     TokenBody body;
     u32       line;
     TokenTag  tag;
-} Token;
+};
 
-typedef struct {
+struct PreInst {
     Inst   inst;
     String label;
     Bool   resolved;
-} PreInst;
+};
 
-typedef struct {
+struct Label {
     String string;
     i32    index_inst;
-} Label;
+};
 
-typedef struct {
+struct Memory {
     Vm      vm;
     char    chars[CAP_CHARS];
     Token   tokens[CAP_TOKENS];
@@ -52,7 +52,7 @@ typedef struct {
     u32     len_tokens;
     u32     len_pre_insts;
     u32     len_labels;
-} Memory;
+};
 
 #define IS_ALPHA(x) \
     ((('A' <= (x)) && ((x) <= 'Z')) || (('a' <= (x)) && ((x) <= 'z')))

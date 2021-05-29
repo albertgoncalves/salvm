@@ -5,9 +5,9 @@
 
 #define MAGIC 0xDEADFADE
 
-typedef struct {
+struct Header {
     u32 magic;
     u32 count_inst;
-} Header;
+};
 
 #endif

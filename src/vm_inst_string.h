@@ -3,10 +3,10 @@
 
 #include "vm.h"
 
-typedef struct {
+struct String {
     const char* chars;
     u32         len;
-} String;
+};
 
 #define TO_STRING(literal)          \
     ((String){                      \
