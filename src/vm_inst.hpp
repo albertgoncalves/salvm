@@ -1,7 +1,7 @@
 #ifndef __VM_INST_H__
 #define __VM_INST_H__
 
-#include "vm.h"
+#include "vm.hpp"
 
 #define BOUNDS_CHECK_STACK(index)      \
     {                                  \

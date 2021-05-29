@@ -1,7 +1,7 @@
 #ifndef __VM_BYTES_H__
 #define __VM_BYTES_H__
 
-#include "vm.h"
+#include "vm.hpp"
 
 #define MAGIC 0xDEADFADE
 

@@ -1,7 +1,7 @@
 #ifndef __VM_INST_STRING_H__
 #define __VM_INST_STRING_H__
 
-#include "vm.h"
+#include "vm.hpp"
 
 struct String {
     const char* chars;

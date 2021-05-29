@@ -1,4 +1,4 @@
-#include "vm_inst.h"
+#include "vm_inst.hpp"
 
 static Vm* VM;
 

@@ -1,7 +1,7 @@
 #ifndef __VM_H__
 #define __VM_H__
 
-#include "prelude.h"
+#include "prelude.hpp"
 
 static_assert(sizeof(i32) == sizeof(f32), "sizeof(i32) != sizeof(f32)");
 static_assert(alignof(i8) == 1, "alignof(i8) != 1");

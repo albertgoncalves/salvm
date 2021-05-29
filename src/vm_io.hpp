@@ -1,10 +1,10 @@
 #ifndef __VM_IO_H__
 #define __VM_IO_H__
 
-#include "vm_inst.h"
+#include "vm_inst.hpp"
 
 #ifdef DEBUG_PRINT_VM
-    #include "vm_inst_string.h"
+    #include "vm_inst_string.hpp"
 #endif
 
 static void run(Vm* vm) {

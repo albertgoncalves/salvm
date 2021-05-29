@@ -1,7 +1,7 @@
 #ifndef __VM_ASM_H__
 #define __VM_ASM_H__
 
-#include "vm_inst_string.h"
+#include "vm_inst_string.hpp"
 
 #define CAP_CHARS  (2 << 11)
 #define CAP_TOKENS (2 << 7)

@@ -26,7 +26,6 @@ flags=(
     "-Wno-c++98-compat-pedantic"
     "-Wno-c99-extensions"
     "-Wno-covered-switch-default"
-    "-Wno-deprecated"
     "-Wno-disabled-macro-expansion"
     "-Wno-error=#warnings"
     "-Wno-extra-semi-stmt"
@@ -43,14 +42,14 @@ bins=(
     clang-format -i -verbose "$WD/src/"*
     start=$(now)
     for x in "${bins[@]}"; do
-        clang++ "${flags[@]}" -O0 -o "$WD/bin/$x" "$WD/src/$x.c"
+        clang++ "${flags[@]}" -O0 -o "$WD/bin/$x" "$WD/src/$x.cpp"
     done
     clang++ \
         "${flags[@]}" \
         "-DDEBUG_PRINT_VM" \
         -o "$WD/bin/vm_debug" \
-        "$WD/src/vm.c"
-    clang++ "${flags[@]}" -O3 -o "$WD/bin/vm" "$WD/src/vm.c"
+        "$WD/src/vm.cpp"
+    clang++ "${flags[@]}" -O3 -o "$WD/bin/vm" "$WD/src/vm.cpp"
     end=$(now)
     python3 -c "print(\"Compiled! ({:.3f}s)\".format(${end} - ${start}))"
 )
