@@ -12,15 +12,19 @@ now () {
 
 flags=(
     "-ferror-limit=1"
+    "-ffast-math"
+    "-fno-exceptions"
+    "-fno-math-errno"
+    "-fno-rtti"
+    "-fno-unwind-tables"
     "-fshort-enums"
     "-g"
     "-march=native"
-    "-O0"
-    "-std=c11"
+    "-std=c++11"
     "-Werror"
     "-Weverything"
-    "-Wno-c++98-compat"
-    "-Wno-cast-align"
+    "-Wno-c++98-compat-pedantic"
+    "-Wno-c99-extensions"
     "-Wno-covered-switch-default"
     "-Wno-disabled-macro-expansion"
     "-Wno-error=#warnings"
@@ -32,16 +36,21 @@ bins=(
     test_vm_asm
     test_vm_inst
     vm_asm
-    vm
 )
 
 (
     clang-format -i -verbose "$WD/src/"*
     start=$(now)
     for x in "${bins[@]}"; do
-        clang "${flags[@]}" -o "$WD/bin/$x" "$WD/src/$x.c"
+        clang++ "${flags[@]}" -O0 -o "$WD/bin/$x" "$WD/src/$x.cpp"
     done
-    clang "${flags[@]}" "-DDEBUG_PRINT_VM" -o "$WD/bin/vm_debug" "$WD/src/vm.c"
+    clang++ \
+        "${flags[@]}" \
+        -O0 \
+        "-DDEBUG_PRINT_VM" \
+        -o "$WD/bin/vm_debug" \
+        "$WD/src/vm.cpp"
+    clang++ "${flags[@]}" -O3 -o "$WD/bin/vm" "$WD/src/vm.cpp"
     end=$(now)
     python3 -c "print(\"Compiled! ({:.3f}s)\".format(${end} - ${start}))"
 )

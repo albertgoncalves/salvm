@@ -1,5 +1,5 @@
-#include "vm_bytes.h"
-#include "vm_io.h"
+#include "vm_bytes.hpp"
+#include "vm_io.hpp"
 
 static void insts_from_bytes(Vm* vm, const char* path) {
     File* file = fopen(path, "rb");
@@ -16,7 +16,7 @@ static void insts_from_bytes(Vm* vm, const char* path) {
 i32 main(i32 n, const char** args) {
     EXIT_IF(n < 2);
     {
-        Vm* vm = calloc(1, sizeof(Vm));
+        Vm* vm = reinterpret_cast<Vm*>(calloc(1, sizeof(Vm)));
         EXIT_IF(!vm);
         insts_from_bytes(vm, args[1]);
         run(vm);

@@ -1,21 +1,20 @@
-#include "vm_asm.h"
+#include "vm_asm.hpp"
 
 #define EPSILON 0.001f
 
 static Memory* MEMORY;
 
-#define INJECT(literal)                        \
-    {                                          \
-        MEMORY->len_chars = 0;                 \
-        MEMORY->len_tokens = 0;                \
-        MEMORY->len_pre_insts = 0;             \
-        MEMORY->len_labels = 0;                \
-        const usize len = sizeof(literal) - 1; \
-        EXIT_IF(CAP_CHARS <= len);             \
-        memcpy(MEMORY->chars, literal, len);   \
-        MEMORY->len_chars = (u32)len;          \
-        set_tokens(MEMORY);                    \
-        set_insts(MEMORY);                     \
+#define INJECT(literal)                                      \
+    {                                                        \
+        MEMORY->len_chars = 0;                               \
+        MEMORY->len_tokens = 0;                              \
+        MEMORY->len_pre_insts = 0;                           \
+        MEMORY->len_labels = 0;                              \
+        EXIT_IF(CAP_CHARS <= (sizeof(literal) - 1));         \
+        memcpy(MEMORY->chars, literal, sizeof(literal) - 1); \
+        MEMORY->len_chars = sizeof(literal) - 1;             \
+        set_tokens(MEMORY);                                  \
+        set_insts(MEMORY);                                   \
     }
 
 TEST(test_halt, {
@@ -32,7 +31,7 @@ TEST(test_push, {
     EXIT_IF(MEMORY->vm.insts[1].tag != INST_PUSH);
     EXIT_IF(MEMORY->vm.insts[1].op != -12345);
     EXIT_IF(MEMORY->vm.insts[2].tag != INST_PUSH);
-    const f32 op = *((f32*)(&MEMORY->vm.insts[2].op));
+    const f32 op = *(reinterpret_cast<f32*>(&MEMORY->vm.insts[2].op));
     EXIT_IF((op < (-12345.6789f - EPSILON)) ||
             ((-12345.6789f + EPSILON) < op));
     EXIT_IF(MEMORY->vm.insts[3].tag != INST_PUSH);
@@ -280,10 +279,7 @@ TEST(test_native, {
     {                                                       \
         const String result = get_inst_tag_as_string(inst); \
         EXIT_IF(result.len != len_);                        \
-        const String expected = {                           \
-            .len = len_,                                    \
-            .chars = literal,                               \
-        };                                                  \
+        const String expected = {literal, len_};            \
         EXIT_IF(!EQ_STRINGS(result, expected));             \
     }
 
@@ -297,7 +293,7 @@ TEST(test_jpz_as_string, { TEST_STR(INST_JPZ, "jpz", 3); })
 
 TEST(test_native_as_string, { TEST_STR(INST_NATIVE, "native", 6); })
 
-i32 main(void) {
+i32 main() {
     printf("sizeof(TokenTag)  : %zu\n"
            "sizeof(String)    : %zu\n"
            "sizeof(TokenBody) : %zu\n"
@@ -312,7 +308,7 @@ i32 main(void) {
            sizeof(PreInst),
            sizeof(Label),
            sizeof(Memory));
-    MEMORY = calloc(1, sizeof(Memory));
+    MEMORY = reinterpret_cast<Memory*>(calloc(1, sizeof(Memory)));
     EXIT_IF(!MEMORY);
     test_halt();
     test_push();

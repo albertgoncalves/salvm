@@ -1,7 +1,7 @@
 #ifndef __VM_INST_H__
 #define __VM_INST_H__
 
-#include "vm.h"
+#include "vm.hpp"
 
 #define BOUNDS_CHECK_STACK(index)      \
     {                                  \
@@ -34,14 +34,19 @@
         block;                                   \
     }
 
+static void native_nop(Vm* _) {
+    (void)_;
+}
+
 NATIVE_1(native_printc,
          { printf("%c", vm->stack[vm->index.stack_top].as_i32); })
 
 NATIVE_1(native_printi,
          { printf("%d", vm->stack[vm->index.stack_top].as_i32); })
 
-NATIVE_1(native_printf,
-         { printf("%.7f", (f64)vm->stack[vm->index.stack_top].as_f32); })
+NATIVE_1(native_printf, {
+    printf("%.7f", static_cast<f64>(vm->stack[vm->index.stack_top].as_f32));
+})
 
 static void native_prints(Vm* vm) {
     EXIT_IF(vm->index.stack_top < 2);
@@ -52,12 +57,8 @@ static void native_prints(Vm* vm) {
     BOUNDS_CHECK_HEAP8(k);
     const i32 l = vm->stack[j].as_i32;
     EXIT_IF(CAP_HEAP8 <= (k + l));
-    printf("%.*s", l, (char*)&vm->heap[k]);
+    printf("%.*s", l, reinterpret_cast<char*>(&vm->heap[k]));
     vm->index.stack_top -= 2;
-}
-
-static void native_nop(Vm* _) {
-    (void)_;
 }
 
 static const Native NATIVES[COUNT_NATIVE] = {
@@ -151,7 +152,7 @@ static void do_inst(Vm* vm) {
         BOUNDS_CHECK_STACK(i);
         const i32 j = vm->stack[i].as_i32;
         BOUNDS_CHECK_HEAP8(j);
-        vm->stack[i].as_i32 = (i32)(vm->heap[j]);
+        vm->stack[i].as_i32 = static_cast<i32>(vm->heap[j]);
         ++vm->index.inst;
         break;
     }
@@ -160,8 +161,12 @@ static void do_inst(Vm* vm) {
         BOUNDS_CHECK_STACK(i);
         const i32 j = vm->stack[i].as_i32;
         BOUNDS_CHECK_HEAP8(j * 2);
-        const i16* heap = (i16*)vm->heap;
-        vm->stack[i].as_i32 = (i32)(heap[j]);
+        // NOTE: This *should* be fine. See `https://blog.regehr.org/archives/959`.
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wcast-align"
+        const i16* heap = reinterpret_cast<i16*>(vm->heap);
+#pragma GCC diagnostic pop
+        vm->stack[i].as_i32 = static_cast<i32>(heap[j]);
         ++vm->index.inst;
         break;
     }
@@ -170,7 +175,10 @@ static void do_inst(Vm* vm) {
         BOUNDS_CHECK_STACK(i);
         const i32 j = vm->stack[i].as_i32;
         BOUNDS_CHECK_HEAP8(j * 4);
-        const i32* heap = (i32*)vm->heap;
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wcast-align"
+        const i32* heap = reinterpret_cast<i32*>(vm->heap);
+#pragma GCC diagnostic pop
         vm->stack[i].as_i32 = heap[j];
         ++vm->index.inst;
         break;
@@ -182,7 +190,7 @@ static void do_inst(Vm* vm) {
         EXIT_IF(CAP_STACK <= i)
         const i32 l = vm->stack[i].as_i32;
         BOUNDS_CHECK_HEAP8(l);
-        vm->heap[l] = (i8)(vm->stack[j].as_i32);
+        vm->heap[l] = static_cast<i8>(vm->stack[j].as_i32);
         vm->index.stack_top -= 2;
         ++vm->index.inst;
         break;
@@ -194,8 +202,11 @@ static void do_inst(Vm* vm) {
         EXIT_IF(CAP_STACK <= i)
         const i32 l = vm->stack[i].as_i32;
         BOUNDS_CHECK_HEAP8(l * 2);
-        i16* heap = (i16*)vm->heap;
-        heap[l] = (i16)(vm->stack[j].as_i32);
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wcast-align"
+        i16* heap = reinterpret_cast<i16*>(vm->heap);
+#pragma GCC diagnostic pop
+        heap[l] = static_cast<i16>(vm->stack[j].as_i32);
         vm->index.stack_top -= 2;
         ++vm->index.inst;
         break;
@@ -207,7 +218,10 @@ static void do_inst(Vm* vm) {
         EXIT_IF(CAP_STACK <= i)
         const i32 l = vm->stack[i].as_i32;
         BOUNDS_CHECK_HEAP8(l * 4);
-        i32* heap = (i32*)vm->heap;
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wcast-align"
+        i32* heap = reinterpret_cast<i32*>(vm->heap);
+#pragma GCC diagnostic pop
         heap[l] = vm->stack[j].as_i32;
         vm->index.stack_top -= 2;
         ++vm->index.inst;

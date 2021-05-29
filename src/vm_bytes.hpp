@@ -1,13 +1,13 @@
 #ifndef __VM_BYTES_H__
 #define __VM_BYTES_H__
 
-#include "vm.h"
+#include "vm.hpp"
 
 #define MAGIC 0xDEADFADE
 
-typedef struct {
+struct Header {
     u32 magic;
     u32 count_inst;
-} Header;
+};
 
 #endif

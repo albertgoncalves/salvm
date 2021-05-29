@@ -1,17 +1,17 @@
 #ifndef __VM_INST_STRING_H__
 #define __VM_INST_STRING_H__
 
-#include "vm.h"
+#include "vm.hpp"
 
-typedef struct {
+struct String {
     const char* chars;
     u32         len;
-} String;
+};
 
-#define TO_STRING(literal)          \
-    ((String){                      \
-        .chars = literal,           \
-        .len = sizeof(literal) - 1, \
+#define TO_STRING(literal)   \
+    ((String){               \
+        literal,             \
+        sizeof(literal) - 1, \
     })
 
 #define EQ_STRINGS(a, b) \
@@ -20,7 +20,7 @@ typedef struct {
 #define FMT_STR "%.*s"
 
 #define PRINTLN_STR(stream, string) \
-    fprintf(stream, "`" FMT_STR "`\n", (i32)string.len, string.chars)
+    fprintf(stream, "`" FMT_STR "`\n", string.len, string.chars)
 
 static String get_inst_tag_as_string(InstTag tag) {
     switch (tag) {

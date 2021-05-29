@@ -1,4 +1,4 @@
-#include "vm_inst.h"
+#include "vm_inst.hpp"
 
 static Vm* VM;
 
@@ -157,12 +157,15 @@ TEST(test_rd8, {
     EXIT_IF(VM->stack[0].as_i32 != -123);
 })
 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wcast-align"
+
 TEST(test_rd16, {
     RESET();
     VM->insts[0].tag = INST_RD16;
     VM->index.stack_top = 1;
     VM->stack[0].as_i32 = 7;
-    i16* heap = (i16*)VM->heap;
+    i16* heap = reinterpret_cast<i16*>(VM->heap);
     heap[7] = -30000;
     do_inst(VM);
     EXIT_IF(VM->index.inst != 1);
@@ -175,13 +178,15 @@ TEST(test_rd32, {
     VM->insts[0].tag = INST_RD32;
     VM->index.stack_top = 1;
     VM->stack[0].as_i32 = 3;
-    i32* heap = (i32*)VM->heap;
+    i32* heap = reinterpret_cast<i32*>(VM->heap);
     heap[3] = -2000000123;
     do_inst(VM);
     EXIT_IF(VM->index.inst != 1);
     EXIT_IF(VM->index.stack_top != 1);
     EXIT_IF(VM->stack[0].as_i32 != -2000000123);
 })
+
+#pragma GCC diagnostic pop
 
 TEST(test_sv8, {
     RESET();
@@ -195,6 +200,9 @@ TEST(test_sv8, {
     EXIT_IF(VM->heap[11] != -113);
 })
 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wcast-align"
+
 TEST(test_sv16, {
     RESET();
     VM->insts[0].tag = INST_SV16;
@@ -204,7 +212,7 @@ TEST(test_sv16, {
     do_inst(VM);
     EXIT_IF(VM->index.inst != 1);
     EXIT_IF(VM->index.stack_top != 0);
-    i16* heap = (i16*)VM->heap;
+    const i16* heap = reinterpret_cast<i16*>(VM->heap);
     EXIT_IF(heap[2] != -30012);
 })
 
@@ -217,9 +225,11 @@ TEST(test_sv32, {
     do_inst(VM);
     EXIT_IF(VM->index.inst != 1);
     EXIT_IF(VM->index.stack_top != 0);
-    i32* heap = (i32*)VM->heap;
+    const i32* heap = reinterpret_cast<i32*>(VM->heap);
     EXIT_IF(heap[1] != -2000100123);
 })
+
+#pragma GCC diagnostic pop
 
 TEST(test_not, {
     RESET();
@@ -292,7 +302,7 @@ TEST(test_native_nop, {
     EXIT_IF(VM->index.inst != 1);
 })
 
-i32 main(void) {
+i32 main() {
     printf("sizeof(Bool)    : %zu\n"
            "sizeof(InstTag) : %zu\n"
            "sizeof(Inst)    : %zu\n"
@@ -309,7 +319,7 @@ i32 main(void) {
            sizeof(Vm),
            sizeof(Natives),
            sizeof(Native));
-    VM = calloc(1, sizeof(Vm));
+    VM = reinterpret_cast<Vm*>(calloc(1, sizeof(Vm)));
     EXIT_IF(!VM);
     test_push();
     test_top();

@@ -1,18 +1,18 @@
 #ifndef __VM_H__
 #define __VM_H__
 
-#include "prelude.h"
+#include "prelude.hpp"
 
-STATIC_ASSERT(sizeof(i32) == sizeof(f32), "sizeof(i32) != sizeof(f32)");
-STATIC_ASSERT(alignof(i8) == 1, "alignof(i8) != 1");
-STATIC_ASSERT(alignof(i16) == 2, "alignof(i16) != 2");
-STATIC_ASSERT(alignof(i32) == 4, "alignof(i32) != 4");
+static_assert(sizeof(i32) == sizeof(f32), "sizeof(i32) != sizeof(f32)");
+static_assert(alignof(i8) == 1, "alignof(i8) != 1");
+static_assert(alignof(i16) == 2, "alignof(i16) != 2");
+static_assert(alignof(i32) == 4, "alignof(i32) != 4");
 
 #define CAP_INSTS (2 << 7)
 #define CAP_STACK (2 << 14)
 #define CAP_HEAP8 (2 << 7)
 
-typedef enum {
+enum InstTag {
     INST_HALT = 0,
 
     INST_PUSH,
@@ -67,40 +67,40 @@ typedef enum {
     INST_NATIVE,
 
     COUNT_INST_TAG,
-} InstTag;
+};
 
-typedef struct {
+struct Inst {
     i32     op;
     InstTag tag;
-} Inst;
+};
 
-typedef struct {
+struct Index {
     i32 inst;
     i32 stack_top;
     i32 stack_base;
-} Index;
+};
 
-typedef union {
+union Word {
     i32 as_i32;
     f32 as_f32;
-} Word;
+};
 
-typedef struct {
+struct Vm {
     Inst  insts[CAP_INSTS];
     Word  stack[CAP_STACK];
     i8    heap[CAP_HEAP8];
     Index index;
     Bool  alive;
-} Vm;
+};
 
-typedef enum {
+enum Natives {
     NATIVE_NOP = 0,
     NATIVE_PRINTC,
     NATIVE_PRINTI,
     NATIVE_PRINTF,
     NATIVE_PRINTS,
     COUNT_NATIVE,
-} Natives;
+};
 
 typedef void (*Native)(Vm*);
 

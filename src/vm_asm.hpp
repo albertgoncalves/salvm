@@ -1,13 +1,13 @@
 #ifndef __VM_ASM_H__
 #define __VM_ASM_H__
 
-#include "vm_inst_string.h"
+#include "vm_inst_string.hpp"
 
 #define CAP_CHARS  (2 << 11)
 #define CAP_TOKENS (2 << 7)
 #define CAP_LABELS (2 << 5)
 
-typedef enum {
+enum TokenTag {
     TOKEN_INST,
 
     TOKEN_STR,
@@ -16,33 +16,33 @@ typedef enum {
 
     TOKEN_COLON,
     TOKEN_MINUS,
-} TokenTag;
+};
 
-typedef union {
+union TokenBody {
     String  as_string;
     InstTag as_inst_tag;
     i32     as_i32;
     f32     as_f32;
-} TokenBody;
+};
 
-typedef struct {
+struct Token {
     TokenBody body;
     u32       line;
     TokenTag  tag;
-} Token;
+};
 
-typedef struct {
+struct PreInst {
     Inst   inst;
     String label;
     Bool   resolved;
-} PreInst;
+};
 
-typedef struct {
+struct Label {
     String string;
     i32    index_inst;
-} Label;
+};
 
-typedef struct {
+struct Memory {
     Vm      vm;
     char    chars[CAP_CHARS];
     Token   tokens[CAP_TOKENS];
@@ -52,7 +52,7 @@ typedef struct {
     u32     len_tokens;
     u32     len_pre_insts;
     u32     len_labels;
-} Memory;
+};
 
 #define IS_ALPHA(x) \
     ((('A' <= (x)) && ((x) <= 'Z')) || (('a' <= (x)) && ((x) <= 'z')))
@@ -97,7 +97,7 @@ static void println_token(File* stream, Token token) {
         break;
     }
     case TOKEN_F32: {
-        fprintf(stream, "`%.2f`\n", (f64)token.body.as_f32);
+        fprintf(stream, "`%.2f`\n", static_cast<f64>(token.body.as_f32));
         break;
     }
     case TOKEN_COLON: {
@@ -117,7 +117,7 @@ static void println_token(File* stream, Token token) {
 static i32 parse_digits_i32(const char* chars, u32* i) {
     i32 a = 0;
     while (IS_DIGIT(chars[*i])) {
-        i32 b = (a * 10) + ((i32)(chars[(*i)++] - '0'));
+        const i32 b = (a * 10) + static_cast<i32>(chars[(*i)++] - '0');
         EXIT_IF(b < a);
         a = b;
     }
@@ -128,7 +128,7 @@ static f32 parse_decimal_f32(const char* chars, u32* i) {
     f32 a = 0.0f;
     f32 b = 1.0f;
     while (IS_DIGIT(chars[*i])) {
-        a = (a * 10.0f) + ((f32)(chars[(*i)++] - '0'));
+        a = (a * 10.0f) + static_cast<f32>(chars[(*i)++] - '0');
         b *= 10.0f;
     }
     return a / b;
@@ -174,11 +174,11 @@ static void set_tokens(Memory* memory) {
             Token* token = alloc_token(memory);
             token->line = line;
             if (IS_DIGIT(memory->chars[i])) {
-                i32 x = parse_digits_i32(memory->chars, &i);
+                const i32 x = parse_digits_i32(memory->chars, &i);
                 if (memory->chars[i] == '.') {
                     ++i;
-                    token->body.as_f32 =
-                        (f32)x + parse_decimal_f32(memory->chars, &i);
+                    token->body.as_f32 = static_cast<f32>(x) +
+                                         parse_decimal_f32(memory->chars, &i);
                     token->tag = TOKEN_F32;
                 } else {
                     token->body.as_i32 = x;
@@ -193,14 +193,12 @@ static void set_tokens(Memory* memory) {
                 }
             }
             EXIT_IF(i == j);
-            const String token_string = {
-                .chars = &memory->chars[i],
-                .len = j - i,
-            };
-            for (InstTag t = 0; t < COUNT_INST_TAG; ++t) {
-                const String inst_string = get_inst_tag_as_string(t);
+            const String token_string = {&memory->chars[i], j - i};
+            for (u32 k = 0; k < COUNT_INST_TAG; ++k) {
+                const InstTag tag = static_cast<InstTag>(k);
+                const String  inst_string = get_inst_tag_as_string(tag);
                 if (EQ_STRINGS(token_string, inst_string)) {
-                    token->body.as_inst_tag = t;
+                    token->body.as_inst_tag = tag;
                     token->tag = TOKEN_INST;
                     goto end;
                 }

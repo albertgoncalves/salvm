@@ -1,21 +1,19 @@
 #ifndef __VM_IO_H__
 #define __VM_IO_H__
 
-#include "vm_inst.h"
+#include "vm_inst.hpp"
 
 #ifdef DEBUG_PRINT_VM
-    #include "vm_inst_string.h"
+    #include "vm_inst_string.hpp"
 #endif
 
 static void run(Vm* vm) {
-    vm->index.inst = 0;
-    vm->index.stack_top = 0;
-    vm->index.stack_base = 0;
+    vm->index = {};
     vm->alive = TRUE;
     while (vm->alive) {
 #ifdef DEBUG_PRINT_VM
         {
-            String inst =
+            const String inst =
                 get_inst_tag_as_string(vm->insts[vm->index.inst].tag);
             printf("\n\n"
                    "    | .index.inst       : %d\n"

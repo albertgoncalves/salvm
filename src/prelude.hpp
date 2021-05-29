@@ -1,8 +1,6 @@
 #ifndef __PRELUDE_H__
 #define __PRELUDE_H__
 
-#include <assert.h>
-#include <stdalign.h>
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -18,14 +16,12 @@ typedef int32_t i32;
 typedef float  f32;
 typedef double f64;
 
-typedef enum {
+enum Bool {
     FALSE = 0,
     TRUE,
-} Bool;
+};
 
 typedef FILE File;
-
-#define STATIC_ASSERT _Static_assert
 
 #define ERROR()                                                      \
     {                                                                \
@@ -44,10 +40,10 @@ typedef FILE File;
         exit(EXIT_FAILURE);        \
     }
 
-#define TEST(fn, block)    \
-    static void fn(void) { \
-        block;             \
-        printf(".");       \
+#define TEST(fn, block) \
+    static void fn() {  \
+        block;          \
+        printf(".");    \
     }
 
 #endif
