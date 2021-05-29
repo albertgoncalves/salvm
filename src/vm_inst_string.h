@@ -8,10 +8,10 @@ struct String {
     u32         len;
 };
 
-#define TO_STRING(literal)          \
-    ((String){                      \
-        .chars = literal,           \
-        .len = sizeof(literal) - 1, \
+#define TO_STRING(literal)   \
+    ((String){               \
+        literal,             \
+        sizeof(literal) - 1, \
     })
 
 #define EQ_STRINGS(a, b) \

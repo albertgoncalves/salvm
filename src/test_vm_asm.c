@@ -280,10 +280,7 @@ TEST(test_native, {
     {                                                       \
         const String result = get_inst_tag_as_string(inst); \
         EXIT_IF(result.len != len_);                        \
-        const String expected = {                           \
-            .len = len_,                                    \
-            .chars = literal,                               \
-        };                                                  \
+        const String expected = {literal, len_};            \
         EXIT_IF(!EQ_STRINGS(result, expected));             \
     }
 

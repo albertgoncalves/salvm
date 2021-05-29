@@ -17,10 +17,7 @@ static void insts_to_bytes(const Vm* vm, u32 count_inst, const char* path) {
     EXIT_IF(CAP_INSTS <= count_inst);
     File* file = fopen(path, "wb");
     EXIT_IF(!file);
-    const Header header = {
-        .magic = MAGIC,
-        .count_inst = count_inst,
-    };
+    const Header header = {MAGIC, count_inst};
     EXIT_IF(fwrite(&header, sizeof(Header), 1, file) != 1);
     EXIT_IF(fwrite(&vm->insts, sizeof(Inst), count_inst, file) != count_inst);
     fclose(file);
