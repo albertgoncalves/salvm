@@ -162,7 +162,7 @@ TEST(test_rd16, {
     VM->insts[0].tag = INST_RD16;
     VM->index.stack_top = 1;
     VM->stack[0].as_i32 = 7;
-    i16* heap = (i16*)VM->heap;
+    i16* heap = reinterpret_cast<i16*>(VM->heap);
     heap[7] = -30000;
     do_inst(VM);
     EXIT_IF(VM->index.inst != 1);
@@ -175,7 +175,7 @@ TEST(test_rd32, {
     VM->insts[0].tag = INST_RD32;
     VM->index.stack_top = 1;
     VM->stack[0].as_i32 = 3;
-    i32* heap = (i32*)VM->heap;
+    i32* heap = reinterpret_cast<i32*>(VM->heap);
     heap[3] = -2000000123;
     do_inst(VM);
     EXIT_IF(VM->index.inst != 1);
@@ -204,7 +204,7 @@ TEST(test_sv16, {
     do_inst(VM);
     EXIT_IF(VM->index.inst != 1);
     EXIT_IF(VM->index.stack_top != 0);
-    i16* heap = (i16*)VM->heap;
+    const i16* heap = reinterpret_cast<i16*>(VM->heap);
     EXIT_IF(heap[2] != -30012);
 })
 
@@ -217,7 +217,7 @@ TEST(test_sv32, {
     do_inst(VM);
     EXIT_IF(VM->index.inst != 1);
     EXIT_IF(VM->index.stack_top != 0);
-    i32* heap = (i32*)VM->heap;
+    const i32* heap = reinterpret_cast<i32*>(VM->heap);
     EXIT_IF(heap[1] != -2000100123);
 })
 
@@ -309,7 +309,7 @@ i32 main(void) {
            sizeof(Vm),
            sizeof(Natives),
            sizeof(Native));
-    VM = calloc(1, sizeof(Vm));
+    VM = reinterpret_cast<Vm*>(calloc(1, sizeof(Vm)));
     EXIT_IF(!VM);
     test_push();
     test_top();

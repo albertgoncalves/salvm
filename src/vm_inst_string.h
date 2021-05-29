@@ -20,7 +20,7 @@ struct String {
 #define FMT_STR "%.*s"
 
 #define PRINTLN_STR(stream, string) \
-    fprintf(stream, "`" FMT_STR "`\n", (i32)string.len, string.chars)
+    fprintf(stream, "`" FMT_STR "`\n", string.len, string.chars)
 
 static String get_inst_tag_as_string(InstTag tag) {
     switch (tag) {

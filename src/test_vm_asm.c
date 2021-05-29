@@ -13,7 +13,7 @@ static Memory* MEMORY;
         const usize len = sizeof(literal) - 1; \
         EXIT_IF(CAP_CHARS <= len);             \
         memcpy(MEMORY->chars, literal, len);   \
-        MEMORY->len_chars = (u32)len;          \
+        MEMORY->len_chars = len;               \
         set_tokens(MEMORY);                    \
         set_insts(MEMORY);                     \
     }
@@ -32,7 +32,7 @@ TEST(test_push, {
     EXIT_IF(MEMORY->vm.insts[1].tag != INST_PUSH);
     EXIT_IF(MEMORY->vm.insts[1].op != -12345);
     EXIT_IF(MEMORY->vm.insts[2].tag != INST_PUSH);
-    const f32 op = *((f32*)(&MEMORY->vm.insts[2].op));
+    const f32 op = *(reinterpret_cast<f32*>(&MEMORY->vm.insts[2].op));
     EXIT_IF((op < (-12345.6789f - EPSILON)) ||
             ((-12345.6789f + EPSILON) < op));
     EXIT_IF(MEMORY->vm.insts[3].tag != INST_PUSH);
@@ -312,7 +312,7 @@ i32 main(void) {
            sizeof(PreInst),
            sizeof(Label),
            sizeof(Memory));
-    MEMORY = calloc(1, sizeof(Memory));
+    MEMORY = reinterpret_cast<Memory*>(calloc(1, sizeof(Memory)));
     EXIT_IF(!MEMORY);
     test_halt();
     test_push();

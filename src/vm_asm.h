@@ -97,7 +97,7 @@ static void println_token(File* stream, Token token) {
         break;
     }
     case TOKEN_F32: {
-        fprintf(stream, "`%.2f`\n", (f64)token.body.as_f32);
+        fprintf(stream, "`%.2f`\n", static_cast<f64>(token.body.as_f32));
         break;
     }
     case TOKEN_COLON: {
@@ -117,7 +117,7 @@ static void println_token(File* stream, Token token) {
 static i32 parse_digits_i32(const char* chars, u32* i) {
     i32 a = 0;
     while (IS_DIGIT(chars[*i])) {
-        i32 b = (a * 10) + ((i32)(chars[(*i)++] - '0'));
+        const i32 b = (a * 10) + static_cast<i32>(chars[(*i)++] - '0');
         EXIT_IF(b < a);
         a = b;
     }
@@ -128,7 +128,7 @@ static f32 parse_decimal_f32(const char* chars, u32* i) {
     f32 a = 0.0f;
     f32 b = 1.0f;
     while (IS_DIGIT(chars[*i])) {
-        a = (a * 10.0f) + ((f32)(chars[(*i)++] - '0'));
+        a = (a * 10.0f) + static_cast<f32>(chars[(*i)++] - '0');
         b *= 10.0f;
     }
     return a / b;
@@ -177,8 +177,8 @@ static void set_tokens(Memory* memory) {
                 i32 x = parse_digits_i32(memory->chars, &i);
                 if (memory->chars[i] == '.') {
                     ++i;
-                    token->body.as_f32 =
-                        (f32)x + parse_decimal_f32(memory->chars, &i);
+                    token->body.as_f32 = static_cast<f32>(x) +
+                                         parse_decimal_f32(memory->chars, &i);
                     token->tag = TOKEN_F32;
                 } else {
                     token->body.as_i32 = x;
@@ -197,10 +197,11 @@ static void set_tokens(Memory* memory) {
                 .chars = &memory->chars[i],
                 .len = j - i,
             };
-            for (InstTag t = 0; t < COUNT_INST_TAG; ++t) {
-                const String inst_string = get_inst_tag_as_string(t);
+            for (i32 t = 0; t < COUNT_INST_TAG; ++t) {
+                const String inst_string =
+                    get_inst_tag_as_string(static_cast<InstTag>(t));
                 if (EQ_STRINGS(token_string, inst_string)) {
-                    token->body.as_inst_tag = t;
+                    token->body.as_inst_tag = static_cast<InstTag>(t);
                     token->tag = TOKEN_INST;
                     goto end;
                 }

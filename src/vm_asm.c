@@ -5,7 +5,7 @@ static void set_chars_from_file(Memory* memory, const char* path) {
     File* file = fopen(path, "r");
     EXIT_IF(!file);
     fseek(file, 0, SEEK_END);
-    memory->len_chars = (u32)ftell(file);
+    memory->len_chars = static_cast<u32>(ftell(file));
     EXIT_IF(CAP_CHARS <= memory->len_chars);
     rewind(file);
     EXIT_IF(fread(memory->chars, sizeof(char), memory->len_chars, file) !=
@@ -29,7 +29,7 @@ static void insts_to_bytes(const Vm* vm, u32 count_inst, const char* path) {
 i32 main(i32 n, const char** args) {
     EXIT_IF(n < 3);
     {
-        Memory* memory = calloc(1, sizeof(Memory));
+        Memory* memory = reinterpret_cast<Memory*>(calloc(1, sizeof(Memory)));
         EXIT_IF(!memory);
         set_chars_from_file(memory, args[1]);
         set_tokens(memory);
