@@ -294,7 +294,7 @@ TEST(test_jpz_as_string, { TEST_STR(INST_JPZ, "jpz", 3); })
 
 TEST(test_native_as_string, { TEST_STR(INST_NATIVE, "native", 6); })
 
-i32 main(void) {
+i32 main() {
     printf("sizeof(TokenTag)  : %zu\n"
            "sizeof(String)    : %zu\n"
            "sizeof(TokenBody) : %zu\n"

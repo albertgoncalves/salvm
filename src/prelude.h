@@ -40,10 +40,10 @@ typedef FILE File;
         exit(EXIT_FAILURE);        \
     }
 
-#define TEST(fn, block)    \
-    static void fn(void) { \
-        block;             \
-        printf(".");       \
+#define TEST(fn, block) \
+    static void fn() {  \
+        block;          \
+        printf(".");    \
     }
 
 #endif

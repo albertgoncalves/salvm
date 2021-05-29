@@ -292,7 +292,7 @@ TEST(test_native_nop, {
     EXIT_IF(VM->index.inst != 1);
 })
 
-i32 main(void) {
+i32 main() {
     printf("sizeof(Bool)    : %zu\n"
            "sizeof(InstTag) : %zu\n"
            "sizeof(Inst)    : %zu\n"
