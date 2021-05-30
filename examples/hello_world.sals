@@ -6,7 +6,7 @@
 +[
     10
 ]                   ; 16
-+[ 33 33 33 10 ]    ; 17
++[ 46 46 46 10 ]    ; 17
 
         push    119     ; 'w'
         push    9
@@ -32,7 +32,7 @@
         push    0       ; &(((i8*)vm->heap)[0])
         native  4       ; NATIVE_PRINTS
 
-        push    4       ; len("!!!\n")
+        push    4       ; len("...\n")
         push    17      ; &(((i8*)vm->heap)[16])
         native  4       ; NATIVE_PRINTS
 
