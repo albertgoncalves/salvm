@@ -27,7 +27,6 @@ flags=(
     "-Wno-c99-extensions"
     "-Wno-covered-switch-default"
     "-Wno-disabled-macro-expansion"
-    "-Wno-error=#warnings"
     "-Wno-extra-semi-stmt"
     "-Wno-padded"
     "-Wno-reserved-id-macro"

@@ -1,10 +1,13 @@
 #ifndef __PRELUDE_H__
 #define __PRELUDE_H__
 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-W#warnings"
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#pragma GCC diagnostic pop
 
 typedef uint8_t  u8;
 typedef uint16_t u16;
