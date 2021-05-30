@@ -8,6 +8,10 @@ static_assert(alignof(i8) == 1, "alignof(i8) != 1");
 static_assert(alignof(i16) == 2, "alignof(i16) != 2");
 static_assert(alignof(i32) == 4, "alignof(i32) != 4");
 
+#ifndef __LITTLE_ENDIAN__
+    #error "#ifndef __LITTLE_ENDIAN__"
+#endif
+
 #define CAP_INSTS (2 << 7)
 #define CAP_STACK (2 << 14)
 #define CAP_HEAP8 (2 << 7)
