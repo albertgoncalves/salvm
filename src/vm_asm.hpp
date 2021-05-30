@@ -116,6 +116,16 @@ static void println_token(File* stream, Token token) {
     }
 }
 
+static u8 parse_digits_u8(const char* chars, u32* i) {
+    u8 a = 0;
+    while (IS_DIGIT(chars[*i])) {
+        const u8 b = (a * 10) + static_cast<u8>(chars[(*i)++] - '0');
+        EXIT_IF(b < a);
+        a = b;
+    }
+    return a;
+}
+
 static i32 parse_digits_i32(const char* chars, u32* i) {
     i32 a = 0;
     while (IS_DIGIT(chars[*i])) {
@@ -170,6 +180,67 @@ static void set_tokens(Memory* memory) {
             token->tag = TOKEN_MINUS;
             token->line = line;
             ++i;
+            break;
+        }
+        case '+': {
+            switch (memory->chars[++i]) {
+            case '"': {
+                u32 j = i + 1;
+                for (; memory->chars[j] != '"'; ++j) {
+                    EXIT_IF(memory->len_chars <= j);
+                    Bool escaped = FALSE;
+                    switch (memory->chars[j]) {
+                    case '\n': {
+                        ++line;
+                        break;
+                    }
+                    case '\\': {
+                        escaped = TRUE;
+                        ++j;
+                        break;
+                    }
+                    }
+                    EXIT_IF(CAP_HEAP8 <= memory->len_bytes);
+                    if ((memory->chars[j] == 'n') && escaped) {
+                        memory->vm.heap[memory->len_bytes++] = '\n';
+                    } else {
+                        memory->vm.heap[memory->len_bytes++] =
+                            memory->chars[j];
+                    }
+                }
+                i = j + 1;
+                break;
+            }
+            case '[': {
+                u32 j = i + 1;
+                for (; memory->chars[j] != ']';) {
+                    EXIT_IF(memory->len_chars <= j);
+                    switch (memory->chars[j]) {
+                    case ' ':
+                    case '\t': {
+                        ++j;
+                        break;
+                    }
+                    case '\n': {
+                        ++line;
+                        ++j;
+                        break;
+                    }
+                    default: {
+                        EXIT_IF(!IS_DIGIT(memory->chars[j]));
+                        EXIT_IF(CAP_HEAP8 <= memory->len_bytes);
+                        memory->vm.heap[memory->len_bytes++] = static_cast<i8>(
+                            parse_digits_u8(memory->chars, &j));
+                    }
+                    }
+                }
+                i = j + 1;
+                break;
+            }
+            default: {
+                ERROR();
+            }
+            }
             break;
         }
         default: {
