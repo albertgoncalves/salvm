@@ -116,20 +116,10 @@ static void println_token(File* stream, Token token) {
     }
 }
 
-static u8 parse_digits_u8(const char* chars, u32* i) {
-    u8 a = 0;
+template <typename T> static T parse_digits(const char* chars, u32* i) {
+    T a = 0;
     while (IS_DIGIT(chars[*i])) {
-        const u8 b = (a * 10) + static_cast<u8>(chars[(*i)++] - '0');
-        EXIT_IF(b < a);
-        a = b;
-    }
-    return a;
-}
-
-static i32 parse_digits_i32(const char* chars, u32* i) {
-    i32 a = 0;
-    while (IS_DIGIT(chars[*i])) {
-        const i32 b = (a * 10) + static_cast<i32>(chars[(*i)++] - '0');
+        const T b = (a * 10) + static_cast<T>(chars[(*i)++] - '0');
         EXIT_IF(b < a);
         a = b;
     }
@@ -145,6 +135,31 @@ static f32 parse_decimal_f32(const char* chars, u32* i) {
     }
     return a / b;
 }
+
+#define SET_HEAP_BYTES(memory, line, i, j, block) \
+    {                                             \
+        EXIT_IF(memory->chars[++i] != '[');       \
+        j = i + 1;                                \
+        for (; memory->chars[j] != ']';) {        \
+            EXIT_IF(memory->len_chars <= j);      \
+            switch (memory->chars[j]) {           \
+            case ' ':                             \
+            case '\t': {                          \
+                ++j;                              \
+                break;                            \
+            }                                     \
+            case '\n': {                          \
+                ++line;                           \
+                ++j;                              \
+                break;                            \
+            }                                     \
+            default: {                            \
+                block;                            \
+            }                                     \
+            }                                     \
+        }                                         \
+        i = j + 1;                                \
+    }
 
 static void set_tokens(Memory* memory) {
     u32 line = 1;
@@ -211,30 +226,42 @@ static void set_tokens(Memory* memory) {
                 i = j + 1;
                 break;
             }
-            case '[': {
-                u32 j = i + 1;
-                for (; memory->chars[j] != ']';) {
-                    EXIT_IF(memory->len_chars <= j);
-                    switch (memory->chars[j]) {
-                    case ' ':
-                    case '\t': {
-                        ++j;
-                        break;
-                    }
-                    case '\n': {
-                        ++line;
-                        ++j;
-                        break;
-                    }
-                    default: {
-                        EXIT_IF(!IS_DIGIT(memory->chars[j]));
-                        EXIT_IF(CAP_HEAP8 <= memory->len_bytes);
-                        memory->vm.heap[memory->len_bytes++] = static_cast<i8>(
-                            parse_digits_u8(memory->chars, &j));
-                    }
-                    }
-                }
-                i = j + 1;
+            case '1': {
+                u32 j;
+                SET_HEAP_BYTES(memory, line, i, j, {
+                    EXIT_IF(!IS_DIGIT(memory->chars[j]));
+                    EXIT_IF(CAP_HEAP8 <= memory->len_bytes);
+                    memory->vm.heap[memory->len_bytes++] =
+                        static_cast<i8>(parse_digits<u8>(memory->chars, &j));
+                })
+                break;
+            }
+            case '2': {
+                u32 j;
+                SET_HEAP_BYTES(memory, line, i, j, {
+                    EXIT_IF(!IS_DIGIT(memory->chars[j]));
+                    const u32 n = memory->len_bytes + 2;
+                    EXIT_IF(CAP_HEAP8 < n);
+                    const u16 x = parse_digits<u16>(memory->chars, &j);
+                    memcpy(&memory->vm.heap[memory->len_bytes],
+                           &x,
+                           sizeof(u16));
+                    memory->len_bytes = n;
+                })
+                break;
+            }
+            case '4': {
+                u32 j;
+                SET_HEAP_BYTES(memory, line, i, j, {
+                    EXIT_IF(!IS_DIGIT(memory->chars[j]));
+                    const u32 n = memory->len_bytes + 4;
+                    EXIT_IF(CAP_HEAP8 < n);
+                    const u32 x = parse_digits<u32>(memory->chars, &j);
+                    memcpy(&memory->vm.heap[memory->len_bytes],
+                           &x,
+                           sizeof(u32));
+                    memory->len_bytes = n;
+                })
                 break;
             }
             default: {
@@ -247,7 +274,7 @@ static void set_tokens(Memory* memory) {
             Token* token = alloc_token(memory);
             token->line = line;
             if (IS_DIGIT(memory->chars[i])) {
-                const i32 x = parse_digits_i32(memory->chars, &i);
+                const i32 x = parse_digits<i32>(memory->chars, &i);
                 if (memory->chars[i] == '.') {
                     ++i;
                     token->body.as_f32 = static_cast<f32>(x) +
