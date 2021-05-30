@@ -138,10 +138,12 @@ static f32 parse_decimal_f32(const char* chars, u32* i) {
 
 #define SET_HEAP_BYTES(memory, line, i, j, block) \
     {                                             \
-        EXIT_IF(memory->chars[++i] != '[');       \
+        ++i;                                      \
+        EXIT_IF(memory->len_chars <= i);          \
+        EXIT_IF(memory->chars[i] != '[');         \
         j = i + 1;                                \
+        EXIT_IF(memory->len_chars <= j);          \
         for (; memory->chars[j] != ']';) {        \
-            EXIT_IF(memory->len_chars <= j);      \
             switch (memory->chars[j]) {           \
             case ' ':                             \
             case '\t': {                          \
@@ -157,8 +159,8 @@ static f32 parse_decimal_f32(const char* chars, u32* i) {
                 block;                            \
             }                                     \
             }                                     \
+            EXIT_IF(memory->len_chars <= j);      \
         }                                         \
-        i = j + 1;                                \
     }
 
 static void set_tokens(Memory* memory) {
@@ -198,11 +200,14 @@ static void set_tokens(Memory* memory) {
             break;
         }
         case '+': {
-            switch (memory->chars[++i]) {
+            ++i;
+            EXIT_IF(memory->len_chars <= i);
+            u32 j;
+            switch (memory->chars[i]) {
             case '"': {
-                u32 j = i + 1;
-                for (; memory->chars[j] != '"'; ++j) {
-                    EXIT_IF(memory->len_chars <= j);
+                j = i + 1;
+                EXIT_IF(memory->len_chars <= j);
+                for (; memory->chars[j] != '"';) {
                     Bool escaped = FALSE;
                     switch (memory->chars[j]) {
                     case '\n': {
@@ -212,6 +217,7 @@ static void set_tokens(Memory* memory) {
                     case '\\': {
                         escaped = TRUE;
                         ++j;
+                        EXIT_IF(memory->len_chars <= j);
                         break;
                     }
                     }
@@ -222,12 +228,12 @@ static void set_tokens(Memory* memory) {
                         memory->vm.heap[memory->len_bytes++] =
                             memory->chars[j];
                     }
+                    ++j;
+                    EXIT_IF(memory->len_chars <= j);
                 }
-                i = j + 1;
                 break;
             }
             case '1': {
-                u32 j;
                 SET_HEAP_BYTES(memory, line, i, j, {
                     EXIT_IF(!IS_DIGIT(memory->chars[j]));
                     EXIT_IF(CAP_HEAP8 <= memory->len_bytes);
@@ -237,7 +243,6 @@ static void set_tokens(Memory* memory) {
                 break;
             }
             case '2': {
-                u32 j;
                 SET_HEAP_BYTES(memory, line, i, j, {
                     EXIT_IF(!IS_DIGIT(memory->chars[j]));
                     const u32 n = memory->len_bytes + 2;
@@ -251,7 +256,6 @@ static void set_tokens(Memory* memory) {
                 break;
             }
             case '4': {
-                u32 j;
                 SET_HEAP_BYTES(memory, line, i, j, {
                     EXIT_IF(!IS_DIGIT(memory->chars[j]));
                     const u32 n = memory->len_bytes + 4;
@@ -268,6 +272,7 @@ static void set_tokens(Memory* memory) {
                 ERROR();
             }
             }
+            i = j + 1;
             break;
         }
         default: {
