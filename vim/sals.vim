@@ -7,9 +7,11 @@ if exists("b:current_syntax")
 endif
 
 syn match Comment   ";.*$"
-syn match Delimiter "[:\-]"
+syn match Delimiter "[:\-+\[\]]"
 syn match Number    "\<[0-9]\+\>"
-syn match Number    "\<[0-9]\+\.[0-9]\+\>"
+syn match Float     "\<[0-9]\+\.[0-9]\+\>"
+
+syn region String start=+"+ skip=+\\"+ end=+"+
 
 syn keyword Keyword
     \ halt

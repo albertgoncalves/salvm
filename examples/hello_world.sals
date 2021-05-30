@@ -1,62 +1,67 @@
-        push    72      ; 'H'
-        push    0
-        sv8             ; ((i8*)vm->heap)[0] = 72
-
-        push    101     ; 'e'
-        push    1
-        sv8
-
-        push    108     ; 'l'
-        push    2
-        sv8
-
-        push    108     ; 'l'
-        push    3
-        sv8
-
-        push    111     ; 'o'
-        push    4
-        sv8
-
-        push    44      ; ','
-        push    5
-        sv8
-
-        push    32      ; ' '
-        push    6
-        sv8
++"
+\""                 ; 0
++"Hello, "          ; 2
++"_____!"           ; 9
++"\""               ; 15
++"\n"               ; 16
++1[
+    46
+    46
+    46
+    10
+]                   ; 17    "...\n"
++2[ 11822 2606 ]    ; 21    "...\n"
++4[ 170798638 ]     ; 25    "...\n"
 
         push    119     ; 'w'
-        push    7
-        sv8
-
-        push    111     ; 'o'
-        push    8
-        sv8
-
-        push    114     ; 'r'
         push    9
         sv8
 
-        push    108     ; 'l'
+        push    111     ; 'o'
         push    10
         sv8
 
-        push    100     ; 'd'
+        push    114     ; 'r'
         push    11
         sv8
 
-        push    33      ; '!'
+        push    108     ; 'l'
         push    12
         sv8
 
-        push    10      ; '\n'
+        push    100     ; 'd'
         push    13
         sv8
 
-        push    14      ; len("Hello, world!")
+        push    17      ; len("\"Hello, world!\"\n")
         push    0       ; &(((i8*)vm->heap)[0])
         native  4       ; NATIVE_PRINTS
+
+        push    4       ; len("...\n")
+        push    17      ; &(((i8*)vm->heap)[16])
+        native  4       ; NATIVE_PRINTS
+
+        push    4       ; len("...\n")
+        push    21      ; &(((i8*)vm->heap)[21])
+        native  4       ; NATIVE_PRINTS
+
+        push    4       ; len("...\n")
+        push    25      ; &(((i8*)vm->heap)[25])
+        native  4       ; NATIVE_PRINTS
+
+        push    0
+        rd16            ; ((i16*)vm->heap)[0]
+        native  2       ; NATIVE_PRINTI
+
+        push    32      ; ' '
+        native  1       ; NATIVE_PRINTC
+
+        push    1
+        rd16            ; ((i16*)vm->heap)[1]
+        native  2       ; NATIVE_PRINTI
+
+        push    10      ; '\n'
+        native  1       ; NATIVE_PRINTC
 
         push    0
         rd32            ; ((i32*)vm->heap)[0]

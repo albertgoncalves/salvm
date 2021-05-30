@@ -7,6 +7,7 @@
 
 struct Header {
     u32 magic;
+    u32 count_bytes;
     u32 count_inst;
 };
 
