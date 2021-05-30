@@ -8,6 +8,7 @@ static Memory* MEMORY;
     {                                                        \
         MEMORY->len_chars = 0;                               \
         MEMORY->len_tokens = 0;                              \
+        MEMORY->len_bytes = 0;                               \
         MEMORY->len_pre_insts = 0;                           \
         MEMORY->len_labels = 0;                              \
         EXIT_IF(CAP_CHARS <= (sizeof(literal) - 1));         \
@@ -16,6 +17,45 @@ static Memory* MEMORY;
         set_tokens(MEMORY);                                  \
         set_insts(MEMORY);                                   \
     }
+
+TEST(test_plus_chars, {
+    INJECT("+\"abcd\\n\"\n+\"!\n\"\n");
+    EXIT_IF(MEMORY->len_bytes != 7);
+    EXIT_IF(MEMORY->vm.heap[0] != 'a');
+    EXIT_IF(MEMORY->vm.heap[1] != 'b');
+    EXIT_IF(MEMORY->vm.heap[2] != 'c');
+    EXIT_IF(MEMORY->vm.heap[3] != 'd');
+    EXIT_IF(MEMORY->vm.heap[4] != '\n');
+    EXIT_IF(MEMORY->vm.heap[5] != '!');
+    EXIT_IF(MEMORY->vm.heap[6] != '\n');
+})
+
+TEST(test_plus_u8, {
+    INJECT("+1[97 98 99 100]");
+    EXIT_IF(MEMORY->len_bytes != 4);
+    EXIT_IF(MEMORY->vm.heap[0] != 'a');
+    EXIT_IF(MEMORY->vm.heap[1] != 'b');
+    EXIT_IF(MEMORY->vm.heap[2] != 'c');
+    EXIT_IF(MEMORY->vm.heap[3] != 'd');
+})
+
+TEST(test_plus_u16, {
+    INJECT("+2[ 97 98 99 100 ]\n");
+    EXIT_IF(MEMORY->len_bytes != 8);
+    EXIT_IF(reinterpret_cast<i16*>(MEMORY->vm.heap)[0] != 97);
+    EXIT_IF(reinterpret_cast<i16*>(MEMORY->vm.heap)[1] != 98);
+    EXIT_IF(reinterpret_cast<i16*>(MEMORY->vm.heap)[2] != 99);
+    EXIT_IF(reinterpret_cast<i16*>(MEMORY->vm.heap)[3] != 100);
+})
+
+TEST(test_plus_u32, {
+    INJECT("+4[\n    97\n    98\n    99\n    100\n]\n");
+    EXIT_IF(MEMORY->len_bytes != 16);
+    EXIT_IF(reinterpret_cast<i32*>(MEMORY->vm.heap)[0] != 97);
+    EXIT_IF(reinterpret_cast<i32*>(MEMORY->vm.heap)[1] != 98);
+    EXIT_IF(reinterpret_cast<i32*>(MEMORY->vm.heap)[2] != 99);
+    EXIT_IF(reinterpret_cast<i32*>(MEMORY->vm.heap)[3] != 100);
+})
 
 TEST(test_halt, {
     INJECT("halt\n");
@@ -310,6 +350,10 @@ i32 main() {
            sizeof(Memory));
     MEMORY = reinterpret_cast<Memory*>(calloc(1, sizeof(Memory)));
     EXIT_IF(!MEMORY);
+    test_plus_chars();
+    test_plus_u8();
+    test_plus_u16();
+    test_plus_u32();
     test_halt();
     test_push();
     test_top();
