@@ -3,10 +3,15 @@
 +"Hello, "          ; 2
 +"_____!"           ; 9
 +"\""               ; 15
-+[
++"\n"               ; 16
++1[
+    46
+    46
+    46
     10
-]                   ; 16
-+[ 46 46 46 10 ]    ; 17
+]                   ; 17    "...\n"
++2[ 11822 2606 ]    ; 21    "...\n"
++4[ 170798638 ]     ; 25    "...\n"
 
         push    119     ; 'w'
         push    9
@@ -34,6 +39,14 @@
 
         push    4       ; len("...\n")
         push    17      ; &(((i8*)vm->heap)[16])
+        native  4       ; NATIVE_PRINTS
+
+        push    4       ; len("...\n")
+        push    21      ; &(((i8*)vm->heap)[21])
+        native  4       ; NATIVE_PRINTS
+
+        push    4       ; len("...\n")
+        push    25      ; &(((i8*)vm->heap)[25])
         native  4       ; NATIVE_PRINTS
 
         push    0
