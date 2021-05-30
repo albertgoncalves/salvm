@@ -17,6 +17,7 @@ static void insts_to_bytes(const Vm*   vm,
                            u32         count_bytes,
                            u32         count_inst,
                            const char* path) {
+    EXIT_IF(CAP_HEAP8 <= count_bytes);
     EXIT_IF(CAP_INSTS <= count_inst);
     File* file = fopen(path, "wb");
     EXIT_IF(!file);
