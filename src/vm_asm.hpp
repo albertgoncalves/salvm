@@ -280,8 +280,9 @@ static void set_tokens(Memory* memory) {
             token->line = line;
             if (IS_DIGIT(memory->chars[i])) {
                 const i32 x = parse_digits<i32>(memory->chars, &i);
-                if (memory->chars[i] == '.') {
+                if ((i < memory->len_chars) && (memory->chars[i] == '.')) {
                     ++i;
+                    EXIT_IF(memory->len_chars <= i);
                     token->body.as_f32 = static_cast<f32>(x) +
                                          parse_decimal_f32(memory->chars, &i);
                     token->tag = TOKEN_F32;
