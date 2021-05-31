@@ -23,6 +23,10 @@ i32 main(i32 n, const char** args) {
         EXIT_IF(!vm);
         insts_from_bytes(vm, args[1]);
         run(vm);
+        {
+            const i32 len = vm->index.stack_top + vm->index.stack_base;
+            printf("%d\n", len == 0 ? 0 : vm->stack[len - 1].as_i32);
+        }
         free(vm);
     }
     return EXIT_SUCCESS;
