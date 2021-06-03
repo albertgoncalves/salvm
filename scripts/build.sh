@@ -18,7 +18,6 @@ flags=(
     "-fno-rtti"
     "-fno-unwind-tables"
     "-fshort-enums"
-    "-g"
     "-march=native"
     "-std=c++11"
     "-Werror"
@@ -43,13 +42,8 @@ bins=(
     for x in "${bins[@]}"; do
         clang++ "${flags[@]}" -O0 -o "$WD/bin/$x" "$WD/src/$x.cpp"
     done
-    clang++ \
-        "${flags[@]}" \
-        -O0 \
-        "-DDEBUG_PRINT_VM" \
-        -o "$WD/bin/vm_debug" \
-        "$WD/src/vm.cpp"
-    clang++ "${flags[@]}" -O3 -o "$WD/bin/vm" "$WD/src/vm.cpp"
+    clang++ "${flags[@]}" -O0 "-DDEBUG" -o "$WD/bin/vm_debug" "$WD/src/vm.cpp"
+    clang++ "${flags[@]}" -O3 -g -o "$WD/bin/vm" "$WD/src/vm.cpp"
     end=$(now)
     python3 -c "print(\"Compiled! ({:.3f}s)\".format(${end} - ${start}))"
 )

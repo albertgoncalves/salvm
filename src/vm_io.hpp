@@ -3,7 +3,7 @@
 
 #include "vm_inst.hpp"
 
-#ifdef DEBUG_PRINT_VM
+#ifdef DEBUG
     #include "vm_inst_string.hpp"
 #endif
 
@@ -11,7 +11,7 @@ static void run(Vm* vm) {
     vm->index = {};
     vm->alive = TRUE;
     while (vm->alive) {
-#ifdef DEBUG_PRINT_VM
+#ifdef DEBUG
         {
             const String inst =
                 get_inst_tag_as_string(vm->insts[vm->index.inst].tag);
