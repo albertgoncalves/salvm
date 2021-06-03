@@ -2,11 +2,9 @@
 
 static Vm* VM;
 
-#define RESET()                   \
-    {                             \
-        VM->index.inst = 0;       \
-        VM->index.stack_top = 0;  \
-        VM->index.stack_base = 0; \
+#define RESET()         \
+    {                   \
+        VM->index = {}; \
     }
 
 TEST(test_push, {
