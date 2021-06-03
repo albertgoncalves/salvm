@@ -87,11 +87,15 @@ static void println_token(File* stream, Token token) {
     switch (token.tag) {
     case TOKEN_INST: {
         const String string = get_inst_tag_as_string(token.body.as_inst_tag);
-        PRINTLN_STR(stream, string);
+        fprintf(stream, "`");
+        PRINT_STR(stream, string);
+        fprintf(stream, "`\n");
         break;
     }
     case TOKEN_STR: {
-        PRINTLN_STR(stream, token.body.as_string);
+        fprintf(stream, "`");
+        PRINT_STR(stream, token.body.as_string);
+        fprintf(stream, "`\n");
         break;
     }
     case TOKEN_I32: {
