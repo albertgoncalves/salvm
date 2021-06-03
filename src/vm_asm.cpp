@@ -11,6 +11,7 @@ static void set_chars_from_file(Memory* memory, const char* path) {
     EXIT_IF(fread(memory->chars, sizeof(char), memory->len_chars, file) !=
             memory->len_chars);
     fclose(file);
+    memory->chars[memory->len_chars] = '\0';
 }
 
 static void insts_to_bytes(const Vm*   vm,
