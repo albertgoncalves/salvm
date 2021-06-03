@@ -4,18 +4,13 @@
 
 static Memory* MEMORY;
 
-#define INJECT(literal)                                      \
-    {                                                        \
-        MEMORY->len_chars = 0;                               \
-        MEMORY->len_tokens = 0;                              \
-        MEMORY->len_bytes = 0;                               \
-        MEMORY->len_pre_insts = 0;                           \
-        MEMORY->len_labels = 0;                              \
-        EXIT_IF(CAP_CHARS <= (sizeof(literal) - 1));         \
-        memcpy(MEMORY->chars, literal, sizeof(literal) - 1); \
-        MEMORY->len_chars = sizeof(literal) - 1;             \
-        set_tokens(MEMORY);                                  \
-        set_insts(MEMORY);                                   \
+#define INJECT(literal)                                  \
+    {                                                    \
+        EXIT_IF(CAP_CHARS < sizeof(literal));            \
+        memcpy(MEMORY->chars, literal, sizeof(literal)); \
+        MEMORY->len_chars = sizeof(literal) - 1;         \
+        set_tokens(MEMORY);                              \
+        set_insts(MEMORY);                               \
     }
 
 TEST(test_plus_chars, {

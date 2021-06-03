@@ -164,6 +164,8 @@ static f32 parse_decimal_f32(const char* chars, u32* i) {
     }
 
 static void set_tokens(Memory* memory) {
+    memory->len_tokens = 0;
+    memory->len_bytes = 0;
     u32 line = 1;
     for (u32 i = 0; i < memory->len_chars;) {
         switch (memory->chars[i]) {
@@ -319,6 +321,8 @@ static void set_tokens(Memory* memory) {
 }
 
 static void set_insts(Memory* memory) {
+    memory->len_pre_insts = 0;
+    memory->len_labels = 0;
     i32 index_inst = 0;
     for (u32 i = 0; i < memory->len_tokens; ++i) {
         Token token = memory->tokens[i];
