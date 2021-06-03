@@ -77,7 +77,7 @@ static void do_inst(Vm* vm) {
     const Inst inst = vm->insts[vm->index.inst];
     switch (inst.tag) {
     case INST_HALT: {
-        vm->alive = FALSE;
+        vm->alive = false;
         break;
     }
     case INST_PUSH: {

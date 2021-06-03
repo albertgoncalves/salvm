@@ -90,7 +90,7 @@ struct Vm {
     Word  stack[CAP_STACK];
     i8    heap[CAP_HEAP8];
     Index index;
-    Bool  alive;
+    bool  alive;
 };
 
 enum Natives {

@@ -34,7 +34,7 @@ struct Token {
 struct PreInst {
     Inst   inst;
     String label;
-    Bool   resolved;
+    bool   resolved;
 };
 
 struct Label {
@@ -214,14 +214,14 @@ static void set_tokens(Memory* memory) {
                 j = i + 1;
                 EXIT_IF(memory->len_chars <= j);
                 for (; memory->chars[j] != '"';) {
-                    Bool escaped = FALSE;
+                    bool escaped = false;
                     switch (memory->chars[j]) {
                     case '\n': {
                         ++line;
                         break;
                     }
                     case '\\': {
-                        escaped = TRUE;
+                        escaped = true;
                         ++j;
                         EXIT_IF(memory->len_chars <= j);
                         break;
@@ -369,7 +369,7 @@ static void set_insts(Memory* memory) {
             case INST_LEF:
             case INST_GTF:
             case INST_GEF: {
-                pre_inst->resolved = TRUE;
+                pre_inst->resolved = true;
                 break;
             }
             case INST_PUSH: {
@@ -378,7 +378,7 @@ static void set_insts(Memory* memory) {
                 case TOKEN_I32:
                 case TOKEN_F32: {
                     pre_inst->inst.op = token.body.as_i32;
-                    pre_inst->resolved = TRUE;
+                    pre_inst->resolved = true;
                     break;
                 }
                 case TOKEN_MINUS: {
@@ -386,13 +386,13 @@ static void set_insts(Memory* memory) {
                     switch (token.tag) {
                     case TOKEN_I32: {
                         pre_inst->inst.op = -token.body.as_i32;
-                        pre_inst->resolved = TRUE;
+                        pre_inst->resolved = true;
                         break;
                     }
                     case TOKEN_F32: {
                         token.body.as_f32 = -token.body.as_f32;
                         pre_inst->inst.op = token.body.as_i32;
-                        pre_inst->resolved = TRUE;
+                        pre_inst->resolved = true;
                         break;
                     }
                     case TOKEN_INST:
@@ -407,7 +407,7 @@ static void set_insts(Memory* memory) {
                 }
                 case TOKEN_STR: {
                     pre_inst->label = token.body.as_string;
-                    pre_inst->resolved = FALSE;
+                    pre_inst->resolved = false;
                     break;
                 }
                 case TOKEN_INST:
@@ -426,7 +426,7 @@ static void set_insts(Memory* memory) {
                 switch (token.tag) {
                 case TOKEN_I32: {
                     pre_inst->inst.op = token.body.as_i32;
-                    pre_inst->resolved = TRUE;
+                    pre_inst->resolved = true;
                     break;
                 }
                 case TOKEN_MINUS: {
@@ -434,7 +434,7 @@ static void set_insts(Memory* memory) {
                     switch (token.tag) {
                     case TOKEN_I32: {
                         pre_inst->inst.op = -token.body.as_i32;
-                        pre_inst->resolved = TRUE;
+                        pre_inst->resolved = true;
                         break;
                     }
                     case TOKEN_F32:
@@ -463,7 +463,7 @@ static void set_insts(Memory* memory) {
                 switch (token.tag) {
                 case TOKEN_I32: {
                     pre_inst->inst.op = token.body.as_i32;
-                    pre_inst->resolved = TRUE;
+                    pre_inst->resolved = true;
                     break;
                 }
                 case TOKEN_F32:
@@ -484,12 +484,12 @@ static void set_insts(Memory* memory) {
                 switch (token.tag) {
                 case TOKEN_I32: {
                     pre_inst->inst.op = token.body.as_i32;
-                    pre_inst->resolved = TRUE;
+                    pre_inst->resolved = true;
                     break;
                 }
                 case TOKEN_STR: {
                     pre_inst->label = token.body.as_string;
-                    pre_inst->resolved = FALSE;
+                    pre_inst->resolved = false;
                     break;
                 }
                 case TOKEN_F32:
@@ -535,7 +535,7 @@ static void set_insts(Memory* memory) {
                 const Label label = memory->labels[j];
                 if (EQ_STRINGS(label.string, pre_inst->label)) {
                     pre_inst->inst.op = label.index_inst;
-                    pre_inst->resolved = TRUE;
+                    pre_inst->resolved = true;
                     break;
                 }
             }

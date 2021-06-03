@@ -9,7 +9,7 @@
 
 static void run(Vm* vm) {
     vm->index = {};
-    vm->alive = TRUE;
+    vm->alive = true;
     while (vm->alive) {
 #ifdef DEBUG
         {

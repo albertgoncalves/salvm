@@ -21,11 +21,6 @@ typedef int32_t i32;
 typedef float  f32;
 typedef double f64;
 
-enum Bool {
-    FALSE = 0,
-    TRUE,
-};
-
 typedef FILE File;
 
 #define ERROR()                                                      \
