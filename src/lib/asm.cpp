@@ -1,60 +1,4 @@
-#ifndef __VM_ASM_H__
-#define __VM_ASM_H__
-
-#include "vm_inst_string.hpp"
-
-#define CAP_CHARS  (2 << 11)
-#define CAP_TOKENS (2 << 7)
-#define CAP_LABELS (2 << 5)
-
-enum TokenTag {
-    TOKEN_INST,
-
-    TOKEN_STR,
-    TOKEN_I32,
-    TOKEN_F32,
-
-    TOKEN_COLON,
-    TOKEN_MINUS,
-};
-
-union TokenBody {
-    String  as_string;
-    InstTag as_inst_tag;
-    i32     as_i32;
-    f32     as_f32;
-};
-
-struct Token {
-    TokenBody body;
-    u32       line;
-    TokenTag  tag;
-};
-
-struct PreInst {
-    Inst   inst;
-    String label;
-    bool   resolved;
-};
-
-struct Label {
-    String string;
-    i32    index_inst;
-};
-
-struct Memory {
-    Vm      vm;
-    char    chars[CAP_CHARS];
-    Token   tokens[CAP_TOKENS];
-    i8      bytes[CAP_HEAP8];
-    PreInst pre_insts[CAP_INSTS];
-    Label   labels[CAP_LABELS];
-    u32     len_chars;
-    u32     len_tokens;
-    u32     len_bytes;
-    u32     len_pre_insts;
-    u32     len_labels;
-};
+#include "asm.hpp"
 
 #define IS_ALPHA(x) \
     ((('A' <= (x)) && ((x) <= 'Z')) || (('a' <= (x)) && ((x) <= 'z')))
@@ -167,7 +111,7 @@ static f32 parse_decimal_f32(const char* chars, u32* i) {
         }                                         \
     }
 
-static void set_tokens(Memory* memory) {
+void set_tokens(Memory* memory) {
     memory->len_tokens = 0;
     memory->len_bytes = 0;
     u32 line = 1;
@@ -324,7 +268,7 @@ static void set_tokens(Memory* memory) {
     }
 }
 
-static void set_insts(Memory* memory) {
+void set_insts(Memory* memory) {
     memory->len_pre_insts = 0;
     memory->len_labels = 0;
     i32 index_inst = 0;
@@ -544,5 +488,3 @@ static void set_insts(Memory* memory) {
         memory->vm.insts[i] = pre_inst->inst;
     }
 }
-
-#endif

@@ -1,7 +1,4 @@
-#ifndef __VM_INST_H__
-#define __VM_INST_H__
-
-#include "vm.hpp"
+#include "inst.hpp"
 
 #define BOUNDS_CHECK_STACK(index)      \
     {                                  \
@@ -69,7 +66,7 @@ static const Native NATIVES[COUNT_NATIVE] = {
     [NATIVE_PRINTS] = native_prints,
 };
 
-static void do_inst(Vm* vm) {
+void do_inst(Vm* vm) {
     {
         EXIT_IF(CAP_INSTS <= vm->index.inst);
         EXIT_IF(vm->index.inst < 0);
@@ -322,5 +319,3 @@ static void do_inst(Vm* vm) {
     }
     }
 }
-
-#endif

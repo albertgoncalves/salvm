@@ -1,13 +1,6 @@
-#ifndef __VM_IO_H__
-#define __VM_IO_H__
+#include "io.hpp"
 
-#include "vm_inst.hpp"
-
-#ifdef DEBUG
-    #include "vm_inst_string.hpp"
-#endif
-
-static void run(Vm* vm) {
+void run(Vm* vm) {
     vm->index = {};
     vm->alive = true;
     while (vm->alive) {
@@ -37,5 +30,3 @@ static void run(Vm* vm) {
         do_inst(vm);
     }
 }
-
-#endif

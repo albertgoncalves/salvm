@@ -1,4 +1,5 @@
-#include "vm_asm.hpp"
+#include "asm.hpp"
+#include "test.hpp"
 
 #define EPSILON 0.001f
 

@@ -1,4 +1,5 @@
-#include "vm_inst.hpp"
+#include "inst.hpp"
+#include "test.hpp"
 
 static Vm* VM;
 
