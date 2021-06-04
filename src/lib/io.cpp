@@ -18,8 +18,7 @@ void run(Vm* vm) {
                    vm->index.inst,
                    vm->index.stack_top,
                    vm->index.stack_base,
-                   inst.len,
-                   inst.chars,
+                   ARG_STR(inst),
                    vm->insts[vm->index.inst].op);
             for (i32 i = vm->index.stack_base; i < vm->index.stack_top; ++i) {
                 printf("%d ", vm->stack[i].as_i32);

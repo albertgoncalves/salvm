@@ -3,132 +3,132 @@
 String get_inst_tag_as_string(InstTag tag) {
     switch (tag) {
     case INST_HALT: {
-        return TO_STRING("halt");
+        return TO_STR("halt");
     }
 
     case INST_PUSH: {
-        return TO_STRING("push");
+        return TO_STR("push");
     }
 
     case INST_TOP: {
-        return TO_STRING("top");
+        return TO_STR("top");
     }
 
     case INST_COPY: {
-        return TO_STRING("copy");
+        return TO_STR("copy");
     }
     case INST_PUT: {
-        return TO_STRING("put");
+        return TO_STR("put");
     }
 
     case INST_CALL: {
-        return TO_STRING("call");
+        return TO_STR("call");
     }
     case INST_SCL: {
-        return TO_STRING("scl");
+        return TO_STR("scl");
     }
     case INST_RET: {
-        return TO_STRING("ret");
+        return TO_STR("ret");
     }
 
     case INST_BASE: {
-        return TO_STRING("base");
+        return TO_STR("base");
     }
     case INST_FRAME: {
-        return TO_STRING("frame");
+        return TO_STR("frame");
     }
     case INST_RESET: {
-        return TO_STRING("reset");
+        return TO_STR("reset");
     }
 
     case INST_RD8: {
-        return TO_STRING("rd8");
+        return TO_STR("rd8");
     }
     case INST_RD16: {
-        return TO_STRING("rd16");
+        return TO_STR("rd16");
     }
     case INST_RD32: {
-        return TO_STRING("rd32");
+        return TO_STR("rd32");
     }
 
     case INST_SV8: {
-        return TO_STRING("sv8");
+        return TO_STR("sv8");
     }
     case INST_SV16: {
-        return TO_STRING("sv16");
+        return TO_STR("sv16");
     }
     case INST_SV32: {
-        return TO_STRING("sv32");
+        return TO_STR("sv32");
     }
 
     case INST_JPZ: {
-        return TO_STRING("jpz");
+        return TO_STR("jpz");
     }
     case INST_JUMP: {
-        return TO_STRING("jump");
+        return TO_STR("jump");
     }
 
     case INST_NOT: {
-        return TO_STRING("not");
+        return TO_STR("not");
     }
     case INST_EQ: {
-        return TO_STRING("eq");
+        return TO_STR("eq");
     }
 
     case INST_ADDI: {
-        return TO_STRING("addi");
+        return TO_STR("addi");
     }
     case INST_SUBI: {
-        return TO_STRING("subi");
+        return TO_STR("subi");
     }
     case INST_MULI: {
-        return TO_STRING("muli");
+        return TO_STR("muli");
     }
     case INST_DIVI: {
-        return TO_STRING("divi");
+        return TO_STR("divi");
     }
 
     case INST_ADDF: {
-        return TO_STRING("addf");
+        return TO_STR("addf");
     }
     case INST_SUBF: {
-        return TO_STRING("subf");
+        return TO_STR("subf");
     }
     case INST_MULF: {
-        return TO_STRING("mulf");
+        return TO_STR("mulf");
     }
     case INST_DIVF: {
-        return TO_STRING("divf");
+        return TO_STR("divf");
     }
 
     case INST_LTI: {
-        return TO_STRING("lti");
+        return TO_STR("lti");
     }
     case INST_LEI: {
-        return TO_STRING("lei");
+        return TO_STR("lei");
     }
     case INST_GTI: {
-        return TO_STRING("gti");
+        return TO_STR("gti");
     }
     case INST_GEI: {
-        return TO_STRING("gei");
+        return TO_STR("gei");
     }
 
     case INST_LTF: {
-        return TO_STRING("ltf");
+        return TO_STR("ltf");
     }
     case INST_LEF: {
-        return TO_STRING("lef");
+        return TO_STR("lef");
     }
     case INST_GTF: {
-        return TO_STRING("gtf");
+        return TO_STR("gtf");
     }
     case INST_GEF: {
-        return TO_STRING("gef");
+        return TO_STR("gef");
     }
 
     case INST_NATIVE: {
-        return TO_STRING("native");
+        return TO_STR("native");
     }
 
     case COUNT_INST_TAG:

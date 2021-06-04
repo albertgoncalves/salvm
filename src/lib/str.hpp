@@ -8,19 +8,19 @@ struct String {
     u32         len;
 };
 
-#define TO_STRING(literal)   \
+#define TO_STR(literal)      \
     ((String){               \
         literal,             \
         sizeof(literal) - 1, \
     })
 
-#define EQ_STRINGS(a, b) \
-    ((a.len == b.len) && (!memcmp(a.chars, b.chars, a.len)))
+#define EQ_STR(a, b) ((a.len == b.len) && (!memcmp(a.chars, b.chars, a.len)))
 
 #define FMT_STR "%.*s"
 
-#define PRINT_STR(stream, string) \
-    fprintf(stream, FMT_STR, string.len, string.chars)
+#define ARG_STR(string) string.len, string.chars
+
+#define PRINT_STR(stream, string) fprintf(stream, FMT_STR, ARG_STR(string))
 
 String get_inst_tag_as_string(InstTag);
 

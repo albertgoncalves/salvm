@@ -253,7 +253,7 @@ void set_tokens(Memory* memory) {
             for (u32 k = 0; k < COUNT_INST_TAG; ++k) {
                 const InstTag tag = static_cast<InstTag>(k);
                 const String  inst_string = get_inst_tag_as_string(tag);
-                if (EQ_STRINGS(token_string, inst_string)) {
+                if (EQ_STR(token_string, inst_string)) {
                     token->body.as_inst_tag = tag;
                     token->tag = TOKEN_INST;
                     goto end;
@@ -477,7 +477,7 @@ void set_insts(Memory* memory) {
         if (!pre_inst->resolved) {
             for (u32 j = 0; j < memory->len_labels; ++j) {
                 const Label label = memory->labels[j];
-                if (EQ_STRINGS(label.string, pre_inst->label)) {
+                if (EQ_STR(label.string, pre_inst->label)) {
                     pre_inst->inst.op = label.index_inst;
                     pre_inst->resolved = true;
                     break;
