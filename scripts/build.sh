@@ -2,9 +2,11 @@
 
 set -eu
 
-if [ ! -d "$WD/bin" ]; then
-    mkdir "$WD/bin"
-fi
+for x in bin build; do
+    if [ ! -d "$WD/$x" ]; then
+        mkdir "$WD/$x"
+    fi
+done
 
 now () {
     date +%s.%N
@@ -30,23 +32,40 @@ flags=(
     "-Wno-padded"
     "-Wno-reserved-id-macro"
 )
-bins=(
-    test_vm_asm
-    test_vm_inst
-    vm_asm
-)
+
+obj () {
+    clang++ "${flags[@]}" -c "$@"
+}
+
+exe () {
+    clang++ "${flags[@]}" "-I$WD/src/lib" "$@"
+}
 
 (
-    clang-format -i -verbose "$WD/src/"*
+    cd "$WD" || exit 1
+    clang-format -i -verbose src/*/*
     start=$(now)
-    for x in "${bins[@]}"; do
-        clang++ "${flags[@]}" -O0 -o "$WD/bin/$x" "$WD/src/$x.cpp"
+    for x in asm io str; do
+        obj -O0 -o "build/$x.o" "src/lib/$x.cpp" &
     done
-    clang++ "${flags[@]}" -O0 "-DDEBUG" -o "$WD/bin/vm_debug" "$WD/src/vm.cpp"
-    clang++ "${flags[@]}" -O3 -g -o "$WD/bin/vm" "$WD/src/vm.cpp"
+    obj -O3 -o build/inst.o src/lib/inst.cpp &
+    obj -O0 -DDEBUG -o build/io_debug.o src/lib/io.cpp &
+    for _ in $(jobs -p); do
+        wait -n
+    done
+    for x in test_asm asm; do
+        exe -O0 -o "bin/$x" build/str.o build/asm.o src/app/$x.cpp &
+    done
+    exe -O0 -o bin/test_inst build/inst.o src/app/test_inst.cpp &
+    exe -O0 -o bin/vm_debug build/str.o build/inst.o build/io_debug.o \
+        src/app/vm.cpp &
+    exe -O3 -flto -g -DRELEASE -o bin/vm src/app/vm.cpp &
+    for _ in $(jobs -p); do
+        wait -n
+    done
     end=$(now)
-    python3 -c "print(\"Compiled! ({:.3f}s)\".format(${end} - ${start}))"
+    python3 -c "print(\"Compiled! ({:.3f}s)\".format($end - $start))"
 )
 
-"$WD/bin/test_vm_asm"
-"$WD/bin/test_vm_inst"
+"$WD/bin/test_asm"
+"$WD/bin/test_inst"

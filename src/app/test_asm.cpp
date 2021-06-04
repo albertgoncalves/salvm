@@ -1,4 +1,5 @@
-#include "vm_asm.hpp"
+#include "asm.hpp"
+#include "test.hpp"
 
 #define EPSILON 0.001f
 
@@ -315,7 +316,7 @@ TEST(test_native, {
         const String result = get_inst_tag_as_string(inst); \
         EXIT_IF(result.len != len_);                        \
         const String expected = {literal, len_};            \
-        EXIT_IF(!EQ_STRINGS(result, expected));             \
+        EXIT_IF(!EQ_STR(result, expected));                 \
     }
 
 TEST(test_halt_as_string, { TEST_STR(INST_HALT, "halt", 4); })

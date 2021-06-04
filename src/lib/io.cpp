@@ -1,13 +1,6 @@
-#ifndef __VM_IO_H__
-#define __VM_IO_H__
+#include "io.hpp"
 
-#include "vm_inst.hpp"
-
-#ifdef DEBUG
-    #include "vm_inst_string.hpp"
-#endif
-
-static void run(Vm* vm) {
+void run(Vm* vm) {
     vm->index = {};
     vm->alive = true;
     while (vm->alive) {
@@ -25,8 +18,7 @@ static void run(Vm* vm) {
                    vm->index.inst,
                    vm->index.stack_top,
                    vm->index.stack_base,
-                   inst.len,
-                   inst.chars,
+                   ARG_STR(inst),
                    vm->insts[vm->index.inst].op);
             for (i32 i = vm->index.stack_base; i < vm->index.stack_top; ++i) {
                 printf("%d ", vm->stack[i].as_i32);
@@ -37,5 +29,3 @@ static void run(Vm* vm) {
         do_inst(vm);
     }
 }
-
-#endif

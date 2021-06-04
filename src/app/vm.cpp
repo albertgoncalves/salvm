@@ -1,5 +1,10 @@
-#include "vm_bytes.hpp"
-#include "vm_io.hpp"
+#include "bytes.hpp"
+#include "io.hpp"
+
+#ifdef RELEASE
+    #include "inst.cpp"
+    #include "io.cpp"
+#endif
 
 static void insts_from_bytes(Vm* vm, const char* path) {
     File* file = fopen(path, "rb");

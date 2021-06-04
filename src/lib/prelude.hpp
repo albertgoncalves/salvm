@@ -3,10 +3,11 @@
 
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-W#warnings"
+
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <string.h>
+
 #pragma GCC diagnostic pop
 
 typedef uint8_t  u8;
@@ -38,12 +39,6 @@ typedef FILE File;
                 __LINE__,          \
                 #condition);       \
         exit(EXIT_FAILURE);        \
-    }
-
-#define TEST(fn, block) \
-    static void fn() {  \
-        block;          \
-        printf(".");    \
     }
 
 #endif

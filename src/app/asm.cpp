@@ -1,5 +1,5 @@
-#include "vm_asm.hpp"
-#include "vm_bytes.hpp"
+#include "asm.hpp"
+#include "bytes.hpp"
 
 static void set_chars_from_file(Memory* memory, const char* path) {
     File* file = fopen(path, "r");

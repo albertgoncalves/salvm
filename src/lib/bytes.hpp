@@ -1,5 +1,5 @@
-#ifndef __VM_BYTES_H__
-#define __VM_BYTES_H__
+#ifndef __BYTES_H__
+#define __BYTES_H__
 
 #include "vm.hpp"
 
