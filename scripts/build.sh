@@ -59,7 +59,7 @@ exe () {
     exe -O0 -o bin/test_inst build/inst.o src/app/test_inst.cpp &
     exe -O0 -o bin/vm_debug build/str.o build/inst.o build/io_debug.o \
         src/app/vm.cpp &
-    exe -O3 -flto -g -o bin/vm build/inst.o build/io.o src/app/vm.cpp &
+    exe -O3 -flto -g -DRELEASE -o bin/vm src/app/vm.cpp &
     for _ in $(jobs -p); do
         wait -n
     done
