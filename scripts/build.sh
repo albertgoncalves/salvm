@@ -34,7 +34,7 @@ flags=(
 )
 
 obj () {
-    clang++ "${flags[@]}" -c "$@"
+    clang++ "${flags[@]}" -O0 -c "$@"
 }
 
 exe () {
@@ -46,18 +46,18 @@ exe () {
     clang-format -i -verbose src/*/*
     start=$(now)
     for x in asm io str; do
-        obj -O0 -o "build/$x.o" "src/lib/$x.cpp" &
+        obj -o "build/$x.o" "src/lib/$x.cpp" &
     done
-    obj -O3 -o build/inst.o src/lib/inst.cpp &
-    obj -O0 -DDEBUG -o build/io_debug.o src/lib/io.cpp &
+    obj -o build/inst.o src/lib/inst.cpp &
+    obj -DDEBUG -o build/io_debug.o src/lib/io.cpp &
     for _ in $(jobs -p); do
         wait -n
     done
     for x in test_asm asm; do
-        exe -O0 -o "bin/$x" build/str.o build/asm.o src/app/$x.cpp &
+        exe -O0 -o "bin/$x" build/asm.o build/str.o src/app/$x.cpp &
     done
     exe -O0 -o bin/test_inst build/inst.o src/app/test_inst.cpp &
-    exe -O0 -o bin/vm_debug build/str.o build/inst.o build/io_debug.o \
+    exe -O0 -o bin/vm_debug build/inst.o build/io_debug.o build/str.o \
         src/app/vm.cpp &
     exe -O3 -flto -g -DRELEASE -o bin/vm src/app/vm.cpp &
     for _ in $(jobs -p); do
