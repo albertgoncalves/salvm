@@ -26,31 +26,31 @@ TEST(test_plus_chars, {
     EXIT_IF(MEMORY->vm.heap[6] != '\n');
 })
 
-TEST(test_plus_u8, {
-    INJECT("+1[97 98 99 100]");
+TEST(test_plus_i8, {
+    INJECT("+1[-128 127 99 100]");
     EXIT_IF(MEMORY->len_bytes != 4);
-    EXIT_IF(MEMORY->vm.heap[0] != 'a');
-    EXIT_IF(MEMORY->vm.heap[1] != 'b');
+    EXIT_IF(MEMORY->vm.heap[0] != -128);
+    EXIT_IF(MEMORY->vm.heap[1] != 127);
     EXIT_IF(MEMORY->vm.heap[2] != 'c');
     EXIT_IF(MEMORY->vm.heap[3] != 'd');
 })
 
-TEST(test_plus_u16, {
-    INJECT("+2[ 97 98 99 100 ]\n");
+TEST(test_plus_i16, {
+    INJECT("+2[ 32767 -32768 99 -100 ]\n");
     EXIT_IF(MEMORY->len_bytes != 8);
-    EXIT_IF(reinterpret_cast<i16*>(MEMORY->vm.heap)[0] != 97);
-    EXIT_IF(reinterpret_cast<i16*>(MEMORY->vm.heap)[1] != 98);
+    EXIT_IF(reinterpret_cast<i16*>(MEMORY->vm.heap)[0] != 32767);
+    EXIT_IF(reinterpret_cast<i16*>(MEMORY->vm.heap)[1] != -32768);
     EXIT_IF(reinterpret_cast<i16*>(MEMORY->vm.heap)[2] != 99);
-    EXIT_IF(reinterpret_cast<i16*>(MEMORY->vm.heap)[3] != 100);
+    EXIT_IF(reinterpret_cast<i16*>(MEMORY->vm.heap)[3] != -100);
 })
 
-TEST(test_plus_u32, {
-    INJECT("+4[\n    97\n    98\n    99\n    100\n]\n");
+TEST(test_plus_i32, {
+    INJECT("+4[\n    -97\n    98\n    2147483647\n    -2147483648\n]\n");
     EXIT_IF(MEMORY->len_bytes != 16);
-    EXIT_IF(reinterpret_cast<i32*>(MEMORY->vm.heap)[0] != 97);
+    EXIT_IF(reinterpret_cast<i32*>(MEMORY->vm.heap)[0] != -97);
     EXIT_IF(reinterpret_cast<i32*>(MEMORY->vm.heap)[1] != 98);
-    EXIT_IF(reinterpret_cast<i32*>(MEMORY->vm.heap)[2] != 99);
-    EXIT_IF(reinterpret_cast<i32*>(MEMORY->vm.heap)[3] != 100);
+    EXIT_IF(reinterpret_cast<i32*>(MEMORY->vm.heap)[2] != 2147483647);
+    EXIT_IF(reinterpret_cast<i32*>(MEMORY->vm.heap)[3] != -2147483648);
 })
 
 TEST(test_halt, {
@@ -347,9 +347,9 @@ i32 main() {
     MEMORY = reinterpret_cast<Memory*>(calloc(1, sizeof(Memory)));
     EXIT_IF(!MEMORY);
     test_plus_chars();
-    test_plus_u8();
-    test_plus_u16();
-    test_plus_u32();
+    test_plus_i8();
+    test_plus_i16();
+    test_plus_i32();
     test_halt();
     test_push();
     test_top();
