@@ -61,6 +61,13 @@ String to_string(InstTag tag) {
         return TO_STR("sv32");
     }
 
+    case INST_RDF32: {
+        return TO_STR("rdf32");
+    }
+    case INST_SVF32: {
+        return TO_STR("svf32");
+    }
+
     case INST_JPZ: {
         return TO_STR("jpz");
     }

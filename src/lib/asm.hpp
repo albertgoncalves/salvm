@@ -18,6 +18,7 @@ enum SizeTag {
     SIZE_I8 = 0,
     SIZE_I16,
     SIZE_I32,
+    SIZE_F32,
     COUNT_SIZE_TAG,
 };
 

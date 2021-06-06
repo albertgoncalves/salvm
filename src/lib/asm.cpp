@@ -37,6 +37,9 @@ String to_string(SizeTag tag) {
     case SIZE_I32: {
         return TO_STR("i32");
     }
+    case SIZE_F32: {
+        return TO_STR("f32");
+    }
     case COUNT_SIZE_TAG:
     default: {
         ERROR();
@@ -329,6 +332,29 @@ static void set_bytes(Token token, Memory* memory, u32* i) {
     ERROR_TOKEN(token);
 }
 
+static void set_bytes_f32(Token token, Memory* memory, u32* i) {
+    if (token.tag == TOKEN_F32) {
+        const u32 n = memory->len_bytes + sizeof(f32);
+        EXIT_IF(CAP_HEAP8 < n);
+        const i32 x = static_cast<i32>(token.body.as_u32);
+        memcpy(&memory->vm.heap[memory->len_bytes], &x, sizeof(f32));
+        memory->len_bytes = n;
+        return;
+    } else if (token.tag == TOKEN_MINUS) {
+        SET_NEXT(memory, token, *i);
+        if (token.tag == TOKEN_F32) {
+            const u32 n = memory->len_bytes + sizeof(f32);
+            EXIT_IF(CAP_HEAP8 < n);
+            token.body.as_f32 = -token.body.as_f32;
+            const i32 x = static_cast<i32>(token.body.as_u32);
+            memcpy(&memory->vm.heap[memory->len_bytes], &x, sizeof(f32));
+            memory->len_bytes = n;
+            return;
+        }
+    }
+    ERROR_TOKEN(token);
+}
+
 void set_insts(Memory* memory) {
     memory->len_pre_insts = 0;
     memory->len_labels = 0;
@@ -352,6 +378,10 @@ void set_insts(Memory* memory) {
             case INST_SV8:
             case INST_SV16:
             case INST_SV32:
+
+            case INST_RDF32:
+            case INST_SVF32:
+
             case INST_NOT:
             case INST_EQ:
 
@@ -586,6 +616,13 @@ void set_insts(Memory* memory) {
                 case SIZE_I32: {
                     while (token.tag != TOKEN_RBRACKET) {
                         set_bytes<i32, I32_MAX, I32_MIN>(token, memory, &i);
+                        SET_NEXT(memory, token, i);
+                    }
+                    break;
+                }
+                case SIZE_F32: {
+                    while (token.tag != TOKEN_RBRACKET) {
+                        set_bytes_f32(token, memory, &i);
                         SET_NEXT(memory, token, i);
                     }
                     break;
