@@ -293,12 +293,12 @@ static void set_bytes_char(Memory* memory, Token token) {
         token = memory->tokens[(i)];        \
     }
 
-template <typename T, u32 N, u32 M>
+template <typename T, u32 MAX, u32 MIN>
 static void set_bytes(Token token, Memory* memory, u32* i) {
     if (token.tag == TOKEN_U32) {
         const u32 n = memory->len_bytes + sizeof(T);
         EXIT_IF(CAP_HEAP8 < n);
-        EXIT_IF(N < token.body.as_u32);
+        EXIT_IF(MAX < token.body.as_u32);
         const i32 x = static_cast<T>(token.body.as_u32);
         memcpy(&memory->vm.heap[memory->len_bytes], &x, sizeof(T));
         memory->len_bytes = n;
@@ -308,7 +308,7 @@ static void set_bytes(Token token, Memory* memory, u32* i) {
         if (token.tag == TOKEN_U32) {
             const u32 n = memory->len_bytes + sizeof(T);
             EXIT_IF(CAP_HEAP8 < n);
-            EXIT_IF(M < token.body.as_u32);
+            EXIT_IF(MIN < token.body.as_u32);
             const i32 x = -static_cast<T>(token.body.as_u32);
             memcpy(&memory->vm.heap[memory->len_bytes], &x, sizeof(T));
             memory->len_bytes = n;
