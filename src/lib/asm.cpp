@@ -125,10 +125,9 @@ static f32 to_decimal(const char* chars, u32* i) {
     return a / b;
 }
 
-template <TokenTag X>
-static void set_tag(Memory* memory, u32 line, u32* i) {
+static void set_tag(Memory* memory, u32 line, u32* i, TokenTag tag) {
     Token* token = alloc_token(memory);
-    token->tag = X;
+    token->tag = tag;
     token->line = line;
     ++(*i);
 }
@@ -158,27 +157,27 @@ void set_tokens(Memory* memory) {
             break;
         }
         case ':': {
-            set_tag<TOKEN_COLON>(memory, line, &i);
+            set_tag(memory, line, &i, TOKEN_COLON);
             break;
         }
         case '-': {
-            set_tag<TOKEN_MINUS>(memory, line, &i);
+            set_tag(memory, line, &i, TOKEN_MINUS);
             break;
         }
         case '+': {
-            set_tag<TOKEN_PLUS>(memory, line, &i);
+            set_tag(memory, line, &i, TOKEN_PLUS);
             break;
         }
         case '[': {
-            set_tag<TOKEN_LBRACKET>(memory, line, &i);
+            set_tag(memory, line, &i, TOKEN_LBRACKET);
             break;
         }
         case ']': {
-            set_tag<TOKEN_RBRACKET>(memory, line, &i);
+            set_tag(memory, line, &i, TOKEN_RBRACKET);
             break;
         }
         case '"': {
-            set_tag<TOKEN_QUOTE>(memory, line, &i);
+            set_tag(memory, line, &i, TOKEN_QUOTE);
             {
                 EXIT_IF(memory->len_chars <= i);
                 u32  j = i;
@@ -199,7 +198,7 @@ void set_tokens(Memory* memory) {
                 token->tag = TOKEN_STR;
                 i = j;
             }
-            set_tag<TOKEN_QUOTE>(memory, line, &i);
+            set_tag(memory, line, &i, TOKEN_QUOTE);
             break;
         }
         default: {
