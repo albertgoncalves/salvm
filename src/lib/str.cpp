@@ -1,6 +1,6 @@
 #include "str.hpp"
 
-String get_inst_tag_as_string(InstTag tag) {
+String to_string(InstTag tag) {
     switch (tag) {
     case INST_HALT: {
         return TO_STR("halt");
@@ -59,6 +59,13 @@ String get_inst_tag_as_string(InstTag tag) {
     }
     case INST_SV32: {
         return TO_STR("sv32");
+    }
+
+    case INST_RDF32: {
+        return TO_STR("rdf32");
+    }
+    case INST_SVF32: {
+        return TO_STR("svf32");
     }
 
     case INST_JPZ: {

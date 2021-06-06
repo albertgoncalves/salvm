@@ -159,10 +159,7 @@ void do_inst(Vm* vm) {
         const i32 j = vm->stack[i].as_i32;
         BOUNDS_CHECK_HEAP8(j * 2);
         // NOTE: This *should* be fine. See `https://blog.regehr.org/archives/959`.
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wcast-align"
         const i16* heap = reinterpret_cast<i16*>(vm->heap);
-#pragma GCC diagnostic pop
         vm->stack[i].as_i32 = static_cast<i32>(heap[j]);
         ++vm->index.inst;
         break;
@@ -172,11 +169,18 @@ void do_inst(Vm* vm) {
         BOUNDS_CHECK_STACK(i);
         const i32 j = vm->stack[i].as_i32;
         BOUNDS_CHECK_HEAP8(j * 4);
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wcast-align"
         const i32* heap = reinterpret_cast<i32*>(vm->heap);
-#pragma GCC diagnostic pop
         vm->stack[i].as_i32 = heap[j];
+        ++vm->index.inst;
+        break;
+    }
+    case INST_RDF32: {
+        const i32 i = vm->index.stack_top - 1;
+        BOUNDS_CHECK_STACK(i);
+        const i32 j = vm->stack[i].as_i32;
+        BOUNDS_CHECK_HEAP8(j * 4);
+        const f32* heap = reinterpret_cast<f32*>(vm->heap);
+        vm->stack[i].as_f32 = heap[j];
         ++vm->index.inst;
         break;
     }
@@ -199,10 +203,7 @@ void do_inst(Vm* vm) {
         EXIT_IF(CAP_STACK <= i)
         const i32 l = vm->stack[i].as_i32;
         BOUNDS_CHECK_HEAP8(l * 2);
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wcast-align"
         i16* heap = reinterpret_cast<i16*>(vm->heap);
-#pragma GCC diagnostic pop
         heap[l] = static_cast<i16>(vm->stack[j].as_i32);
         vm->index.stack_top -= 2;
         ++vm->index.inst;
@@ -215,11 +216,21 @@ void do_inst(Vm* vm) {
         EXIT_IF(CAP_STACK <= i)
         const i32 l = vm->stack[i].as_i32;
         BOUNDS_CHECK_HEAP8(l * 4);
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wcast-align"
         i32* heap = reinterpret_cast<i32*>(vm->heap);
-#pragma GCC diagnostic pop
         heap[l] = vm->stack[j].as_i32;
+        vm->index.stack_top -= 2;
+        ++vm->index.inst;
+        break;
+    }
+    case INST_SVF32: {
+        EXIT_IF(vm->index.stack_top < 2);
+        const i32 i = vm->index.stack_top - 1;
+        const i32 j = vm->index.stack_top - 2;
+        EXIT_IF(CAP_STACK <= i)
+        const i32 l = vm->stack[i].as_i32;
+        BOUNDS_CHECK_HEAP8(l * 4);
+        f32* heap = reinterpret_cast<f32*>(vm->heap);
+        heap[l] = vm->stack[j].as_f32;
         vm->index.stack_top -= 2;
         ++vm->index.inst;
         break;

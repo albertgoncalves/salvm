@@ -6,8 +6,7 @@ void run(Vm* vm) {
     while (vm->alive) {
 #ifdef DEBUG
         {
-            const String inst =
-                get_inst_tag_as_string(vm->insts[vm->index.inst].tag);
+            const String inst = to_string(vm->insts[vm->index.inst].tag);
             printf("\n\n"
                    "    | .index.inst       : %d\n"
                    "    |       .stack_top  : %d\n"

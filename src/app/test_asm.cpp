@@ -1,8 +1,6 @@
 #include "asm.hpp"
 #include "test.hpp"
 
-#define EPSILON 0.001f
-
 static Memory* MEMORY;
 
 #define INJECT(literal)                                  \
@@ -15,19 +13,21 @@ static Memory* MEMORY;
     }
 
 TEST(test_plus_chars, {
-    INJECT("+\"abcd\\n\"\n+\"!\n\"\n");
-    EXIT_IF(MEMORY->len_bytes != 7);
-    EXIT_IF(MEMORY->vm.heap[0] != 'a');
-    EXIT_IF(MEMORY->vm.heap[1] != 'b');
-    EXIT_IF(MEMORY->vm.heap[2] != 'c');
-    EXIT_IF(MEMORY->vm.heap[3] != 'd');
-    EXIT_IF(MEMORY->vm.heap[4] != '\n');
-    EXIT_IF(MEMORY->vm.heap[5] != '!');
+    INJECT("+\"\\\"abcd\\\"\\n\"\n+\"!\n\"\n");
+    EXIT_IF(MEMORY->len_bytes != 9);
+    EXIT_IF(MEMORY->vm.heap[0] != '"');
+    EXIT_IF(MEMORY->vm.heap[1] != 'a');
+    EXIT_IF(MEMORY->vm.heap[2] != 'b');
+    EXIT_IF(MEMORY->vm.heap[3] != 'c');
+    EXIT_IF(MEMORY->vm.heap[4] != 'd');
+    EXIT_IF(MEMORY->vm.heap[5] != '"');
     EXIT_IF(MEMORY->vm.heap[6] != '\n');
+    EXIT_IF(MEMORY->vm.heap[7] != '!');
+    EXIT_IF(MEMORY->vm.heap[8] != '\n');
 })
 
 TEST(test_plus_i8, {
-    INJECT("+1[-128 127 99 100]");
+    INJECT("+i8[-128 127 99 100]");
     EXIT_IF(MEMORY->len_bytes != 4);
     EXIT_IF(MEMORY->vm.heap[0] != -128);
     EXIT_IF(MEMORY->vm.heap[1] != 127);
@@ -36,7 +36,7 @@ TEST(test_plus_i8, {
 })
 
 TEST(test_plus_i16, {
-    INJECT("+2[ 32767 -32768 99 -100 ]\n");
+    INJECT("+i16[ 32767 -32768 99 -100 ]\n");
     EXIT_IF(MEMORY->len_bytes != 8);
     EXIT_IF(reinterpret_cast<i16*>(MEMORY->vm.heap)[0] != 32767);
     EXIT_IF(reinterpret_cast<i16*>(MEMORY->vm.heap)[1] != -32768);
@@ -45,12 +45,21 @@ TEST(test_plus_i16, {
 })
 
 TEST(test_plus_i32, {
-    INJECT("+4[\n    -97\n    98\n    2147483647\n    -2147483648\n]\n");
+    INJECT("+i32[\n    -97\n    98\n    2147483647\n    -2147483648\n]\n");
     EXIT_IF(MEMORY->len_bytes != 16);
     EXIT_IF(reinterpret_cast<i32*>(MEMORY->vm.heap)[0] != -97);
     EXIT_IF(reinterpret_cast<i32*>(MEMORY->vm.heap)[1] != 98);
     EXIT_IF(reinterpret_cast<i32*>(MEMORY->vm.heap)[2] != 2147483647);
     EXIT_IF(reinterpret_cast<i32*>(MEMORY->vm.heap)[3] != -2147483648);
+})
+
+TEST(test_plus_f32, {
+    INJECT("+f32[1.0 -1.0 0.1234567 -0.1234567]");
+    EXIT_IF(MEMORY->len_bytes != 16);
+    EXIT_IF(!EQ_F32(reinterpret_cast<f32*>(MEMORY->vm.heap)[0], 1.0f));
+    EXIT_IF(!EQ_F32(reinterpret_cast<f32*>(MEMORY->vm.heap)[1], -1.0f));
+    EXIT_IF(!EQ_F32(reinterpret_cast<f32*>(MEMORY->vm.heap)[2], 0.1234567f));
+    EXIT_IF(!EQ_F32(reinterpret_cast<f32*>(MEMORY->vm.heap)[3], -0.1234567f));
 })
 
 TEST(test_halt, {
@@ -71,9 +80,8 @@ TEST(test_push, {
     EXIT_IF(MEMORY->vm.insts[1].tag != INST_PUSH);
     EXIT_IF(MEMORY->vm.insts[1].op != -2147483648);
     EXIT_IF(MEMORY->vm.insts[2].tag != INST_PUSH);
-    const f32 op = *(reinterpret_cast<f32*>(&MEMORY->vm.insts[2].op));
-    EXIT_IF((op < (-12345.6789f - EPSILON)) ||
-            ((-12345.6789f + EPSILON) < op));
+    EXIT_IF(!EQ_F32(*(reinterpret_cast<f32*>(&MEMORY->vm.insts[2].op)),
+                    -12345.6789f));
     EXIT_IF(MEMORY->vm.insts[3].tag != INST_PUSH);
     EXIT_IF(MEMORY->vm.insts[3].op != 2);
 })
@@ -200,6 +208,18 @@ TEST(test_sv32, {
     EXIT_IF(MEMORY->vm.insts[0].tag != INST_SV32);
 })
 
+TEST(test_rdf32, {
+    INJECT("rdf32\n");
+    EXIT_IF(MEMORY->len_chars != 6);
+    EXIT_IF(MEMORY->vm.insts[0].tag != INST_RDF32);
+})
+
+TEST(test_svf32, {
+    INJECT("svf32\n");
+    EXIT_IF(MEMORY->len_chars != 6);
+    EXIT_IF(MEMORY->vm.insts[0].tag != INST_SVF32);
+})
+
 TEST(test_not, {
     INJECT("not\n");
     EXIT_IF(MEMORY->len_chars != 4);
@@ -315,12 +335,11 @@ TEST(test_native, {
     EXIT_IF(MEMORY->vm.insts[0].op != 1);
 })
 
-#define TEST_STR(inst, literal, len_)                       \
-    {                                                       \
-        const String result = get_inst_tag_as_string(inst); \
-        EXIT_IF(result.len != len_);                        \
-        const String expected = {literal, len_};            \
-        EXIT_IF(!EQ_STR(result, expected));                 \
+#define TEST_STR(x, literal, len_)                           \
+    {                                                        \
+        const String result = to_string(x);                  \
+        EXIT_IF(result.len != len_);                         \
+        EXIT_IF(!EQ_STR(result, ((String){literal, len_}))); \
     }
 
 TEST(test_halt_as_string, { TEST_STR(INST_HALT, "halt", 4); })
@@ -332,6 +351,10 @@ TEST(test_eq_as_string, { TEST_STR(INST_EQ, "eq", 2); })
 TEST(test_jpz_as_string, { TEST_STR(INST_JPZ, "jpz", 3); })
 
 TEST(test_native_as_string, { TEST_STR(INST_NATIVE, "native", 6); })
+
+TEST(test_size_i32_as_string, { TEST_STR(SIZE_I32, "i32", 3); })
+
+TEST(test_size_f32_as_string, { TEST_STR(SIZE_F32, "f32", 3); })
 
 i32 main() {
     printf("sizeof(TokenTag)  : %zu\n"
@@ -354,6 +377,7 @@ i32 main() {
     test_plus_i8();
     test_plus_i16();
     test_plus_i32();
+    test_plus_f32();
     test_halt();
     test_push();
     test_top();
@@ -373,6 +397,8 @@ i32 main() {
     test_sv8();
     test_sv16();
     test_sv32();
+    test_rdf32();
+    test_svf32();
     test_not();
     test_eq();
     test_addi();
@@ -397,6 +423,8 @@ i32 main() {
     test_jpz_as_string();
     test_native_as_string();
     test_scl_as_string();
+    test_size_i32_as_string();
+    test_size_f32_as_string();
     free(MEMORY);
     printf("\n\n");
     return EXIT_SUCCESS;

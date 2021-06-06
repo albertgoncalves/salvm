@@ -33,6 +33,8 @@ syn keyword Keyword
     \ sv8
     \ sv16
     \ sv32
+    \ rdf32
+    \ svf32
     \ not
     \ eq
     \ addi
@@ -52,5 +54,9 @@ syn keyword Keyword
     \ gtf
     \ gef
     \ native
+    \ i8
+    \ i16
+    \ i32
+    \ f32
 
 let b:current_syntax = "sals"

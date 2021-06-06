@@ -38,6 +38,9 @@ enum InstTag {
     INST_SV16,
     INST_SV32,
 
+    INST_RDF32,
+    INST_SVF32,
+
     INST_JPZ,
     INST_JUMP,
 

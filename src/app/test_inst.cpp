@@ -156,16 +156,12 @@ TEST(test_rd8, {
     EXIT_IF(VM->stack[0].as_i32 != -123);
 })
 
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wcast-align"
-
 TEST(test_rd16, {
     RESET();
     VM->insts[0].tag = INST_RD16;
     VM->index.stack_top = 1;
     VM->stack[0].as_i32 = 7;
-    i16* heap = reinterpret_cast<i16*>(VM->heap);
-    heap[7] = -30000;
+    reinterpret_cast<i16*>(VM->heap)[7] = -30000;
     do_inst(VM);
     EXIT_IF(VM->index.inst != 1);
     EXIT_IF(VM->index.stack_top != 1);
@@ -177,15 +173,12 @@ TEST(test_rd32, {
     VM->insts[0].tag = INST_RD32;
     VM->index.stack_top = 1;
     VM->stack[0].as_i32 = 3;
-    i32* heap = reinterpret_cast<i32*>(VM->heap);
-    heap[3] = -2000000123;
+    reinterpret_cast<i32*>(VM->heap)[3] = -2000000123;
     do_inst(VM);
     EXIT_IF(VM->index.inst != 1);
     EXIT_IF(VM->index.stack_top != 1);
     EXIT_IF(VM->stack[0].as_i32 != -2000000123);
 })
-
-#pragma GCC diagnostic pop
 
 TEST(test_sv8, {
     RESET();
@@ -199,9 +192,6 @@ TEST(test_sv8, {
     EXIT_IF(VM->heap[11] != -113);
 })
 
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wcast-align"
-
 TEST(test_sv16, {
     RESET();
     VM->insts[0].tag = INST_SV16;
@@ -211,8 +201,7 @@ TEST(test_sv16, {
     do_inst(VM);
     EXIT_IF(VM->index.inst != 1);
     EXIT_IF(VM->index.stack_top != 0);
-    const i16* heap = reinterpret_cast<i16*>(VM->heap);
-    EXIT_IF(heap[2] != -30012);
+    EXIT_IF(reinterpret_cast<i16*>(VM->heap)[2] != -30012);
 })
 
 TEST(test_sv32, {
@@ -224,11 +213,32 @@ TEST(test_sv32, {
     do_inst(VM);
     EXIT_IF(VM->index.inst != 1);
     EXIT_IF(VM->index.stack_top != 0);
-    const i32* heap = reinterpret_cast<i32*>(VM->heap);
-    EXIT_IF(heap[1] != -2000100123);
+    EXIT_IF(reinterpret_cast<i32*>(VM->heap)[1] != -2000100123);
 })
 
-#pragma GCC diagnostic pop
+TEST(test_rdf32, {
+    RESET();
+    VM->insts[0].tag = INST_RDF32;
+    VM->index.stack_top = 1;
+    VM->stack[0].as_i32 = 5;
+    reinterpret_cast<f32*>(VM->heap)[5] = -0.1234567f;
+    do_inst(VM);
+    EXIT_IF(VM->index.inst != 1);
+    EXIT_IF(VM->index.stack_top != 1);
+    EXIT_IF(!EQ_F32(VM->stack[0].as_f32, -0.1234567f));
+})
+
+TEST(test_svf32, {
+    RESET();
+    VM->insts[0].tag = INST_SVF32;
+    VM->index.stack_top = 2;
+    VM->stack[0].as_f32 = 50.12345f;
+    VM->stack[1].as_i32 = 9;
+    do_inst(VM);
+    EXIT_IF(VM->index.inst != 1);
+    EXIT_IF(VM->index.stack_top != 0);
+    EXIT_IF(!EQ_F32(reinterpret_cast<f32*>(VM->heap)[9], 50.12345f));
+})
 
 TEST(test_not, {
     RESET();
@@ -336,6 +346,8 @@ i32 main() {
     test_sv8();
     test_sv16();
     test_sv32();
+    test_rdf32();
+    test_svf32();
     test_not();
     test_eq();
     test_addi();
