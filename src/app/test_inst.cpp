@@ -156,9 +156,6 @@ TEST(test_rd8, {
     EXIT_IF(VM->stack[0].as_i32 != -123);
 })
 
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wcast-align"
-
 TEST(test_rd16, {
     RESET();
     VM->insts[0].tag = INST_RD16;
@@ -183,8 +180,6 @@ TEST(test_rd32, {
     EXIT_IF(VM->stack[0].as_i32 != -2000000123);
 })
 
-#pragma GCC diagnostic pop
-
 TEST(test_sv8, {
     RESET();
     VM->insts[0].tag = INST_SV8;
@@ -196,9 +191,6 @@ TEST(test_sv8, {
     EXIT_IF(VM->index.stack_top != 0);
     EXIT_IF(VM->heap[11] != -113);
 })
-
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wcast-align"
 
 TEST(test_sv16, {
     RESET();
@@ -236,7 +228,6 @@ TEST(test_rdf32, {
     EXIT_IF(!EQ_F32(VM->stack[0].as_f32, -0.1234567f));
 })
 
-#pragma GCC diagnostic pop
 TEST(test_svf32, {
     RESET();
     VM->insts[0].tag = INST_SVF32;
