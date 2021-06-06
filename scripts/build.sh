@@ -38,7 +38,7 @@ obj () {
 }
 
 exe () {
-    clang++ "${flags[@]}" "-I$WD/src/lib" "$@"
+    clang++ "${flags[@]}" -fuse-ld=lld "-I$WD/src/lib" "$@"
 }
 
 (
