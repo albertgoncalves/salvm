@@ -14,8 +14,15 @@
 #define CAP_TOKENS (2 << 7)
 #define CAP_LABELS (2 << 5)
 
+enum SizeTag {
+    SIZE_I8 = 0,
+    SIZE_I16,
+    SIZE_I32,
+    COUNT_SIZE_TAG,
+};
+
 enum TokenTag {
-    TOKEN_INST,
+    TOKEN_INST = 0,
 
     TOKEN_STR,
     TOKEN_U32,
@@ -23,11 +30,19 @@ enum TokenTag {
 
     TOKEN_COLON,
     TOKEN_MINUS,
+    TOKEN_PLUS,
+
+    TOKEN_SIZE,
+
+    TOKEN_QUOTE,
+    TOKEN_LBRACKET,
+    TOKEN_RBRACKET,
 };
 
 union TokenBody {
     String  as_string;
     InstTag as_inst_tag;
+    SizeTag as_size_tag;
     u32     as_u32;
     f32     as_f32;
 };
@@ -63,7 +78,8 @@ struct Memory {
     u32     len_labels;
 };
 
-void set_tokens(Memory*);
-void set_insts(Memory*);
+void   set_tokens(Memory*);
+void   set_insts(Memory*);
+String to_string(SizeTag);
 
 #endif

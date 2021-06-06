@@ -22,6 +22,6 @@ struct String {
 
 #define PRINT_STR(stream, string) fprintf(stream, FMT_STR, ARG_STR(string))
 
-String get_inst_tag_as_string(InstTag);
+String to_string(InstTag);
 
 #endif

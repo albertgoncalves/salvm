@@ -1,6 +1,6 @@
 #include "str.hpp"
 
-String get_inst_tag_as_string(InstTag tag) {
+String to_string(InstTag tag) {
     switch (tag) {
     case INST_HALT: {
         return TO_STR("halt");
