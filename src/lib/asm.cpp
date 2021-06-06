@@ -42,8 +42,8 @@ static void println_token(File* stream, Token token) {
         fprintf(stream, "`\n");
         break;
     }
-    case TOKEN_I32: {
-        fprintf(stream, "`%d`\n", token.body.as_i32);
+    case TOKEN_U32: {
+        fprintf(stream, "`%u`\n", token.body.as_u32);
         break;
     }
     case TOKEN_F32: {
@@ -254,7 +254,7 @@ void set_tokens(Memory* memory) {
             Token* token = alloc_token(memory);
             token->line = line;
             if (IS_DIGIT(memory->chars[i])) {
-                const i32 x = to_digits<i32>(memory->chars, &i);
+                const u32 x = to_digits<u32>(memory->chars, &i);
                 if ((i < memory->len_chars) && (memory->chars[i] == '.')) {
                     ++i;
                     EXIT_IF(memory->len_chars <= i);
@@ -262,8 +262,8 @@ void set_tokens(Memory* memory) {
                         static_cast<f32>(x) + to_decimal(memory->chars, &i);
                     token->tag = TOKEN_F32;
                 } else {
-                    token->body.as_i32 = x;
-                    token->tag = TOKEN_I32;
+                    token->body.as_u32 = x;
+                    token->tag = TOKEN_U32;
                 }
                 continue;
             }
@@ -291,6 +291,18 @@ void set_tokens(Memory* memory) {
         }
         }
     }
+}
+
+static void set_pre_inst_i32(Token token, PreInst* pre_inst) {
+    EXIT_IF(0x7FFFFFFFu < token.body.as_u32);
+    pre_inst->inst.op = static_cast<i32>(token.body.as_u32);
+    pre_inst->resolved = true;
+}
+
+static void set_pre_inst_negative_i32(Token token, PreInst* pre_inst) {
+    EXIT_IF(0x80000000u < token.body.as_u32);
+    pre_inst->inst.op = -static_cast<i32>(token.body.as_u32);
+    pre_inst->resolved = true;
 }
 
 void set_insts(Memory* memory) {
@@ -344,23 +356,26 @@ void set_insts(Memory* memory) {
             case INST_PUSH: {
                 token = memory->tokens[++i];
                 switch (token.tag) {
-                case TOKEN_I32:
+                case TOKEN_U32: {
+                    set_pre_inst_i32(token, pre_inst);
+                    break;
+                }
                 case TOKEN_F32: {
-                    pre_inst->inst.op = token.body.as_i32;
+                    pre_inst->inst.op = static_cast<i32>(token.body.as_u32);
                     pre_inst->resolved = true;
                     break;
                 }
                 case TOKEN_MINUS: {
                     token = memory->tokens[++i];
                     switch (token.tag) {
-                    case TOKEN_I32: {
-                        pre_inst->inst.op = -token.body.as_i32;
-                        pre_inst->resolved = true;
+                    case TOKEN_U32: {
+                        set_pre_inst_negative_i32(token, pre_inst);
                         break;
                     }
                     case TOKEN_F32: {
                         token.body.as_f32 = -token.body.as_f32;
-                        pre_inst->inst.op = token.body.as_i32;
+                        pre_inst->inst.op =
+                            static_cast<i32>(token.body.as_u32);
                         pre_inst->resolved = true;
                         break;
                     }
@@ -393,17 +408,15 @@ void set_insts(Memory* memory) {
             case INST_FRAME: {
                 token = memory->tokens[++i];
                 switch (token.tag) {
-                case TOKEN_I32: {
-                    pre_inst->inst.op = token.body.as_i32;
-                    pre_inst->resolved = true;
+                case TOKEN_U32: {
+                    set_pre_inst_i32(token, pre_inst);
                     break;
                 }
                 case TOKEN_MINUS: {
                     token = memory->tokens[++i];
                     switch (token.tag) {
-                    case TOKEN_I32: {
-                        pre_inst->inst.op = -token.body.as_i32;
-                        pre_inst->resolved = true;
+                    case TOKEN_U32: {
+                        set_pre_inst_negative_i32(token, pre_inst);
                         break;
                     }
                     case TOKEN_F32:
@@ -430,9 +443,8 @@ void set_insts(Memory* memory) {
             case INST_NATIVE: {
                 token = memory->tokens[++i];
                 switch (token.tag) {
-                case TOKEN_I32: {
-                    pre_inst->inst.op = token.body.as_i32;
-                    pre_inst->resolved = true;
+                case TOKEN_U32: {
+                    set_pre_inst_i32(token, pre_inst);
                     break;
                 }
                 case TOKEN_F32:
@@ -451,9 +463,8 @@ void set_insts(Memory* memory) {
             case INST_JUMP: {
                 token = memory->tokens[++i];
                 switch (token.tag) {
-                case TOKEN_I32: {
-                    pre_inst->inst.op = token.body.as_i32;
-                    pre_inst->resolved = true;
+                case TOKEN_U32: {
+                    set_pre_inst_i32(token, pre_inst);
                     break;
                 }
                 case TOKEN_STR: {
@@ -488,7 +499,7 @@ void set_insts(Memory* memory) {
             label->index_inst = index_inst;
             break;
         }
-        case TOKEN_I32:
+        case TOKEN_U32:
         case TOKEN_F32:
         case TOKEN_COLON:
         case TOKEN_MINUS:

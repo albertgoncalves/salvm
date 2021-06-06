@@ -60,12 +60,16 @@ TEST(test_halt, {
 })
 
 TEST(test_push, {
-    INJECT("push 567890\npush -12345\n\nf: push -12345.6789\npush f\n");
-    EXIT_IF(MEMORY->len_chars != 52);
+    INJECT("push 2147483647\n"
+           "push -2147483648\n"
+           "\n"
+           "f: push -12345.6789\n"
+           "push f\n");
+    EXIT_IF(MEMORY->len_chars != 61);
     EXIT_IF(MEMORY->vm.insts[0].tag != INST_PUSH);
-    EXIT_IF(MEMORY->vm.insts[0].op != 567890);
+    EXIT_IF(MEMORY->vm.insts[0].op != 2147483647);
     EXIT_IF(MEMORY->vm.insts[1].tag != INST_PUSH);
-    EXIT_IF(MEMORY->vm.insts[1].op != -12345);
+    EXIT_IF(MEMORY->vm.insts[1].op != -2147483648);
     EXIT_IF(MEMORY->vm.insts[2].tag != INST_PUSH);
     const f32 op = *(reinterpret_cast<f32*>(&MEMORY->vm.insts[2].op));
     EXIT_IF((op < (-12345.6789f - EPSILON)) ||

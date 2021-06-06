@@ -18,7 +18,7 @@ enum TokenTag {
     TOKEN_INST,
 
     TOKEN_STR,
-    TOKEN_I32,
+    TOKEN_U32,
     TOKEN_F32,
 
     TOKEN_COLON,
@@ -28,7 +28,7 @@ enum TokenTag {
 union TokenBody {
     String  as_string;
     InstTag as_inst_tag;
-    i32     as_i32;
+    u32     as_u32;
     f32     as_f32;
 };
 
