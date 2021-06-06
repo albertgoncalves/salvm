@@ -1,0 +1,56 @@
++i8[-128 127]
++i16[ -1 1 0 ]
++i32[
+    1
+    -1
+]
+
+    push    0
+    rd8
+    native  2
+
+    push    10
+    native  1
+
+    push    1
+    rd8
+    native  2
+
+    push    10
+    native  1
+
+    ;
+
+    push    1
+    rd16
+    native  2
+
+    push    10
+    native  1
+
+    push    2
+    rd16
+    native  2
+
+    push    10
+    native  1
+
+    ;
+
+    push    2
+    rd32
+    native  2
+
+    push    10
+    native  1
+
+    push    3
+    rd32
+    native  2
+
+    push    10
+    native  1
+
+    ;
+
+    halt
