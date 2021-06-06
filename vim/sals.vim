@@ -52,5 +52,8 @@ syn keyword Keyword
     \ gtf
     \ gef
     \ native
+    \ i8
+    \ i16
+    \ i32
 
 let b:current_syntax = "sals"
