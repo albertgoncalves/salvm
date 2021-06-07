@@ -21,6 +21,8 @@ typedef double f64;
 
 typedef FILE File;
 
+#define I32_MAX 0x7FFFFFFF
+
 #define ERROR()                                                      \
     {                                                                \
         fprintf(stderr, "%s:%s:%d\n", __FILE__, __func__, __LINE__); \

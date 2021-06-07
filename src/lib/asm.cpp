@@ -128,10 +128,10 @@ static f32 to_decimal(const char* chars, u32* i) {
     return a / b;
 }
 
-template <TokenTag TAG>
+template <TokenTag X>
 static void set_tag(Memory* memory, u32 line, u32* i) {
     Token* token = alloc_token(memory);
-    token->tag = TAG;
+    token->tag = X;
     token->line = line;
     ++(*i);
 }
@@ -257,17 +257,14 @@ void set_tokens(Memory* memory) {
     }
 }
 
-#define I32_MIN 0x80000000u
-#define I32_MAX 0x7FFFFFFFu
-
 static void set_pre_inst_i32(Token token, PreInst* pre_inst) {
-    EXIT_IF(I32_MAX < token.body.as_u32);
+    EXIT_IF(static_cast<u32>(I32_MAX) < token.body.as_u32);
     pre_inst->inst.op = static_cast<i32>(token.body.as_u32);
     pre_inst->resolved = true;
 }
 
 static void set_pre_inst_negative_i32(Token token, PreInst* pre_inst) {
-    EXIT_IF(I32_MIN < token.body.as_u32);
+    EXIT_IF((static_cast<u32>(I32_MAX) + 1) < token.body.as_u32);
     pre_inst->inst.op = -static_cast<i32>(token.body.as_u32);
     pre_inst->resolved = true;
 }
@@ -282,7 +279,7 @@ static void set_pre_inst_string(Token token, PreInst* pre_inst) {
     pre_inst->resolved = false;
 }
 
-static void set_bytes_char(Memory* memory, Token token) {
+static void set_heap_char(Memory* memory, Token token) {
     const String string = token.body.as_string;
     for (u32 j = 0; j < string.len; ++j) {
         bool escaped = false;
@@ -307,12 +304,12 @@ static void set_bytes_char(Memory* memory, Token token) {
         token = memory->tokens[(i)];        \
     }
 
-template <typename T, u32 MAX, u32 MIN>
-static void set_bytes(Token token, Memory* memory, u32* i) {
+template <typename T, u32 N>
+static void set_heap(Token token, Memory* memory, u32* i) {
     if (token.tag == TOKEN_U32) {
         const u32 n = memory->len_bytes + sizeof(T);
         EXIT_IF(CAP_HEAP8 < n);
-        EXIT_IF(MAX < token.body.as_u32);
+        EXIT_IF(N < token.body.as_u32);
         const i32 x = static_cast<T>(token.body.as_u32);
         memcpy(&memory->vm.heap[memory->len_bytes], &x, sizeof(T));
         memory->len_bytes = n;
@@ -322,7 +319,7 @@ static void set_bytes(Token token, Memory* memory, u32* i) {
         if (token.tag == TOKEN_U32) {
             const u32 n = memory->len_bytes + sizeof(T);
             EXIT_IF(CAP_HEAP8 < n);
-            EXIT_IF(MIN < token.body.as_u32);
+            EXIT_IF((N + 1) < token.body.as_u32);
             const i32 x = -static_cast<T>(token.body.as_u32);
             memcpy(&memory->vm.heap[memory->len_bytes], &x, sizeof(T));
             memory->len_bytes = n;
@@ -332,7 +329,7 @@ static void set_bytes(Token token, Memory* memory, u32* i) {
     ERROR_TOKEN(token);
 }
 
-static void set_bytes_f32(Token token, Memory* memory, u32* i) {
+static void set_heap_f32(Token token, Memory* memory, u32* i) {
     if (token.tag == TOKEN_F32) {
         const u32 n = memory->len_bytes + sizeof(f32);
         EXIT_IF(CAP_HEAP8 < n);
@@ -584,7 +581,7 @@ void set_insts(Memory* memory) {
             switch (token.tag) {
             case TOKEN_QUOTE: {
                 SET_NEXT(memory, token, i);
-                set_bytes_char(memory, token);
+                set_heap_char(memory, token);
                 SET_NEXT(memory, token, i);
                 if (token.tag != TOKEN_QUOTE) {
                     ERROR_TOKEN(token);
@@ -601,28 +598,28 @@ void set_insts(Memory* memory) {
                 switch (tag) {
                 case SIZE_I8: {
                     while (token.tag != TOKEN_RBRACKET) {
-                        set_bytes<i8, 0x7Fu, 0x80u>(token, memory, &i);
+                        set_heap<i8, 0x7F>(token, memory, &i);
                         SET_NEXT(memory, token, i);
                     }
                     break;
                 }
                 case SIZE_I16: {
                     while (token.tag != TOKEN_RBRACKET) {
-                        set_bytes<i16, 0x7FFFu, 0x8000u>(token, memory, &i);
+                        set_heap<i16, 0x7FFF>(token, memory, &i);
                         SET_NEXT(memory, token, i);
                     }
                     break;
                 }
                 case SIZE_I32: {
                     while (token.tag != TOKEN_RBRACKET) {
-                        set_bytes<i32, I32_MAX, I32_MIN>(token, memory, &i);
+                        set_heap<i32, I32_MAX>(token, memory, &i);
                         SET_NEXT(memory, token, i);
                     }
                     break;
                 }
                 case SIZE_F32: {
                     while (token.tag != TOKEN_RBRACKET) {
-                        set_bytes_f32(token, memory, &i);
+                        set_heap_f32(token, memory, &i);
                         SET_NEXT(memory, token, i);
                     }
                     break;
