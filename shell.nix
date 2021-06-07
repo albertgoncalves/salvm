@@ -2,7 +2,7 @@ with import <nixpkgs> {};
 mkShell.override { stdenv = llvmPackages_12.stdenv; } {
     buildInputs = [
         linuxPackages.perf
-        lld_12
+        llvmPackages_12.lld
         python3
         shellcheck
         valgrind
