@@ -35,17 +35,17 @@ static void native_nop(Vm* _) {
     (void)_;
 }
 
-NATIVE_1(native_printc,
+NATIVE_1(native_print_char,
          { printf("%c", vm->stack[vm->index.stack_top].as_i32); })
 
-NATIVE_1(native_printi,
+NATIVE_1(native_print_i32,
          { printf("%d", vm->stack[vm->index.stack_top].as_i32); })
 
-NATIVE_1(native_printf, {
+NATIVE_1(native_print_f32, {
     printf("%.7f", static_cast<f64>(vm->stack[vm->index.stack_top].as_f32));
 })
 
-static void native_prints(Vm* vm) {
+static void native_print_str(Vm* vm) {
     EXIT_IF(vm->index.stack_top < 2);
     const i32 i = vm->index.stack_top - 1;
     const i32 j = vm->index.stack_top - 2;
@@ -60,10 +60,10 @@ static void native_prints(Vm* vm) {
 
 static const Native NATIVES[COUNT_NATIVE] = {
     [NATIVE_NOP] = native_nop,
-    [NATIVE_PRINTC] = native_printc,
-    [NATIVE_PRINTI] = native_printi,
-    [NATIVE_PRINTF] = native_printf,
-    [NATIVE_PRINTS] = native_prints,
+    [NATIVE_PRINT_CHAR] = native_print_char,
+    [NATIVE_PRINT_I32] = native_print_i32,
+    [NATIVE_PRINT_F32] = native_print_f32,
+    [NATIVE_PRINT_STR] = native_print_str,
 };
 
 void do_inst(Vm* vm) {

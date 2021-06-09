@@ -20,10 +20,10 @@ ALLOC_MEMORY(alloc_token, CAP_TOKENS, tokens, Token)
 ALLOC_MEMORY(alloc_pre_inst, CAP_INSTS, pre_insts, PreInst)
 ALLOC_MEMORY(alloc_label, CAP_LABELS, labels, Label)
 
-#define ERROR_TOKEN(token)            \
-    {                                 \
-        println_token(stderr, token); \
-        ERROR();                      \
+#define ERROR_TOKEN(token)    \
+    {                         \
+        print(stderr, token); \
+        ERROR();              \
     }
 
 String to_string(SizeTag tag) {
@@ -47,7 +47,7 @@ String to_string(SizeTag tag) {
     }
 }
 
-static void println_token(File* stream, Token token) {
+static void print(File* stream, Token token) {
     fprintf(stream, "%u:", token.line);
     switch (token.tag) {
     case TOKEN_INST: {
