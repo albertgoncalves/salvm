@@ -10,9 +10,9 @@
 
 #include "str.hpp"
 
-#define CAP_CHARS  (2 << 11)
-#define CAP_TOKENS (2 << 7)
-#define CAP_LABELS (2 << 5)
+#define CAP_CHARS  (1 << 12)
+#define CAP_TOKENS (1 << 8)
+#define CAP_LABELS (1 << 6)
 
 enum SizeTag {
     SIZE_I8 = 0,

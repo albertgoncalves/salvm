@@ -8,9 +8,9 @@ static_assert(alignof(i8) == 1, "alignof(i8) != 1");
 static_assert(alignof(i16) == 2, "alignof(i16) != 2");
 static_assert(alignof(i32) == 4, "alignof(i32) != 4");
 
-#define CAP_INSTS (2 << 7)
-#define CAP_STACK (2 << 14)
-#define CAP_HEAP8 (2 << 7)
+#define CAP_INSTS (1 << 8)
+#define CAP_STACK (1 << 15)
+#define CAP_HEAP8 (1 << 8)
 
 enum InstTag {
     INST_HALT = 0,
