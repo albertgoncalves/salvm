@@ -289,6 +289,22 @@ TEST(test_eq, {
     EXIT_IF(MEMORY->vm.insts[0].tag != INST_EQ);
 })
 
+TEST(test_sigi, {
+    INJECT("sigi\n");
+    EXIT_IF(MEMORY->len_tokens != 1);
+    EXIT_IF(MEMORY->tokens[0].line != 1);
+    EXIT_IF(MEMORY->len_chars != 5);
+    EXIT_IF(MEMORY->vm.insts[0].tag != INST_SIGI);
+})
+
+TEST(test_sigf, {
+    INJECT("sigf\n");
+    EXIT_IF(MEMORY->len_tokens != 1);
+    EXIT_IF(MEMORY->tokens[0].line != 1);
+    EXIT_IF(MEMORY->len_chars != 5);
+    EXIT_IF(MEMORY->vm.insts[0].tag != INST_SIGF);
+})
+
 TEST(test_addi, {
     INJECT("addi\n");
     EXIT_IF(MEMORY->len_tokens != 1);
@@ -492,6 +508,8 @@ i32 main() {
     test_svf32();
     test_not();
     test_eq();
+    test_sigi();
+    test_sigf();
     test_addi();
     test_subi();
     test_muli();

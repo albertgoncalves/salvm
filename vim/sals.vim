@@ -37,6 +37,8 @@ syn keyword Keyword
     \ svf32
     \ not
     \ eq
+    \ sigi
+    \ sigf
     \ addi
     \ subi
     \ muli

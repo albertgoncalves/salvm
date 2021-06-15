@@ -275,6 +275,38 @@ TEST(test_eq, {
     EXIT_IF(VM->stack[0].as_i32 != 1);
 })
 
+TEST(test_sigi, {
+    RESET();
+    VM->insts[0].tag = INST_SIGI;
+    VM->index.stack_top = 1;
+    VM->stack[0].as_i32 = 12345;
+    do_inst(VM);
+    EXIT_IF(VM->index.inst != 1);
+    EXIT_IF(VM->index.stack_top != 1);
+    EXIT_IF(VM->stack[0].as_i32 != -12345);
+    VM->insts[1].tag = INST_SIGI;
+    do_inst(VM);
+    EXIT_IF(VM->index.inst != 2);
+    EXIT_IF(VM->index.stack_top != 1);
+    EXIT_IF(VM->stack[0].as_i32 != 12345);
+})
+
+TEST(test_sigf, {
+    RESET();
+    VM->insts[0].tag = INST_SIGF;
+    VM->index.stack_top = 1;
+    VM->stack[0].as_f32 = 12345.0f;
+    do_inst(VM);
+    EXIT_IF(VM->index.inst != 1);
+    EXIT_IF(VM->index.stack_top != 1);
+    EXIT_IF(!EQ_F32(VM->stack[0].as_f32, -12345.0f));
+    VM->insts[1].tag = INST_SIGF;
+    do_inst(VM);
+    EXIT_IF(VM->index.inst != 2);
+    EXIT_IF(VM->index.stack_top != 1);
+    EXIT_IF(!EQ_F32(VM->stack[0].as_f32, 12345.0f));
+})
+
 #define TEST_BINARY_OP(fn, inst_tag, in, out, expected) \
     TEST(fn, {                                          \
         RESET();                                        \
@@ -350,6 +382,8 @@ i32 main() {
     test_svf32();
     test_not();
     test_eq();
+    test_sigi();
+    test_sigf();
     test_addi();
     test_subi();
     test_muli();

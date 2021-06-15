@@ -82,6 +82,13 @@ String to_string(InstTag tag) {
         return TO_STR("eq");
     }
 
+    case INST_SIGI: {
+        return TO_STR("sigi");
+    }
+    case INST_SIGF: {
+        return TO_STR("sigf");
+    }
+
     case INST_ADDI: {
         return TO_STR("addi");
     }

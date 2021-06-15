@@ -382,6 +382,9 @@ void set_insts(Memory* memory) {
             case INST_NOT:
             case INST_EQ:
 
+            case INST_SIGI:
+            case INST_SIGF:
+
             case INST_ADDI:
             case INST_SUBI:
             case INST_MULI:

@@ -267,6 +267,20 @@ void do_inst(Vm* vm) {
         ++vm->index.inst;
         break;
     }
+    case INST_SIGI: {
+        const i32 i = vm->index.stack_top - 1;
+        BOUNDS_CHECK_STACK(i);
+        vm->stack[i].as_i32 = -vm->stack[i].as_i32;
+        ++vm->index.inst;
+        break;
+    }
+    case INST_SIGF: {
+        const i32 i = vm->index.stack_top - 1;
+        BOUNDS_CHECK_STACK(i);
+        vm->stack[i].as_f32 = -vm->stack[i].as_f32;
+        ++vm->index.inst;
+        break;
+    }
     case INST_ADDI: {
         BINARY_OP(vm, +, i32, i32)
     }

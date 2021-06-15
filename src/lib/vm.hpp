@@ -47,6 +47,9 @@ enum InstTag {
     INST_NOT,
     INST_EQ,
 
+    INST_SIGI,
+    INST_SIGF,
+
     INST_ADDI,
     INST_SUBI,
     INST_MULI,
