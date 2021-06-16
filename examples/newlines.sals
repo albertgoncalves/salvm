@@ -1,0 +1,14 @@
++"\"abcd\"\n\n"
++"!
+
+"
+
+    push    8
+    push    0
+    native  4
+
+    push    3
+    push    8
+    native  4
+
+    halt
