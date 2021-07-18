@@ -12,7 +12,7 @@ now () {
     date +%s.%N
 }
 
-flags=(
+shared=(
     "-ferror-limit=1"
     "-ffast-math"
     "-fno-autolink"
@@ -22,7 +22,6 @@ flags=(
     "-fno-unwind-tables"
     "-fshort-enums"
     "-march=native"
-    "-nostdlib++"
     "-std=c++11"
     "-Werror"
     "-Weverything"
@@ -34,13 +33,26 @@ flags=(
     "-Wno-padded"
     "-Wno-reserved-id-macro"
 )
+debug=(
+    "-fno-omit-frame-pointer"
+    "-fsanitize=address"
+    "-fsanitize=undefined"
+    "-O0"
+)
+release=(
+    "-DRELEASE"
+    "-flto"
+    "-g"
+    "-nostdlib++"
+    "-O3"
+)
 
 obj () {
-    clang++ "${flags[@]}" -O0 -c "$@"
+    clang++ "${shared[@]}" -O0 -c "$@"
 }
 
 exe () {
-    clang++ "${flags[@]}" -fuse-ld=lld "-I$WD/src/lib" "$@"
+    clang++ "${shared[@]}" -fuse-ld=lld "-I$WD/src/lib" "$@"
 }
 
 (
@@ -56,12 +68,12 @@ exe () {
         wait -n
     done
     for x in test_asm asm; do
-        exe -O0 -o "bin/$x" build/asm.o build/str.o src/app/$x.cpp &
+        exe "${debug[@]}" -o "bin/$x" build/asm.o build/str.o src/app/$x.cpp &
     done
-    exe -O0 -o bin/test_inst build/inst.o src/app/test_inst.cpp &
-    exe -O0 -o bin/vm_debug build/inst.o build/io_debug.o build/str.o \
-        src/app/vm.cpp &
-    exe -O3 -flto -g -DRELEASE -o bin/vm src/app/vm.cpp &
+    exe "${debug[@]}" -o bin/test_inst build/inst.o src/app/test_inst.cpp &
+    exe "${debug[@]}" -o bin/vm_debug build/inst.o build/io_debug.o \
+        build/str.o src/app/vm.cpp &
+    exe "${release[@]}" -o bin/vm src/app/vm.cpp &
     for _ in $(jobs -p); do
         wait -n
     done
