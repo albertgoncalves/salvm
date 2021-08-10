@@ -69,12 +69,12 @@ struct Memory {
     Vm      vm;
     char    chars[CAP_CHARS];
     Token   tokens[CAP_TOKENS];
-    i8      bytes[CAP_HEAP8];
+    i8      heap[CAP_HEAP8];
     PreInst pre_insts[CAP_INSTS];
     Label   labels[CAP_LABELS];
     u32     len_chars;
     u32     len_tokens;
-    u32     len_bytes;
+    u32     len_heap;
     u32     len_pre_insts;
     u32     len_labels;
 };

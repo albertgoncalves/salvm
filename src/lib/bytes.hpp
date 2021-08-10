@@ -7,8 +7,8 @@
 
 struct Header {
     u32 magic;
-    u32 count_bytes;
-    u32 count_inst;
+    u32 count_heap;
+    u32 count_insts;
 };
 
 #endif

@@ -16,7 +16,7 @@ TEST(test_plus_chars, {
     INJECT("+\"\\\"abcd\\\"\\n\"\n+\"!\n\"\n");
     EXIT_IF(MEMORY->len_tokens != 8);
     EXIT_IF(MEMORY->tokens[7].line != 3);
-    EXIT_IF(MEMORY->len_bytes != 9);
+    EXIT_IF(MEMORY->len_heap != 9);
     EXIT_IF(MEMORY->vm.heap[0] != '"');
     EXIT_IF(MEMORY->vm.heap[1] != 'a');
     EXIT_IF(MEMORY->vm.heap[2] != 'b');
@@ -32,7 +32,7 @@ TEST(test_plus_i8, {
     INJECT("+i8[-128 127 99 100]");
     EXIT_IF(MEMORY->len_tokens != 9);
     EXIT_IF(MEMORY->tokens[8].line != 1);
-    EXIT_IF(MEMORY->len_bytes != 4);
+    EXIT_IF(MEMORY->len_heap != 4);
     EXIT_IF(MEMORY->vm.heap[0] != -128);
     EXIT_IF(MEMORY->vm.heap[1] != 127);
     EXIT_IF(MEMORY->vm.heap[2] != 'c');
@@ -43,7 +43,7 @@ TEST(test_plus_i16, {
     INJECT("+i16[ 32767 -32768 99 -100 ]\n");
     EXIT_IF(MEMORY->len_tokens != 10);
     EXIT_IF(MEMORY->tokens[9].line != 1);
-    EXIT_IF(MEMORY->len_bytes != 8);
+    EXIT_IF(MEMORY->len_heap != 8);
     EXIT_IF(reinterpret_cast<i16*>(MEMORY->vm.heap)[0] != 32767);
     EXIT_IF(reinterpret_cast<i16*>(MEMORY->vm.heap)[1] != -32768);
     EXIT_IF(reinterpret_cast<i16*>(MEMORY->vm.heap)[2] != 99);
@@ -54,7 +54,7 @@ TEST(test_plus_i32, {
     INJECT("+i32[\n    -97\n    98\n    2147483647\n    -2147483648\n]\n");
     EXIT_IF(MEMORY->len_tokens != 10);
     EXIT_IF(MEMORY->tokens[9].line != 6);
-    EXIT_IF(MEMORY->len_bytes != 16);
+    EXIT_IF(MEMORY->len_heap != 16);
     EXIT_IF(reinterpret_cast<i32*>(MEMORY->vm.heap)[0] != -97);
     EXIT_IF(reinterpret_cast<i32*>(MEMORY->vm.heap)[1] != 98);
     EXIT_IF(reinterpret_cast<i32*>(MEMORY->vm.heap)[2] != 2147483647);
@@ -65,7 +65,7 @@ TEST(test_plus_f32, {
     INJECT("+f32[1.0 -1.0 0.1234567 -0.1234567]");
     EXIT_IF(MEMORY->len_tokens != 10);
     EXIT_IF(MEMORY->tokens[9].line != 1);
-    EXIT_IF(MEMORY->len_bytes != 16);
+    EXIT_IF(MEMORY->len_heap != 16);
     EXIT_IF(!EQ_F32(reinterpret_cast<f32*>(MEMORY->vm.heap)[0], 1.0f));
     EXIT_IF(!EQ_F32(reinterpret_cast<f32*>(MEMORY->vm.heap)[1], -1.0f));
     EXIT_IF(!EQ_F32(reinterpret_cast<f32*>(MEMORY->vm.heap)[2], 0.1234567f));

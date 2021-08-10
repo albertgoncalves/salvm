@@ -138,7 +138,7 @@ static void set_tag(Memory* memory, u32 line, u32* i) {
 
 void set_tokens(Memory* memory) {
     memory->len_tokens = 0;
-    memory->len_bytes = 0;
+    memory->len_heap = 0;
     u32 line = 1;
     for (u32 i = 0; i < memory->len_chars;) {
         switch (memory->chars[i]) {
@@ -288,11 +288,11 @@ static void set_heap_char(Memory* memory, Token token) {
             ++j;
             EXIT_IF(string.len <= j);
         }
-        EXIT_IF(CAP_HEAP8 <= memory->len_bytes);
+        EXIT_IF(CAP_HEAP8 <= memory->len_heap);
         if (escaped && (string.chars[j] == 'n')) {
-            memory->vm.heap[memory->len_bytes++] = '\n';
+            memory->vm.heap[memory->len_heap++] = '\n';
         } else {
-            memory->vm.heap[memory->len_bytes++] = string.chars[j];
+            memory->vm.heap[memory->len_heap++] = string.chars[j];
         }
     }
 }
@@ -309,26 +309,26 @@ static void set_heap_char(Memory* memory, Token token) {
 template <typename T, u32 N>
 static void set_heap(Token token, Memory* memory, u32* i) {
     if (token.tag == TOKEN_U32) {
-        const u32 n = memory->len_bytes + sizeof(T);
+        const u32 n = memory->len_heap + sizeof(T);
         EXIT_IF(CAP_HEAP8 < n);
         if (N < token.body.as_u32) {
             ERROR_PRINT(token);
         }
         const i32 x = static_cast<T>(token.body.as_u32);
-        memcpy(&memory->vm.heap[memory->len_bytes], &x, sizeof(T));
-        memory->len_bytes = n;
+        memcpy(&memory->vm.heap[memory->len_heap], &x, sizeof(T));
+        memory->len_heap = n;
         return;
     } else if (token.tag == TOKEN_MINUS) {
         SET_NEXT(memory, token, *i);
         if (token.tag == TOKEN_U32) {
-            const u32 n = memory->len_bytes + sizeof(T);
+            const u32 n = memory->len_heap + sizeof(T);
             EXIT_IF(CAP_HEAP8 < n);
             if ((N + 1) < token.body.as_u32) {
                 ERROR_PRINT(token);
             }
             const i32 x = -static_cast<T>(token.body.as_u32);
-            memcpy(&memory->vm.heap[memory->len_bytes], &x, sizeof(T));
-            memory->len_bytes = n;
+            memcpy(&memory->vm.heap[memory->len_heap], &x, sizeof(T));
+            memory->len_heap = n;
             return;
         }
     }
@@ -337,21 +337,21 @@ static void set_heap(Token token, Memory* memory, u32* i) {
 
 static void set_heap_f32(Token token, Memory* memory, u32* i) {
     if (token.tag == TOKEN_F32) {
-        const u32 n = memory->len_bytes + sizeof(f32);
+        const u32 n = memory->len_heap + sizeof(f32);
         EXIT_IF(CAP_HEAP8 < n);
         const i32 x = static_cast<i32>(token.body.as_u32);
-        memcpy(&memory->vm.heap[memory->len_bytes], &x, sizeof(f32));
-        memory->len_bytes = n;
+        memcpy(&memory->vm.heap[memory->len_heap], &x, sizeof(f32));
+        memory->len_heap = n;
         return;
     } else if (token.tag == TOKEN_MINUS) {
         SET_NEXT(memory, token, *i);
         if (token.tag == TOKEN_F32) {
-            const u32 n = memory->len_bytes + sizeof(f32);
+            const u32 n = memory->len_heap + sizeof(f32);
             EXIT_IF(CAP_HEAP8 < n);
             token.body.as_f32 = -token.body.as_f32;
             const i32 x = static_cast<i32>(token.body.as_u32);
-            memcpy(&memory->vm.heap[memory->len_bytes], &x, sizeof(f32));
-            memory->len_bytes = n;
+            memcpy(&memory->vm.heap[memory->len_heap], &x, sizeof(f32));
+            memory->len_heap = n;
             return;
         }
     }

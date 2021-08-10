@@ -15,17 +15,18 @@ static void set_chars_from_file(Memory* memory, const char* path) {
 }
 
 static void insts_to_bytes(const Vm*   vm,
-                           u32         count_bytes,
-                           u32         count_inst,
+                           u32         count_heap,
+                           u32         count_insts,
                            const char* path) {
-    EXIT_IF(CAP_HEAP8 <= count_bytes);
-    EXIT_IF(CAP_INSTS <= count_inst);
+    EXIT_IF(CAP_HEAP8 <= count_heap);
+    EXIT_IF(CAP_INSTS <= count_insts);
     File* file = fopen(path, "wb");
     EXIT_IF(!file);
-    const Header header = {MAGIC, count_bytes, count_inst};
+    const Header header = {MAGIC, count_heap, count_insts};
     EXIT_IF(fwrite(&header, sizeof(Header), 1, file) != 1);
-    EXIT_IF(fwrite(&vm->heap, sizeof(i8), count_bytes, file) != count_bytes);
-    EXIT_IF(fwrite(&vm->insts, sizeof(Inst), count_inst, file) != count_inst);
+    EXIT_IF(fwrite(&vm->heap, sizeof(i8), count_heap, file) != count_heap);
+    EXIT_IF(fwrite(&vm->insts, sizeof(Inst), count_insts, file) !=
+            count_insts);
     fclose(file);
 }
 
@@ -38,7 +39,7 @@ i32 main(i32 n, const char** args) {
         set_tokens(memory);
         set_insts(memory);
         insts_to_bytes(&memory->vm,
-                       memory->len_bytes,
+                       memory->len_heap,
                        memory->len_pre_insts,
                        args[2]);
         free(memory);
