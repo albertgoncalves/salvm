@@ -23,9 +23,7 @@ enum SizeTag {
 };
 
 enum TokenTag {
-    TOKEN_UNKNOWN = 0,
-
-    TOKEN_INST,
+    TOKEN_INST = 0,
 
     TOKEN_STR,
     TOKEN_U32,

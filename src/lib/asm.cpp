@@ -21,15 +21,9 @@ struct Position {
         return &memory->field[memory->len_##field++]; \
     }
 
+ALLOC_MEMORY(alloc_token, CAP_TOKENS, tokens, Token)
 ALLOC_MEMORY(alloc_pre_inst, CAP_INSTS, pre_insts, PreInst)
 ALLOC_MEMORY(alloc_label, CAP_LABELS, labels, Label)
-
-static Token* alloc_token(Memory* memory) {
-    EXIT_IF(CAP_TOKENS <= memory->len_tokens);
-    Token* token = &memory->tokens[memory->len_tokens++];
-    token->tag = TOKEN_UNKNOWN;
-    return token;
-}
 
 #define EXIT_IF_PRINT(condition, memory, x) \
     {                                       \
@@ -74,6 +68,7 @@ String to_string(SizeTag tag) {
 
 static Position get_position(Memory* memory, u32 offset) {
     Position position = {1, 1};
+    EXIT_IF(memory->len_chars <= offset);
     for (u32 i = 0; i < offset; ++i) {
         if (memory->chars[i] == '\n') {
             ++position.row;
@@ -85,14 +80,15 @@ static Position get_position(Memory* memory, u32 offset) {
     return position;
 }
 
+static void print(File* stream, Memory* memory, u32 offset) {
+    Position position = get_position(memory, offset);
+    fprintf(stream, "%u:%u\n", position.row, position.col);
+}
+
 static void print(File* stream, Memory* memory, Token token) {
     Position position = get_position(memory, token.offset);
     fprintf(stream, "%u:%u:", position.row, position.col);
     switch (token.tag) {
-    case TOKEN_UNKNOWN: {
-        fprintf(stream, "\n");
-        break;
-    }
     case TOKEN_INST: {
         const String string = to_string(token.body.as_inst_tag);
         fprintf(stream, "`");
@@ -221,7 +217,9 @@ void set_tokens(Memory* memory) {
         case '"': {
             set_char_tag<TOKEN_QUOTE>(memory, &i);
             {
-                EXIT_IF(memory->len_chars <= i);
+                EXIT_IF_PRINT(memory->len_chars <= i,
+                              memory,
+                              memory->len_chars - 1);
                 u32  j = i;
                 bool escaped = false;
                 for (; escaped || (memory->chars[j] != '"');) {
@@ -230,7 +228,9 @@ void set_tokens(Memory* memory) {
                         escaped = true;
                     }
                     ++j;
-                    EXIT_IF(memory->len_chars <= j);
+                    EXIT_IF_PRINT(memory->len_chars <= j,
+                                  memory,
+                                  memory->len_chars - 1);
                 }
                 Token* token = alloc_token(memory);
                 token->body.as_string = {&memory->chars[i], j - i};
@@ -248,7 +248,9 @@ void set_tokens(Memory* memory) {
                 const u32 x = to_digits(memory->chars, &i);
                 if ((i < memory->len_chars) && (memory->chars[i] == '.')) {
                     ++i;
-                    EXIT_IF_PRINT(memory->len_chars <= i, memory, *token);
+                    EXIT_IF_PRINT(memory->len_chars <= i,
+                                  memory,
+                                  memory->len_chars - 1);
                     token->body.as_f32 =
                         static_cast<f32>(x) + to_decimal(memory->chars, &i);
                     token->tag = TOKEN_F32;
@@ -264,7 +266,7 @@ void set_tokens(Memory* memory) {
                     break;
                 }
             }
-            EXIT_IF_PRINT(i == j, memory, *token);
+            EXIT_IF_PRINT(i == j, memory, i);
             const String token_string = {&memory->chars[i], j - i};
             for (u32 k = 0; k < COUNT_INST_TAG; ++k) {
                 const InstTag tag = static_cast<InstTag>(k);
@@ -472,7 +474,6 @@ void set_insts(Memory* memory) {
                         set_pre_inst_f32(token, pre_inst);
                         break;
                     }
-                    case TOKEN_UNKNOWN:
                     case TOKEN_INST:
                     case TOKEN_STR:
                     case TOKEN_COLON:
@@ -492,7 +493,6 @@ void set_insts(Memory* memory) {
                     set_pre_inst_string(token, pre_inst);
                     break;
                 }
-                case TOKEN_UNKNOWN:
                 case TOKEN_INST:
                 case TOKEN_COLON:
                 case TOKEN_PLUS:
@@ -523,7 +523,6 @@ void set_insts(Memory* memory) {
                         set_pre_inst_negative_i32(token, pre_inst);
                         break;
                     }
-                    case TOKEN_UNKNOWN:
                     case TOKEN_INST:
                     case TOKEN_STR:
                     case TOKEN_F32:
@@ -540,7 +539,6 @@ void set_insts(Memory* memory) {
                     }
                     break;
                 }
-                case TOKEN_UNKNOWN:
                 case TOKEN_INST:
                 case TOKEN_STR:
                 case TOKEN_F32:
@@ -563,7 +561,6 @@ void set_insts(Memory* memory) {
                     set_pre_inst_i32(token, pre_inst);
                     break;
                 }
-                case TOKEN_UNKNOWN:
                 case TOKEN_INST:
                 case TOKEN_STR:
                 case TOKEN_F32:
@@ -593,7 +590,6 @@ void set_insts(Memory* memory) {
                     set_pre_inst_string(token, pre_inst);
                     break;
                 }
-                case TOKEN_UNKNOWN:
                 case TOKEN_INST:
                 case TOKEN_F32:
                 case TOKEN_COLON:
@@ -682,7 +678,6 @@ void set_insts(Memory* memory) {
                 }
                 break;
             }
-            case TOKEN_UNKNOWN:
             case TOKEN_STR:
             case TOKEN_U32:
             case TOKEN_F32:
@@ -698,7 +693,6 @@ void set_insts(Memory* memory) {
             }
             break;
         }
-        case TOKEN_UNKNOWN:
         case TOKEN_U32:
         case TOKEN_F32:
         case TOKEN_COLON:
