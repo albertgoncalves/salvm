@@ -23,7 +23,9 @@ enum SizeTag {
 };
 
 enum TokenTag {
-    TOKEN_INST = 0,
+    TOKEN_UNKNOWN = 0,
+
+    TOKEN_INST,
 
     TOKEN_STR,
     TOKEN_U32,
@@ -50,7 +52,7 @@ union TokenBody {
 
 struct Token {
     TokenBody body;
-    u32       line;
+    u32       offset;
     TokenTag  tag;
 };
 

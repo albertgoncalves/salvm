@@ -15,7 +15,12 @@ static Memory* MEMORY;
 TEST(test_plus_chars, {
     INJECT("+\"\\\"abcd\\\"\\n\"\n+\"!\n\"\n");
     EXIT_IF(MEMORY->len_tokens != 8);
-    EXIT_IF(MEMORY->tokens[7].line != 3);
+    for (u32 i = 1; i < MEMORY->len_tokens; ++i) {
+        EXIT_IF(MEMORY->tokens[i].offset <= MEMORY->tokens[i - 1].offset);
+    }
+    EXIT_IF(MEMORY->tokens[2].offset != 2);
+    EXIT_IF(MEMORY->tokens[6].offset != 16);
+    EXIT_IF(MEMORY->tokens[7].offset != 18);
     EXIT_IF(MEMORY->len_heap != 9);
     EXIT_IF(MEMORY->vm.heap[0] != '"');
     EXIT_IF(MEMORY->vm.heap[1] != 'a');
@@ -31,7 +36,10 @@ TEST(test_plus_chars, {
 TEST(test_plus_i8, {
     INJECT("+i8[-128 127 99 100]");
     EXIT_IF(MEMORY->len_tokens != 9);
-    EXIT_IF(MEMORY->tokens[8].line != 1);
+    for (u32 i = 1; i < MEMORY->len_tokens; ++i) {
+        EXIT_IF(MEMORY->tokens[i].offset <= MEMORY->tokens[i - 1].offset);
+    }
+    EXIT_IF(MEMORY->tokens[8].offset != 19);
     EXIT_IF(MEMORY->len_heap != 4);
     EXIT_IF(MEMORY->vm.heap[0] != -128);
     EXIT_IF(MEMORY->vm.heap[1] != 127);
@@ -42,7 +50,10 @@ TEST(test_plus_i8, {
 TEST(test_plus_i16, {
     INJECT("+i16[ 32767 -32768 99 -100 ]\n");
     EXIT_IF(MEMORY->len_tokens != 10);
-    EXIT_IF(MEMORY->tokens[9].line != 1);
+    for (u32 i = 1; i < MEMORY->len_tokens; ++i) {
+        EXIT_IF(MEMORY->tokens[i].offset <= MEMORY->tokens[i - 1].offset);
+    }
+    EXIT_IF(MEMORY->tokens[9].offset != 27);
     EXIT_IF(MEMORY->len_heap != 8);
     EXIT_IF(reinterpret_cast<i16*>(MEMORY->vm.heap)[0] != 32767);
     EXIT_IF(reinterpret_cast<i16*>(MEMORY->vm.heap)[1] != -32768);
@@ -53,7 +64,11 @@ TEST(test_plus_i16, {
 TEST(test_plus_i32, {
     INJECT("+i32[\n    -97\n    98\n    2147483647\n    -2147483648\n]\n");
     EXIT_IF(MEMORY->len_tokens != 10);
-    EXIT_IF(MEMORY->tokens[9].line != 6);
+    for (u32 i = 1; i < MEMORY->len_tokens; ++i) {
+        EXIT_IF(MEMORY->tokens[i].offset <= MEMORY->tokens[i - 1].offset);
+    }
+    EXIT_IF(MEMORY->tokens[6].offset != 25);
+    EXIT_IF(MEMORY->tokens[9].offset != 52);
     EXIT_IF(MEMORY->len_heap != 16);
     EXIT_IF(reinterpret_cast<i32*>(MEMORY->vm.heap)[0] != -97);
     EXIT_IF(reinterpret_cast<i32*>(MEMORY->vm.heap)[1] != 98);
@@ -64,7 +79,10 @@ TEST(test_plus_i32, {
 TEST(test_plus_f32, {
     INJECT("+f32[1.0 -1.0 0.1234567 -0.1234567]");
     EXIT_IF(MEMORY->len_tokens != 10);
-    EXIT_IF(MEMORY->tokens[9].line != 1);
+    for (u32 i = 1; i < MEMORY->len_tokens; ++i) {
+        EXIT_IF(MEMORY->tokens[i].offset <= MEMORY->tokens[i - 1].offset);
+    }
+    EXIT_IF(MEMORY->tokens[9].offset != 34);
     EXIT_IF(MEMORY->len_heap != 16);
     EXIT_IF(!EQ_F32(reinterpret_cast<f32*>(MEMORY->vm.heap)[0], 1.0f));
     EXIT_IF(!EQ_F32(reinterpret_cast<f32*>(MEMORY->vm.heap)[1], -1.0f));
@@ -75,7 +93,7 @@ TEST(test_plus_f32, {
 TEST(test_halt, {
     INJECT("halt\n");
     EXIT_IF(MEMORY->len_tokens != 1);
-    EXIT_IF(MEMORY->tokens[0].line != 1);
+    EXIT_IF(MEMORY->tokens[0].offset != 0);
     EXIT_IF(MEMORY->len_chars != 5);
     EXIT_IF(MEMORY->vm.insts[0].tag != INST_HALT);
 })
@@ -87,7 +105,10 @@ TEST(test_push, {
            "f: push -12345.6789\n"
            "push f\n");
     EXIT_IF(MEMORY->len_tokens != 12);
-    EXIT_IF(MEMORY->tokens[11].line != 5);
+    for (u32 i = 1; i < MEMORY->len_tokens; ++i) {
+        EXIT_IF(MEMORY->tokens[i].offset <= MEMORY->tokens[i - 1].offset);
+    }
+    EXIT_IF(MEMORY->tokens[11].offset != 59);
     EXIT_IF(MEMORY->len_chars != 61);
     EXIT_IF(MEMORY->vm.insts[0].tag != INST_PUSH);
     EXIT_IF(MEMORY->vm.insts[0].op != 2147483647);
@@ -103,7 +124,10 @@ TEST(test_push, {
 TEST(test_top, {
     INJECT("top 10\ntop -5\n");
     EXIT_IF(MEMORY->len_tokens != 5);
-    EXIT_IF(MEMORY->tokens[4].line != 2);
+    for (u32 i = 1; i < MEMORY->len_tokens; ++i) {
+        EXIT_IF(MEMORY->tokens[i].offset <= MEMORY->tokens[i - 1].offset);
+    }
+    EXIT_IF(MEMORY->tokens[4].offset != 12);
     EXIT_IF(MEMORY->len_chars != 14);
     EXIT_IF(MEMORY->vm.insts[0].tag != INST_TOP);
     EXIT_IF(MEMORY->vm.insts[0].op != 10);
@@ -114,7 +138,10 @@ TEST(test_top, {
 TEST(test_copy, {
     INJECT("copy 2\ncopy -1\n");
     EXIT_IF(MEMORY->len_tokens != 5);
-    EXIT_IF(MEMORY->tokens[4].line != 2);
+    for (u32 i = 1; i < MEMORY->len_tokens; ++i) {
+        EXIT_IF(MEMORY->tokens[i].offset <= MEMORY->tokens[i - 1].offset);
+    }
+    EXIT_IF(MEMORY->tokens[4].offset != 13);
     EXIT_IF(MEMORY->len_chars != 15);
     EXIT_IF(MEMORY->vm.insts[0].tag != INST_COPY);
     EXIT_IF(MEMORY->vm.insts[0].op != 2);
@@ -125,7 +152,10 @@ TEST(test_copy, {
 TEST(test_put, {
     INJECT("put -3\nput 4\n");
     EXIT_IF(MEMORY->len_tokens != 5);
-    EXIT_IF(MEMORY->tokens[4].line != 2);
+    for (u32 i = 1; i < MEMORY->len_tokens; ++i) {
+        EXIT_IF(MEMORY->tokens[i].offset <= MEMORY->tokens[i - 1].offset);
+    }
+    EXIT_IF(MEMORY->tokens[4].offset != 11);
     EXIT_IF(MEMORY->len_chars != 13);
     EXIT_IF(MEMORY->vm.insts[0].tag != INST_PUT);
     EXIT_IF(MEMORY->vm.insts[0].op != -3);
@@ -136,8 +166,11 @@ TEST(test_put, {
 TEST(test_call, {
     INJECT("\n\ncall f\nf: halt\ncall 4");
     EXIT_IF(MEMORY->len_tokens != 7);
-    EXIT_IF(MEMORY->tokens[0].line != 3);
-    EXIT_IF(MEMORY->tokens[6].line != 5);
+    for (u32 i = 1; i < MEMORY->len_tokens; ++i) {
+        EXIT_IF(MEMORY->tokens[i].offset <= MEMORY->tokens[i - 1].offset);
+    }
+    EXIT_IF(MEMORY->tokens[0].offset != 2);
+    EXIT_IF(MEMORY->tokens[6].offset != 22);
     EXIT_IF(MEMORY->len_chars != 23);
     EXIT_IF(MEMORY->vm.insts[0].tag != INST_CALL);
     EXIT_IF(MEMORY->vm.insts[0].op != 1);
@@ -149,7 +182,7 @@ TEST(test_call, {
 TEST(test_scl, {
     INJECT("scl\n");
     EXIT_IF(MEMORY->len_tokens != 1);
-    EXIT_IF(MEMORY->tokens[0].line != 1);
+    EXIT_IF(MEMORY->tokens[0].offset != 0);
     EXIT_IF(MEMORY->len_chars != 4);
     EXIT_IF(MEMORY->vm.insts[0].tag != INST_SCL);
 })
@@ -157,7 +190,7 @@ TEST(test_scl, {
 TEST(test_ret, {
     INJECT("ret\n");
     EXIT_IF(MEMORY->len_tokens != 1);
-    EXIT_IF(MEMORY->tokens[0].line != 1);
+    EXIT_IF(MEMORY->tokens[0].offset != 0);
     EXIT_IF(MEMORY->len_chars != 4);
     EXIT_IF(MEMORY->vm.insts[0].tag != INST_RET);
 })
@@ -165,7 +198,7 @@ TEST(test_ret, {
 TEST(test_base, {
     INJECT("base\n");
     EXIT_IF(MEMORY->len_tokens != 1);
-    EXIT_IF(MEMORY->tokens[0].line != 1);
+    EXIT_IF(MEMORY->tokens[0].offset != 0);
     EXIT_IF(MEMORY->len_chars != 5);
     EXIT_IF(MEMORY->vm.insts[0].tag != INST_BASE);
 })
@@ -173,7 +206,8 @@ TEST(test_base, {
 TEST(test_frame, {
     INJECT("frame 321\n");
     EXIT_IF(MEMORY->len_tokens != 2);
-    EXIT_IF(MEMORY->tokens[1].line != 1);
+    EXIT_IF(MEMORY->tokens[1].offset <= MEMORY->tokens[0].offset);
+    EXIT_IF(MEMORY->tokens[1].offset != 6);
     EXIT_IF(MEMORY->len_chars != 10);
     EXIT_IF(MEMORY->vm.insts[0].tag != INST_FRAME);
     EXIT_IF(MEMORY->vm.insts[0].op != 321);
@@ -182,7 +216,7 @@ TEST(test_frame, {
 TEST(test_reset, {
     INJECT("reset\n");
     EXIT_IF(MEMORY->len_tokens != 1);
-    EXIT_IF(MEMORY->tokens[0].line != 1);
+    EXIT_IF(MEMORY->tokens[0].offset != 0);
     EXIT_IF(MEMORY->len_chars != 6);
     EXIT_IF(MEMORY->vm.insts[0].tag != INST_RESET);
 })
@@ -190,7 +224,10 @@ TEST(test_reset, {
 TEST(test_jpz, {
     INJECT("f: jpz 9\njpz f");
     EXIT_IF(MEMORY->len_tokens != 6);
-    EXIT_IF(MEMORY->tokens[5].line != 2);
+    for (u32 i = 1; i < MEMORY->len_tokens; ++i) {
+        EXIT_IF(MEMORY->tokens[i].offset <= MEMORY->tokens[i - 1].offset);
+    }
+    EXIT_IF(MEMORY->tokens[5].offset != 13);
     EXIT_IF(MEMORY->len_chars != 14);
     EXIT_IF(MEMORY->vm.insts[0].tag != INST_JPZ);
     EXIT_IF(MEMORY->vm.insts[0].op != 9);
@@ -201,7 +238,10 @@ TEST(test_jpz, {
 TEST(test_jump, {
     INJECT("jump 8\nf: jump f");
     EXIT_IF(MEMORY->len_tokens != 6);
-    EXIT_IF(MEMORY->tokens[5].line != 2);
+    for (u32 i = 1; i < MEMORY->len_tokens; ++i) {
+        EXIT_IF(MEMORY->tokens[i].offset <= MEMORY->tokens[i - 1].offset);
+    }
+    EXIT_IF(MEMORY->tokens[5].offset != 15);
     EXIT_IF(MEMORY->len_chars != 16);
     EXIT_IF(MEMORY->vm.insts[0].tag != INST_JUMP);
     EXIT_IF(MEMORY->vm.insts[0].op != 8);
@@ -212,7 +252,7 @@ TEST(test_jump, {
 TEST(test_rd8, {
     INJECT("rd8\n");
     EXIT_IF(MEMORY->len_tokens != 1);
-    EXIT_IF(MEMORY->tokens[0].line != 1);
+    EXIT_IF(MEMORY->tokens[0].offset != 0);
     EXIT_IF(MEMORY->len_chars != 4);
     EXIT_IF(MEMORY->vm.insts[0].tag != INST_RD8);
 })
@@ -220,7 +260,7 @@ TEST(test_rd8, {
 TEST(test_rd16, {
     INJECT("rd16\n");
     EXIT_IF(MEMORY->len_tokens != 1);
-    EXIT_IF(MEMORY->tokens[0].line != 1);
+    EXIT_IF(MEMORY->tokens[0].offset != 0);
     EXIT_IF(MEMORY->len_chars != 5);
     EXIT_IF(MEMORY->vm.insts[0].tag != INST_RD16);
 })
@@ -228,7 +268,7 @@ TEST(test_rd16, {
 TEST(test_rd32, {
     INJECT("rd32\n");
     EXIT_IF(MEMORY->len_tokens != 1);
-    EXIT_IF(MEMORY->tokens[0].line != 1);
+    EXIT_IF(MEMORY->tokens[0].offset != 0);
     EXIT_IF(MEMORY->len_chars != 5);
     EXIT_IF(MEMORY->vm.insts[0].tag != INST_RD32);
 })
@@ -236,7 +276,7 @@ TEST(test_rd32, {
 TEST(test_sv8, {
     INJECT("sv8\n");
     EXIT_IF(MEMORY->len_tokens != 1);
-    EXIT_IF(MEMORY->tokens[0].line != 1);
+    EXIT_IF(MEMORY->tokens[0].offset != 0);
     EXIT_IF(MEMORY->len_chars != 4);
     EXIT_IF(MEMORY->vm.insts[0].tag != INST_SV8);
 })
@@ -244,7 +284,7 @@ TEST(test_sv8, {
 TEST(test_sv16, {
     INJECT("sv16\n");
     EXIT_IF(MEMORY->len_tokens != 1);
-    EXIT_IF(MEMORY->tokens[0].line != 1);
+    EXIT_IF(MEMORY->tokens[0].offset != 0);
     EXIT_IF(MEMORY->len_chars != 5);
     EXIT_IF(MEMORY->vm.insts[0].tag != INST_SV16);
 })
@@ -252,7 +292,7 @@ TEST(test_sv16, {
 TEST(test_sv32, {
     INJECT("sv32\n");
     EXIT_IF(MEMORY->len_tokens != 1);
-    EXIT_IF(MEMORY->tokens[0].line != 1);
+    EXIT_IF(MEMORY->tokens[0].offset != 0);
     EXIT_IF(MEMORY->len_chars != 5);
     EXIT_IF(MEMORY->vm.insts[0].tag != INST_SV32);
 })
@@ -260,7 +300,7 @@ TEST(test_sv32, {
 TEST(test_rdf32, {
     INJECT("rdf32\n");
     EXIT_IF(MEMORY->len_tokens != 1);
-    EXIT_IF(MEMORY->tokens[0].line != 1);
+    EXIT_IF(MEMORY->tokens[0].offset != 0);
     EXIT_IF(MEMORY->len_chars != 6);
     EXIT_IF(MEMORY->vm.insts[0].tag != INST_RDF32);
 })
@@ -268,7 +308,7 @@ TEST(test_rdf32, {
 TEST(test_svf32, {
     INJECT("svf32\n");
     EXIT_IF(MEMORY->len_tokens != 1);
-    EXIT_IF(MEMORY->tokens[0].line != 1);
+    EXIT_IF(MEMORY->tokens[0].offset != 0);
     EXIT_IF(MEMORY->len_chars != 6);
     EXIT_IF(MEMORY->vm.insts[0].tag != INST_SVF32);
 })
@@ -276,7 +316,7 @@ TEST(test_svf32, {
 TEST(test_not, {
     INJECT("not\n");
     EXIT_IF(MEMORY->len_tokens != 1);
-    EXIT_IF(MEMORY->tokens[0].line != 1);
+    EXIT_IF(MEMORY->tokens[0].offset != 0);
     EXIT_IF(MEMORY->len_chars != 4);
     EXIT_IF(MEMORY->vm.insts[0].tag != INST_NOT);
 })
@@ -284,7 +324,7 @@ TEST(test_not, {
 TEST(test_eq, {
     INJECT("eq\n");
     EXIT_IF(MEMORY->len_tokens != 1);
-    EXIT_IF(MEMORY->tokens[0].line != 1);
+    EXIT_IF(MEMORY->tokens[0].offset != 0);
     EXIT_IF(MEMORY->len_chars != 3);
     EXIT_IF(MEMORY->vm.insts[0].tag != INST_EQ);
 })
@@ -292,7 +332,7 @@ TEST(test_eq, {
 TEST(test_sigi, {
     INJECT("sigi\n");
     EXIT_IF(MEMORY->len_tokens != 1);
-    EXIT_IF(MEMORY->tokens[0].line != 1);
+    EXIT_IF(MEMORY->tokens[0].offset != 0);
     EXIT_IF(MEMORY->len_chars != 5);
     EXIT_IF(MEMORY->vm.insts[0].tag != INST_SIGI);
 })
@@ -300,7 +340,7 @@ TEST(test_sigi, {
 TEST(test_sigf, {
     INJECT("sigf\n");
     EXIT_IF(MEMORY->len_tokens != 1);
-    EXIT_IF(MEMORY->tokens[0].line != 1);
+    EXIT_IF(MEMORY->tokens[0].offset != 0);
     EXIT_IF(MEMORY->len_chars != 5);
     EXIT_IF(MEMORY->vm.insts[0].tag != INST_SIGF);
 })
@@ -308,7 +348,7 @@ TEST(test_sigf, {
 TEST(test_addi, {
     INJECT("addi\n");
     EXIT_IF(MEMORY->len_tokens != 1);
-    EXIT_IF(MEMORY->tokens[0].line != 1);
+    EXIT_IF(MEMORY->tokens[0].offset != 0);
     EXIT_IF(MEMORY->len_chars != 5);
     EXIT_IF(MEMORY->vm.insts[0].tag != INST_ADDI);
 })
@@ -316,7 +356,7 @@ TEST(test_addi, {
 TEST(test_subi, {
     INJECT("subi\n");
     EXIT_IF(MEMORY->len_tokens != 1);
-    EXIT_IF(MEMORY->tokens[0].line != 1);
+    EXIT_IF(MEMORY->tokens[0].offset != 0);
     EXIT_IF(MEMORY->len_chars != 5);
     EXIT_IF(MEMORY->vm.insts[0].tag != INST_SUBI);
 })
@@ -324,7 +364,7 @@ TEST(test_subi, {
 TEST(test_muli, {
     INJECT("muli\n");
     EXIT_IF(MEMORY->len_tokens != 1);
-    EXIT_IF(MEMORY->tokens[0].line != 1);
+    EXIT_IF(MEMORY->tokens[0].offset != 0);
     EXIT_IF(MEMORY->len_chars != 5);
     EXIT_IF(MEMORY->vm.insts[0].tag != INST_MULI);
 })
@@ -332,7 +372,7 @@ TEST(test_muli, {
 TEST(test_divi, {
     INJECT("divi\n");
     EXIT_IF(MEMORY->len_tokens != 1);
-    EXIT_IF(MEMORY->tokens[0].line != 1);
+    EXIT_IF(MEMORY->tokens[0].offset != 0);
     EXIT_IF(MEMORY->len_chars != 5);
     EXIT_IF(MEMORY->vm.insts[0].tag != INST_DIVI);
 })
@@ -340,7 +380,7 @@ TEST(test_divi, {
 TEST(test_addf, {
     INJECT("addf\n");
     EXIT_IF(MEMORY->len_tokens != 1);
-    EXIT_IF(MEMORY->tokens[0].line != 1);
+    EXIT_IF(MEMORY->tokens[0].offset != 0);
     EXIT_IF(MEMORY->len_chars != 5);
     EXIT_IF(MEMORY->vm.insts[0].tag != INST_ADDF);
 })
@@ -348,7 +388,7 @@ TEST(test_addf, {
 TEST(test_subf, {
     INJECT("subf\n");
     EXIT_IF(MEMORY->len_tokens != 1);
-    EXIT_IF(MEMORY->tokens[0].line != 1);
+    EXIT_IF(MEMORY->tokens[0].offset != 0);
     EXIT_IF(MEMORY->len_chars != 5);
     EXIT_IF(MEMORY->vm.insts[0].tag != INST_SUBF);
 })
@@ -356,7 +396,7 @@ TEST(test_subf, {
 TEST(test_mulf, {
     INJECT("mulf\n");
     EXIT_IF(MEMORY->len_tokens != 1);
-    EXIT_IF(MEMORY->tokens[0].line != 1);
+    EXIT_IF(MEMORY->tokens[0].offset != 0);
     EXIT_IF(MEMORY->len_chars != 5);
     EXIT_IF(MEMORY->vm.insts[0].tag != INST_MULF);
 })
@@ -364,7 +404,7 @@ TEST(test_mulf, {
 TEST(test_divf, {
     INJECT("divf\n");
     EXIT_IF(MEMORY->len_tokens != 1);
-    EXIT_IF(MEMORY->tokens[0].line != 1);
+    EXIT_IF(MEMORY->tokens[0].offset != 0);
     EXIT_IF(MEMORY->len_chars != 5);
     EXIT_IF(MEMORY->vm.insts[0].tag != INST_DIVF);
 })
@@ -372,7 +412,7 @@ TEST(test_divf, {
 TEST(test_lti, {
     INJECT("lti\n");
     EXIT_IF(MEMORY->len_tokens != 1);
-    EXIT_IF(MEMORY->tokens[0].line != 1);
+    EXIT_IF(MEMORY->tokens[0].offset != 0);
     EXIT_IF(MEMORY->len_chars != 4);
     EXIT_IF(MEMORY->vm.insts[0].tag != INST_LTI);
 })
@@ -380,7 +420,7 @@ TEST(test_lti, {
 TEST(test_lei, {
     INJECT("lei\n");
     EXIT_IF(MEMORY->len_tokens != 1);
-    EXIT_IF(MEMORY->tokens[0].line != 1);
+    EXIT_IF(MEMORY->tokens[0].offset != 0);
     EXIT_IF(MEMORY->len_chars != 4);
     EXIT_IF(MEMORY->vm.insts[0].tag != INST_LEI);
 })
@@ -388,39 +428,39 @@ TEST(test_lei, {
 TEST(test_gti, {
     INJECT("gti\n");
     EXIT_IF(MEMORY->len_tokens != 1);
-    EXIT_IF(MEMORY->tokens[0].line != 1);
+    EXIT_IF(MEMORY->tokens[0].offset != 0);
     EXIT_IF(MEMORY->len_chars != 4);
     EXIT_IF(MEMORY->vm.insts[0].tag != INST_GTI);
 })
 
 TEST(test_gei, {
-    INJECT("gei\n");
+    INJECT("  gei\n");
     EXIT_IF(MEMORY->len_tokens != 1);
-    EXIT_IF(MEMORY->tokens[0].line != 1);
-    EXIT_IF(MEMORY->len_chars != 4);
+    EXIT_IF(MEMORY->tokens[0].offset != 2);
+    EXIT_IF(MEMORY->len_chars != 6);
     EXIT_IF(MEMORY->vm.insts[0].tag != INST_GEI);
 })
 
 TEST(test_ltf, {
     INJECT("ltf\n");
     EXIT_IF(MEMORY->len_tokens != 1);
-    EXIT_IF(MEMORY->tokens[0].line != 1);
+    EXIT_IF(MEMORY->tokens[0].offset != 0);
     EXIT_IF(MEMORY->len_chars != 4);
     EXIT_IF(MEMORY->vm.insts[0].tag != INST_LTF);
 })
 
 TEST(test_lef, {
-    INJECT("lef\n");
+    INJECT("\nlef\n");
     EXIT_IF(MEMORY->len_tokens != 1);
-    EXIT_IF(MEMORY->tokens[0].line != 1);
-    EXIT_IF(MEMORY->len_chars != 4);
+    EXIT_IF(MEMORY->tokens[0].offset != 1);
+    EXIT_IF(MEMORY->len_chars != 5);
     EXIT_IF(MEMORY->vm.insts[0].tag != INST_LEF);
 })
 
 TEST(test_gtf, {
     INJECT("gtf\n");
     EXIT_IF(MEMORY->len_tokens != 1);
-    EXIT_IF(MEMORY->tokens[0].line != 1);
+    EXIT_IF(MEMORY->tokens[0].offset != 0);
     EXIT_IF(MEMORY->len_chars != 4);
     EXIT_IF(MEMORY->vm.insts[0].tag != INST_GTF);
 })
@@ -428,7 +468,7 @@ TEST(test_gtf, {
 TEST(test_gef, {
     INJECT("gef\n");
     EXIT_IF(MEMORY->len_tokens != 1);
-    EXIT_IF(MEMORY->tokens[0].line != 1);
+    EXIT_IF(MEMORY->tokens[0].offset != 0);
     EXIT_IF(MEMORY->len_chars != 4);
     EXIT_IF(MEMORY->vm.insts[0].tag != INST_GEF);
 })
@@ -436,7 +476,8 @@ TEST(test_gef, {
 TEST(test_native, {
     INJECT("native 1");
     EXIT_IF(MEMORY->len_tokens != 2);
-    EXIT_IF(MEMORY->tokens[1].line != 1);
+    EXIT_IF(MEMORY->tokens[1].offset <= MEMORY->tokens[0].offset);
+    EXIT_IF(MEMORY->tokens[1].offset != 7);
     EXIT_IF(MEMORY->len_chars != 8);
     EXIT_IF(MEMORY->vm.insts[0].tag != INST_NATIVE);
     EXIT_IF(MEMORY->vm.insts[0].op != 1);
