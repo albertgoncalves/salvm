@@ -12,6 +12,7 @@ static void set_chars_from_file(Memory* memory, const char* path) {
             memory->len_chars);
     fclose(file);
     memory->chars[memory->len_chars] = '\0';
+    memory->path = path;
 }
 
 static void insts_to_bytes(const Vm*   vm,

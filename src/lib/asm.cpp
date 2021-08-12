@@ -82,12 +82,12 @@ static Position get_position(Memory* memory, u32 offset) {
 
 static void print(File* stream, Memory* memory, u32 offset) {
     Position position = get_position(memory, offset);
-    fprintf(stream, "%u:%u\n", position.row, position.col);
+    fprintf(stream, "%s:%u:%u\n", memory->path, position.row, position.col);
 }
 
 static void print(File* stream, Memory* memory, Token token) {
     Position position = get_position(memory, token.offset);
-    fprintf(stream, "%u:%u:", position.row, position.col);
+    fprintf(stream, "%s:%u:%u:", memory->path, position.row, position.col);
     switch (token.tag) {
     case TOKEN_INST: {
         const String string = to_string(token.body.as_inst_tag);
