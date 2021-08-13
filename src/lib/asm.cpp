@@ -242,6 +242,9 @@ void set_tokens(Memory* memory) {
             break;
         }
         default: {
+            EXIT_IF_PRINT(!(IS_ALPHA_OR_DIGIT_OR_PUNCT(memory->chars[i])),
+                          memory,
+                          i);
             Token* token = alloc_token(memory);
             token->offset = i;
             if (IS_DIGIT(memory->chars[i])) {
