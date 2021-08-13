@@ -23,6 +23,12 @@ typedef FILE File;
 
 #define I32_MAX 0x7FFFFFFF
 
+template <typename T>
+struct Vec2 {
+    T x;
+    T y;
+};
+
 #define ERROR()                                                      \
     {                                                                \
         fprintf(stderr, "%s:%s:%d\n", __FILE__, __func__, __LINE__); \

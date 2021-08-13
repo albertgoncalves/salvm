@@ -1,10 +1,5 @@
 #include "asm.hpp"
 
-struct Position {
-    u32 row;
-    u32 col;
-};
-
 #define IS_ALPHA(x) \
     ((('A' <= (x)) && ((x) <= 'Z')) || (('a' <= (x)) && ((x) <= 'z')))
 
@@ -66,28 +61,28 @@ String to_string(SizeTag tag) {
     }
 }
 
-static Position get_position(Memory* memory, u32 offset) {
-    Position position = {1, 1};
+static Vec2<u32> get_position(Memory* memory, u32 offset) {
+    Vec2<u32> position = {1, 1};
     EXIT_IF(memory->len_chars <= offset);
     for (u32 i = 0; i < offset; ++i) {
         if (memory->chars[i] == '\n') {
-            ++position.row;
-            position.col = 1;
+            ++position.y;
+            position.x = 1;
         } else {
-            ++position.col;
+            ++position.x;
         }
     }
     return position;
 }
 
 static void print(File* stream, Memory* memory, u32 offset) {
-    Position position = get_position(memory, offset);
-    fprintf(stream, "%s:%u:%u\n", memory->path, position.row, position.col);
+    const Vec2<u32> position = get_position(memory, offset);
+    fprintf(stream, "%s:%u:%u\n", memory->path, position.y, position.x);
 }
 
 static void print(File* stream, Memory* memory, Token token) {
-    Position position = get_position(memory, token.offset);
-    fprintf(stream, "%s:%u:%u:", memory->path, position.row, position.col);
+    const Vec2<u32> position = get_position(memory, token.offset);
+    fprintf(stream, "%s:%u:%u:", memory->path, position.y, position.x);
     switch (token.tag) {
     case TOKEN_INST: {
         const String string = to_string(token.body.as_inst_tag);
