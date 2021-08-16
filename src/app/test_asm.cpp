@@ -1,6 +1,8 @@
 #include "asm.hpp"
 #include "test.hpp"
 
+#include <string.h>
+
 static Memory* MEMORY;
 
 #define INJECT(literal)                                  \
@@ -483,11 +485,11 @@ TEST(test_native, {
     EXIT_IF(MEMORY->vm.insts[0].op != 1);
 })
 
-#define TEST_STR(x, literal, len_)                           \
-    {                                                        \
-        const String result = to_string(x);                  \
-        EXIT_IF(result.len != len_);                         \
-        EXIT_IF(!EQ_STR(result, ((String){literal, len_}))); \
+#define TEST_STR(x, literal, len_)                    \
+    {                                                 \
+        const String result = to_string(x);           \
+        EXIT_IF(result.len != len_);                  \
+        EXIT_IF(result != ((String){literal, len_})); \
     }
 
 TEST(test_halt_as_string, { TEST_STR(INST_HALT, "halt", 4); })

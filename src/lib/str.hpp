@@ -14,13 +14,15 @@ struct String {
         sizeof(literal) - 1, \
     })
 
-#define EQ_STR(a, b) ((a.len == b.len) && (!memcmp(a.chars, b.chars, a.len)))
-
 #define FMT_STR "%.*s"
 
 #define ARG_STR(string) string.len, string.chars
 
 #define PRINT_STR(stream, string) fprintf(stream, FMT_STR, ARG_STR(string))
+
+bool operator==(String, String);
+
+bool operator!=(String, String);
 
 String to_string(InstTag);
 

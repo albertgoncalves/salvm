@@ -1,5 +1,15 @@
 #include "str.hpp"
 
+#include <string.h>
+
+bool operator==(String a, String b) {
+    return (a.len == b.len) && (!memcmp(a.chars, b.chars, a.len));
+}
+
+bool operator!=(String a, String b) {
+    return (a.len != b.len) || memcmp(a.chars, b.chars, a.len);
+}
+
 String to_string(InstTag tag) {
     switch (tag) {
     case INST_HALT: {

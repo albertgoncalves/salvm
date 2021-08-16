@@ -1,13 +1,6 @@
 #ifndef __ASM_H__
 #define __ASM_H__
 
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-W#warnings"
-
-#include <string.h>
-
-#pragma GCC diagnostic pop
-
 #include "str.hpp"
 
 #define CAP_CHARS  (1 << 12)

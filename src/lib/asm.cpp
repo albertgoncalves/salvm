@@ -1,5 +1,7 @@
 #include "asm.hpp"
 
+#include <string.h>
+
 #define IS_ALPHA(x) \
     ((('A' <= (x)) && ((x) <= 'Z')) || (('a' <= (x)) && ((x) <= 'z')))
 
@@ -269,7 +271,7 @@ void set_tokens(Memory* memory) {
             for (u32 k = 0; k < COUNT_INST_TAG; ++k) {
                 const InstTag tag = static_cast<InstTag>(k);
                 const String  inst_string = to_string(tag);
-                if (EQ_STR(token_string, inst_string)) {
+                if (token_string == inst_string) {
                     token->body.as_inst_tag = tag;
                     token->tag = TOKEN_INST;
                     goto end;
@@ -278,7 +280,7 @@ void set_tokens(Memory* memory) {
             for (u32 k = 0; k < COUNT_SIZE_TAG; ++k) {
                 const SizeTag tag = static_cast<SizeTag>(k);
                 const String  size_string = to_string(tag);
-                if (EQ_STR(token_string, size_string)) {
+                if (token_string == size_string) {
                     token->body.as_size_tag = tag;
                     token->tag = TOKEN_SIZE;
                     goto end;
@@ -709,7 +711,7 @@ void set_insts(Memory* memory) {
         if (!pre_inst->resolved) {
             for (u32 j = 0; j < memory->len_labels; ++j) {
                 const Label label = memory->labels[j];
-                if (EQ_STR(label.string, pre_inst->label)) {
+                if (label.string == pre_inst->label) {
                     pre_inst->inst.op = label.index_inst;
                     pre_inst->resolved = true;
                     break;
