@@ -26,20 +26,14 @@ ALLOC_MEMORY(alloc_label, CAP_LABELS, labels, Label)
     {                                       \
         if (condition) {                    \
             print(stderr, memory, x);       \
-            fprintf(stderr,                 \
-                    "%s:%s:%d `%s`\n",      \
-                    __FILE__,               \
-                    __func__,               \
-                    __LINE__,               \
-                    #condition);            \
-            exit(EXIT_FAILURE);             \
+            EXIT_WITH(#condition);          \
         }                                   \
     }
 
-#define ERROR_PRINT(memory, x)    \
+#define EXIT_PRINT(memory, x)     \
     {                             \
         print(stderr, memory, x); \
-        ERROR();                  \
+        EXIT();                   \
     }
 
 String to_string(SizeTag tag) {
@@ -58,7 +52,7 @@ String to_string(SizeTag tag) {
     }
     case COUNT_SIZE_TAG:
     default: {
-        ERROR();
+        EXIT();
     }
     }
 }
@@ -139,7 +133,7 @@ static void print(File* stream, Memory* memory, Token token) {
         break;
     }
     default: {
-        ERROR();
+        EXIT();
     }
     }
 }
@@ -339,7 +333,7 @@ static void set_heap_char(Memory* memory, Token token) {
     {                                    \
         ++(i);                           \
         if (memory->len_tokens <= (i)) { \
-            ERROR_PRINT(memory, token);  \
+            EXIT_PRINT(memory, token);   \
         }                                \
         token = memory->tokens[(i)];     \
     }
@@ -350,7 +344,7 @@ static void set_heap(Token token, Memory* memory, u32* i) {
         const u32 n = memory->len_heap + sizeof(T);
         EXIT_IF_PRINT(CAP_HEAP8 < n, memory, token);
         if (N < token.body.as_u32) {
-            ERROR_PRINT(memory, token);
+            EXIT_PRINT(memory, token);
         }
         const i32 x = static_cast<T>(token.body.as_u32);
         memcpy(&memory->vm.heap[memory->len_heap], &x, sizeof(T));
@@ -362,7 +356,7 @@ static void set_heap(Token token, Memory* memory, u32* i) {
             const u32 n = memory->len_heap + sizeof(T);
             EXIT_IF_PRINT(CAP_HEAP8 < n, memory, token);
             if ((N + 1) < token.body.as_u32) {
-                ERROR_PRINT(memory, token);
+                EXIT_PRINT(memory, token);
             }
             const i32 x = -static_cast<T>(token.body.as_u32);
             memcpy(&memory->vm.heap[memory->len_heap], &x, sizeof(T));
@@ -370,7 +364,7 @@ static void set_heap(Token token, Memory* memory, u32* i) {
             return;
         }
     }
-    ERROR_PRINT(memory, token);
+    EXIT_PRINT(memory, token);
 }
 
 static void set_heap_f32(Token token, Memory* memory, u32* i) {
@@ -393,7 +387,7 @@ static void set_heap_f32(Token token, Memory* memory, u32* i) {
             return;
         }
     }
-    ERROR_PRINT(memory, token);
+    EXIT_PRINT(memory, token);
 }
 
 void set_insts(Memory* memory) {
@@ -484,7 +478,7 @@ void set_insts(Memory* memory) {
                     case TOKEN_LBRACKET:
                     case TOKEN_RBRACKET:
                     default: {
-                        ERROR_PRINT(memory, token);
+                        EXIT_PRINT(memory, token);
                     }
                     }
                     break;
@@ -501,7 +495,7 @@ void set_insts(Memory* memory) {
                 case TOKEN_LBRACKET:
                 case TOKEN_RBRACKET:
                 default: {
-                    ERROR_PRINT(memory, token);
+                    EXIT_PRINT(memory, token);
                 }
                 }
                 break;
@@ -534,7 +528,7 @@ void set_insts(Memory* memory) {
                     case TOKEN_LBRACKET:
                     case TOKEN_RBRACKET:
                     default: {
-                        ERROR_PRINT(memory, token);
+                        EXIT_PRINT(memory, token);
                     }
                     }
                     break;
@@ -549,7 +543,7 @@ void set_insts(Memory* memory) {
                 case TOKEN_LBRACKET:
                 case TOKEN_RBRACKET:
                 default: {
-                    ERROR_PRINT(memory, token);
+                    EXIT_PRINT(memory, token);
                 }
                 }
                 break;
@@ -572,7 +566,7 @@ void set_insts(Memory* memory) {
                 case TOKEN_LBRACKET:
                 case TOKEN_RBRACKET:
                 default: {
-                    ERROR_PRINT(memory, token);
+                    EXIT_PRINT(memory, token);
                 }
                 }
                 break;
@@ -600,14 +594,14 @@ void set_insts(Memory* memory) {
                 case TOKEN_LBRACKET:
                 case TOKEN_RBRACKET:
                 default: {
-                    ERROR_PRINT(memory, token);
+                    EXIT_PRINT(memory, token);
                 }
                 }
                 break;
             }
             case COUNT_INST_TAG:
             default: {
-                ERROR_PRINT(memory, token);
+                EXIT_PRINT(memory, token);
             }
             }
             break;
@@ -616,7 +610,7 @@ void set_insts(Memory* memory) {
             const String string = token.body.as_string;
             SET_NEXT(memory, token, i);
             if (token.tag != TOKEN_COLON) {
-                ERROR_PRINT(memory, token);
+                EXIT_PRINT(memory, token);
             }
             Label* label = alloc_label(memory);
             label->string = string;
@@ -631,7 +625,7 @@ void set_insts(Memory* memory) {
                 set_heap_char(memory, token);
                 SET_NEXT(memory, token, i);
                 if (token.tag != TOKEN_QUOTE) {
-                    ERROR_PRINT(memory, token);
+                    EXIT_PRINT(memory, token);
                 }
                 break;
             }
@@ -639,7 +633,7 @@ void set_insts(Memory* memory) {
                 const SizeTag tag = token.body.as_size_tag;
                 SET_NEXT(memory, token, i);
                 if (token.tag != TOKEN_LBRACKET) {
-                    ERROR_PRINT(memory, token);
+                    EXIT_PRINT(memory, token);
                 }
                 SET_NEXT(memory, token, i);
                 switch (tag) {
@@ -673,7 +667,7 @@ void set_insts(Memory* memory) {
                 }
                 case COUNT_SIZE_TAG:
                 default: {
-                    ERROR_PRINT(memory, token);
+                    EXIT_PRINT(memory, token);
                 }
                 }
                 break;
@@ -688,7 +682,7 @@ void set_insts(Memory* memory) {
             case TOKEN_LBRACKET:
             case TOKEN_RBRACKET:
             default: {
-                ERROR_PRINT(memory, token);
+                EXIT_PRINT(memory, token);
             }
             }
             break;
@@ -702,7 +696,7 @@ void set_insts(Memory* memory) {
         case TOKEN_LBRACKET:
         case TOKEN_RBRACKET:
         default: {
-            ERROR_PRINT(memory, token);
+            EXIT_PRINT(memory, token);
         }
         }
     }

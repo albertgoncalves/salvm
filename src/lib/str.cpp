@@ -157,7 +157,7 @@ String to_string(InstTag tag) {
 
     case COUNT_INST_TAG:
     default: {
-        ERROR();
+        EXIT();
     }
     }
 }

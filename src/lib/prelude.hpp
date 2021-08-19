@@ -29,21 +29,21 @@ struct Vec2 {
     T y;
 };
 
-#define ERROR()                                                      \
+#define EXIT()                                                       \
     {                                                                \
         fprintf(stderr, "%s:%s:%d\n", __FILE__, __func__, __LINE__); \
         exit(EXIT_FAILURE);                                          \
     }
 
-#define EXIT_IF(condition)         \
-    if (condition) {               \
-        fprintf(stderr,            \
-                "%s:%s:%d `%s`\n", \
-                __FILE__,          \
-                __func__,          \
-                __LINE__,          \
-                #condition);       \
-        exit(EXIT_FAILURE);        \
+#define EXIT_WITH(x)                                                         \
+    {                                                                        \
+        fprintf(stderr, "%s:%s:%d `%s`\n", __FILE__, __func__, __LINE__, x); \
+        exit(EXIT_FAILURE);                                                  \
+    }
+
+#define EXIT_IF(condition)     \
+    if (condition) {           \
+        EXIT_WITH(#condition); \
     }
 
 #define STATIC_ASSERT(condition) static_assert(condition, "!(" #condition ")")

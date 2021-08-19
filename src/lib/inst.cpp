@@ -340,7 +340,7 @@ void do_inst(Vm* vm) {
     }
     case COUNT_INST_TAG:
     default: {
-        ERROR();
+        EXIT();
     }
     }
 }
