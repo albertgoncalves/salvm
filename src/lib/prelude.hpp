@@ -46,4 +46,6 @@ struct Vec2 {
         exit(EXIT_FAILURE);        \
     }
 
+#define STATIC_ASSERT(condition) static_assert(condition, "!(" #condition ")")
+
 #endif
