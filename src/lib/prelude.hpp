@@ -6,15 +6,17 @@
 
 #include <stdint.h>
 #include <stdio.h>
-#include <stdlib.h>
+#include <unistd.h>
 
 #pragma GCC diagnostic pop
 
 typedef uint32_t u32;
+typedef size_t   usize;
 
 typedef int8_t  i8;
 typedef int16_t i16;
 typedef int32_t i32;
+typedef ssize_t isize;
 
 typedef float  f32;
 typedef double f64;
@@ -22,6 +24,9 @@ typedef double f64;
 typedef FILE File;
 
 #define I32_MAX 0x7FFFFFFF
+
+#define EXIT_SUCCESS 0
+#define EXIT_FAILURE 1
 
 template <typename T>
 struct Vec2 {
@@ -32,13 +37,13 @@ struct Vec2 {
 #define EXIT()                                                       \
     {                                                                \
         fprintf(stderr, "%s:%s:%d\n", __FILE__, __func__, __LINE__); \
-        exit(EXIT_FAILURE);                                          \
+        _exit(EXIT_FAILURE);                                         \
     }
 
 #define EXIT_WITH(x)                                                         \
     {                                                                        \
         fprintf(stderr, "%s:%s:%d `%s`\n", __FILE__, __func__, __LINE__, x); \
-        exit(EXIT_FAILURE);                                                  \
+        _exit(EXIT_FAILURE);                                                 \
     }
 
 #define EXIT_IF(condition)     \

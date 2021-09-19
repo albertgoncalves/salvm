@@ -1,3 +1,4 @@
+#include "alloc.hpp"
 #include "asm.hpp"
 #include "test.hpp"
 
@@ -521,8 +522,7 @@ i32 main() {
            sizeof(PreInst),
            sizeof(Label),
            sizeof(Memory));
-    MEMORY = reinterpret_cast<Memory*>(calloc(1, sizeof(Memory)));
-    EXIT_IF(!MEMORY);
+    MEMORY = reinterpret_cast<Memory*>(alloc(sizeof(Memory)));
     test_plus_chars();
     test_plus_i8();
     test_plus_i16();
@@ -577,7 +577,6 @@ i32 main() {
     test_scl_as_string();
     test_size_i32_as_string();
     test_size_f32_as_string();
-    free(MEMORY);
     printf("\n\n");
     return EXIT_SUCCESS;
 }

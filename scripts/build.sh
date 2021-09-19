@@ -59,7 +59,7 @@ exe () {
     cd "$WD" || exit 1
     clang-format -i -verbose src/*/*
     start=$(now)
-    for x in asm io str; do
+    for x in alloc asm io str; do
         obj -o "build/$x.o" "src/lib/$x.cpp" &
     done
     obj -o build/inst.o src/lib/inst.cpp &
@@ -68,11 +68,13 @@ exe () {
         wait -n
     done
     for x in test_asm asm; do
-        exe "${debug[@]}" -o "bin/$x" build/asm.o build/str.o src/app/$x.cpp &
+        exe "${debug[@]}" -o "bin/$x" build/alloc.o build/asm.o build/str.o \
+            src/app/$x.cpp &
     done
-    exe "${debug[@]}" -o bin/test_inst build/inst.o src/app/test_inst.cpp &
-    exe "${debug[@]}" -o bin/vm_debug build/inst.o build/io_debug.o \
-        build/str.o src/app/vm.cpp &
+    exe "${debug[@]}" -o bin/test_inst build/alloc.o build/inst.o \
+        src/app/test_inst.cpp &
+    exe "${debug[@]}" -o bin/vm_debug build/alloc.o build/inst.o \
+        build/io_debug.o build/str.o src/app/vm.cpp &
     exe "${release[@]}" -o bin/vm src/app/vm.cpp &
     for _ in $(jobs -p); do
         wait -n

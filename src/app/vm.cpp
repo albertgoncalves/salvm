@@ -1,7 +1,9 @@
+#include "alloc.hpp"
 #include "bytes.hpp"
 #include "io.hpp"
 
 #ifdef RELEASE
+    #include "alloc.cpp"
     #include "inst.cpp"
     #include "io.cpp"
 #endif
@@ -24,15 +26,13 @@ static void insts_from_bytes(Vm* vm, const char* path) {
 i32 main(i32 n, const char** args) {
     EXIT_IF(n < 2);
     {
-        Vm* vm = reinterpret_cast<Vm*>(calloc(1, sizeof(Vm)));
-        EXIT_IF(!vm);
+        Vm* vm = reinterpret_cast<Vm*>(alloc(sizeof(Vm)));
         insts_from_bytes(vm, args[1]);
         run(vm);
         {
             const i32 len = vm->index.stack_top + vm->index.stack_base;
             printf("%d\n", len == 0 ? 0 : vm->stack[len - 1].as_i32);
         }
-        free(vm);
     }
     return EXIT_SUCCESS;
 }

@@ -1,3 +1,4 @@
+#include "alloc.hpp"
 #include "inst.hpp"
 #include "test.hpp"
 
@@ -358,8 +359,7 @@ i32 main() {
            sizeof(Vm),
            sizeof(Natives),
            sizeof(Native));
-    VM = reinterpret_cast<Vm*>(calloc(1, sizeof(Vm)));
-    EXIT_IF(!VM);
+    VM = reinterpret_cast<Vm*>(alloc(sizeof(Vm)));
     test_push();
     test_top();
     test_copy();
@@ -398,6 +398,5 @@ i32 main() {
     test_gef();
     test_native_nop();
     printf("\n\n");
-    free(VM);
     return EXIT_SUCCESS;
 }

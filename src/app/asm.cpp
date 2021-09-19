@@ -1,4 +1,5 @@
 #include "asm.hpp"
+#include "alloc.hpp"
 #include "bytes.hpp"
 
 static void set_chars_from_file(Memory* memory, const char* path) {
@@ -34,8 +35,7 @@ static void insts_to_bytes(const Vm*   vm,
 i32 main(i32 n, const char** args) {
     EXIT_IF(n < 3);
     {
-        Memory* memory = reinterpret_cast<Memory*>(calloc(1, sizeof(Memory)));
-        EXIT_IF(!memory);
+        Memory* memory = reinterpret_cast<Memory*>(alloc(sizeof(Memory)));
         set_chars_from_file(memory, args[1]);
         set_tokens(memory);
         set_insts(memory);
@@ -43,7 +43,6 @@ i32 main(i32 n, const char** args) {
                        memory->len_heap,
                        memory->len_pre_insts,
                        args[2]);
-        free(memory);
     }
     return EXIT_SUCCESS;
 }
