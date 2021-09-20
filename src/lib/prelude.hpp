@@ -21,6 +21,8 @@ typedef ssize_t isize;
 typedef float  f32;
 typedef double f64;
 
+#define null nullptr
+
 typedef FILE File;
 
 #define I32_MAX 0x7FFFFFFF
