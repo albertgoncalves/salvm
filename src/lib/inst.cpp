@@ -31,8 +31,7 @@
         block;                                   \
     }
 
-static void native_nop(Vm* _) {
-    (void)_;
+static void native_nop(Vm*) {
 }
 
 NATIVE_1(native_print_char,
