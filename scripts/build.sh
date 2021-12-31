@@ -41,7 +41,6 @@ debug=(
 )
 release=(
     "-DRELEASE"
-    "-flto"
     "-g"
     "-nostdlib++"
     "-O3"
@@ -52,7 +51,7 @@ obj () {
 }
 
 exe () {
-    clang++ "${shared[@]}" -fuse-ld=lld "-I$WD/src/lib" "$@"
+    mold -run clang++ "${shared[@]}" "-I$WD/src/lib" "$@"
 }
 
 (
