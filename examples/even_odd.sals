@@ -32,9 +32,7 @@ is_odd_tco:     copy    0           ; [n, i, b, n]
                 push    0           ; [n, i, b, n, 0]
                 eq                  ; [n, i, b, n==0]
 
-                jpz     is_odd_if   ; [n, i, b]
-                push    0           ; [n, i, b, 0]
-                put     0           ; [1, i, b]
+                jpz     is_odd_if   ; [0, i, b]
                 reset               ; [..., 0, i]
                 ret                 ; [..., 0]
 
