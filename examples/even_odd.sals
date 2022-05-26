@@ -1,0 +1,45 @@
+                push    123         ; [123]
+                push    is_odd      ; [123, is_odd]
+                scl                 ; [x]
+                native  2           ; []        NATIVE_PRINTI
+                push    10          ; [10]      '\n'
+                native  1           ; []        NATIVE_PRINTC
+                halt
+
+is_even:        base                ; [..., n, i, b]
+                frame   3           ; [n, i, b]
+
+is_even_tco:    copy    0           ; [n, i, b, n]
+                push    0           ; [n, i, b, n, 0]
+                eq                  ; [n, i, b, n==0]
+
+                jpz     is_even_if  ; [n, i, b]
+                push    1           ; [n, i, b, 1]
+                put     0           ; [1, i, b]
+                reset               ; [..., 1, i]
+                ret                 ; [..., 1]
+
+is_even_if:     copy    0           ; [n, i, b, n]
+                push    1           ; [n, i, b, n, 1]
+                subi                ; [n, i, b, n - 1]
+                put     0           ; [n - 1, i, b]
+                jump    is_odd_tco
+
+is_odd:         base                ; [..., n, i, b]
+                frame   3           ; [n, i, b]
+
+is_odd_tco:     copy    0           ; [n, i, b, n]
+                push    0           ; [n, i, b, n, 0]
+                eq                  ; [n, i, b, n==0]
+
+                jpz     is_odd_if   ; [n, i, b]
+                push    0           ; [n, i, b, 0]
+                put     0           ; [1, i, b]
+                reset               ; [..., 0, i]
+                ret                 ; [..., 0]
+
+is_odd_if:      copy    0           ; [n, i, b, n]
+                push    1           ; [n, i, b, n, 1]
+                subi                ; [n, i, b, n - 1]
+                put     0           ; [n - 1, i, b]
+                jump    is_even_tco
